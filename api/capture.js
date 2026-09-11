@@ -1,0 +1,1 @@
+import{captureFlight,json}from"./lib.js";export default async function handler(req,res){try{const id=String(req.query.id||"").trim();if(!id)return json(res,400,{ok:false,error:"id required"});json(res,200,{ok:true,...await captureFlight(id)});}catch(e){json(res,e.status||500,{ok:false,error:e.message,detail:e.body})}}
