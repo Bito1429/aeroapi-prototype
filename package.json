@@ -1,0 +1,8 @@
+{
+  "name": "aeroapi-prototype",
+  "version": "2.3.0",
+  "private": true,
+  "type": "module",
+  "engines": {"node": "24.x"},
+  "dependencies": {"@neondatabase/serverless": "^1.0.2"}
+}

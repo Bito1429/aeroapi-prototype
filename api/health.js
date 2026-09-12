@@ -1,0 +1,1 @@
+import{json}from"./lib.js";export default async function handler(req,res){json(res,200,{ok:true,engine:"generic-v2.3-terminal-guarded",aeroapiKeyConfigured:!!process.env.AEROAPI_KEY,databaseConfigured:!!process.env.DATABASE_URL});}
