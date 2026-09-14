@@ -3,7 +3,7 @@ import{db,createJob,addCheckpoint}from"./db.js";
 
 const AIRPORTS=["KATL","KDFW","KDEN","KORD","KLAX","KCLT","KLAS","KPHX","KMCO","KSEA","KIAH","KJFK","KEWR","KBOS","KMSP","KDTW","KSLC","KBWI","KPHL","KSFO"];
 const START=new Date("2026-09-14T20:50:00Z");
-const END=new Date("2026-09-14T23:59:00Z");
+const END=new Date("2026-09-14T23:45:00Z");
 const BATCH_AFTER=new Date("2026-09-14T19:10:00Z");
 const TARGET=300;
 const STEP=50;
@@ -37,7 +37,7 @@ export async function registerEveningBatchStep(){
  let raw=[],airport_errors=[];
  for(const ap of AIRPORTS){
    try{const b=await aero(`/airports/${ap}/flights/scheduled_departures`,{start:scanStart.toISOString(),end:END.toISOString(),max_pages:4});raw.push(...(b.scheduled_departures||b.flights||[]));}
-   catch(e){airport_errors.push({airport:ap,error:e.message});}
+   catch(e){airport_errors.push({airport:ap,error:e.message,detail:e.body||null});}
  }
  const seen=new Map();
  for(const f of raw){
@@ -52,7 +52,7 @@ export async function registerEveningBatchStep(){
  const selected=candidates.slice(0,Math.min(STEP,need));
  const done=[],failed=[];
  for(let i=0;i<selected.length;i+=10){
-   const out=await Promise.all(selected.slice(i,i+10).map(async f=>{try{await registerOne(f,now);return{ok:true,f};}catch(e){return{ok:false,f,error:e.message};}}));
+   const out=await Promise.all(selected.slice(i,i+10).map(async f=>{try{await registerOne(f,now);return{ok:true,f};}catch(e){return{ok:false,f,error:e.message}}}));
    for(const x of out)(x.ok?done:failed).push(x);
  }
  return{done:already+done.length>=TARGET,already,registered_now:done.length,batch_total:already+done.length,target:TARGET,new_candidates:candidates.length,failed:failed.length,airport_errors};
