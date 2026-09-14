@@ -1,1 +1,1 @@
-{"crons":[{"path":"/api/bulk-register-evening","schedule":"* * * * *"}]}
+{"crons":[{"path":"/api/worker","schedule":"* * * * *"}]}
