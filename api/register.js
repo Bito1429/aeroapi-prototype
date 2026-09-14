@@ -4,7 +4,10 @@ export default async function handler(req,res){try{
  if(fid){const c=await captureFlight(fid);f={...c.flight,origin:{code_icao:c.flight.origin},destination:{code_icao:c.flight.destination}}}
  else{if(!ident||!date)return json(res,400,{ok:false,error:"ident and date required, or id"});const fs=await lookup(ident,date);if(fs.length!==1)return json(res,409,{ok:false,error:"flight selection not unique",matches:fs.map(x=>({fa_flight_id:x.fa_flight_id,ident:x.ident,scheduled_out:x.scheduled_out,origin:x.origin?.code_icao||x.origin?.code,destination:x.destination?.code_icao||x.destination?.code}))});f=fs[0];}
  if(!f.scheduled_out)return json(res,422,{ok:false,error:"scheduled_out unavailable"});
- const j=await createJob(f),s=f.scheduled_out,now=Date.now(),t120=new Date(s).getTime()-120*60000,t60=new Date(s).getTime()-60*60000;
+ const s=f.scheduled_out,now=Date.now(),scheduledOutMs=new Date(s).getTime(),minLeadMs=70*60000;
+ if(!Number.isFinite(scheduledOutMs))return json(res,422,{ok:false,error:"scheduled_out invalid"});
+ if(scheduledOutMs-now<minLeadMs)return json(res,422,{ok:false,error:"registration too late for scientific cohort",required_lead_minutes:70,scheduled_out:s,minutes_before_scheduled_out:Math.floor((scheduledOutMs-now)/60000)});
+ const j=await createJob(f),t120=scheduledOutMs-120*60000,t60=scheduledOutMs-60*60000;
  let initState="PENDING",initDue=addMin(s,-90);if(now>=t60)initState="MISSING";else if(now>=t120)initDue=new Date().toISOString();
  const init=await addCheckpoint(j.id,"INITIAL",initDue,1,initState,initDue);
  async function required(label,offset){const nominal=addMin(s,offset),state=now>=new Date(nominal).getTime()?"MISSING":"PENDING";return addCheckpoint(j.id,label,nominal,1,state,nominal);}
