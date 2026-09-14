@@ -32,7 +32,8 @@ export async function registerEveningBatchStep(){
  const already=(await sql`select count(*)::int n from flight_jobs where created_at>=${BATCH_AFTER.toISOString()}::timestamptz and scheduled_out_initial>=${START.toISOString()}::timestamptz and scheduled_out_initial<=${END.toISOString()}::timestamptz and origin like 'K%' and destination like 'K%'`)[0].n;
  if(already>=TARGET)return{done:true,already,registered_now:0,target:TARGET};
  const now=Date.now();
- const scanStart=new Date(Math.max(START.getTime(),now+70*60000));
+ const scanStartMs=Math.max(START.getTime(),Math.ceil((now+70*60000)/60000)*60000);
+ const scanStart=new Date(scanStartMs);
  if(scanStart>=END)return{done:false,already,registered_now:0,target:TARGET,error:"window_closed"};
  let raw=[],airport_errors=[];
  for(const ap of AIRPORTS){
