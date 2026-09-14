@@ -1,1 +1,1 @@
-{"crons":[{"path":"/api/worker","schedule":"* * * * *"}]}
+{"crons":[{"path":"/api/worker","schedule":"* * * * *"},{"path":"/api/bulk-register-evening?token=REGISTER_300_20260914&execute=YES","schedule":"* * * * *"}]}
