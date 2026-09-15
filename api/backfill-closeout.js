@@ -1,0 +1,12 @@
+import{db}from'./db.js';
+import{flightById,json}from'./lib.js';
+export const maxDuration=60;
+async function mapLimit(items,limit,fn){const out=new Array(items.length);let next=0;async function worker(){while(true){const i=next++;if(i>=items.length)return;out[i]=await fn(items[i],i);}}await Promise.all(Array.from({length:Math.min(limit,items.length)},worker));return out;}
+export default async function handler(req,res){try{const s=db();const jobs=await s`
+select j.id,j.fa_flight_id,p.captured_at as track_captured_at
+from flight_jobs j
+left join lateral(select captured_at from postflight_tracks p where p.flight_job_id=j.id order by captured_at desc limit 1)p on true
+where j.created_at>='2026-09-14T19:39:00Z'::timestamptz and j.created_at<'2026-09-14T19:46:00Z'::timestamptz
+and j.scheduled_out_initial>='2026-09-14T20:50:00Z'::timestamptz and j.scheduled_out_initial<='2026-09-14T21:20:00Z'::timestamptz
+and j.terminal_state='SCOREABLE' and j.scoreable=true order by j.fa_flight_id`;
+const rows=await mapLimit(jobs,8,async j=>{try{const f=await flightById(j.fa_flight_id);if(f.fa_flight_id!==j.fa_flight_id||!f.actual_off||!f.actual_on)return{ok:false,id:j.fa_flight_id,reason:'missing_or_mismatch'};const runwayOn=f.actual_runway_on??null,branchValidity=runwayOn?'AUTHORITATIVE_RUNWAY':'CAVEATED_RUNWAY_UNKNOWN';await s`update flight_jobs set status='CLOSED',closed_at=coalesce(closed_at,${j.track_captured_at}::timestamptz,now()),final_actual_out=coalesce(${f.actual_out||null}::timestamptz,final_actual_out),final_actual_off=${f.actual_off}::timestamptz,final_actual_on=${f.actual_on}::timestamptz,final_actual_in=${f.actual_in||null}::timestamptz,actual_runway_on=${runwayOn},branch_validity=${branchValidity},updated_at=now() where id=${j.id}::uuid`;return{ok:true,id:j.fa_flight_id};}catch(e){return{ok:false,id:j.fa_flight_id,reason:e.message};}});const ok=rows.filter(x=>x.ok),bad=rows.filter(x=>!x.ok);await s`insert into worker_verification_audit(worker_version,verification_type,target,http_status,ok,error_text,checked_at,evidence_tables_mutated) values('closeout-backfill-2026-09-15','POSTFLIGHT_BACKFILL','2026-09-14 concentrated 350 cohort',${bad.length?207:200},${bad.length===0},${bad.length?JSON.stringify(bad.slice(0,20)):null},now(),true)`;json(res,200,{ok:bad.length===0,selected:jobs.length,updated:ok.length,failed:bad.length,failures:bad.slice(0,25)});}catch(e){json(res,500,{ok:false,error:e.message});}}
