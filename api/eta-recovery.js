@@ -24,19 +24,18 @@ export default async function handler(req,res){
   try{
     const s=db();
     const jobs=await s`
-      select j.id,j.fa_flight_id,j.ident,j.origin,j.destination,
-             b.filed_ete_seconds
+      select j.id,j.fa_flight_id,j.ident,j.origin,j.destination,b.filed_ete_seconds
       from flight_jobs j
       left join lateral (
         select fc.filed_ete_seconds
-        from flight_captures fc
-        where fc.flight_job_id=j.id
-          and fc.eligibility='ELIGIBLE'
-          and fc.filed_ete_seconds is not null
-        order by fc.captured_at desc
+        from method_a_scores m
+        join flight_captures fc on fc.id=m.baseline_capture_id
+        where m.flight_job_id=j.id
+        order by m.scored_at desc,m.id desc
         limit 1
       ) b on true
-      where j.scheduled_out_initial between '2026-09-14T20:50:00Z'::timestamptz and '2026-09-14T21:20:00Z'::timestamptz
+      where j.created_at between '2026-09-14T19:39:32.414Z'::timestamptz and '2026-09-14T19:45:32.749Z'::timestamptz
+        and j.scheduled_out_initial between '2026-09-14T20:50:00Z'::timestamptz and '2026-09-14T21:20:00Z'::timestamptz
         and j.terminal_state='SCOREABLE'
         and j.scoreable=true
       order by j.fa_flight_id`;
