@@ -46,7 +46,7 @@ export default async function handler(req,res){
         const f=await flightById(j.fa_flight_id);
         const match=f.fa_flight_id===j.fa_flight_id;
         const off=f.actual_off||null,on=f.actual_on||null,ete=j.filed_ete_seconds;
-        if(!match||!off||!on||!Number.isFinite(Number(ete)))return {ok:false,id:j.fa_flight_id,match,off:!!off,on:!!on,ete:ete??null};
+        if(!match||!off||!on||ete==null||!Number.isFinite(Number(ete))||Number(ete)<=0)return {ok:false,id:j.fa_flight_id,match,off:!!off,on:!!on,ete:ete??null};
         const pred=new Date(off).getTime()+Number(ete)*1000;
         const signed=(pred-new Date(on).getTime())/60000;
         return {ok:true,id:j.fa_flight_id,signed,abs:Math.abs(signed)};
