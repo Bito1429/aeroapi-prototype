@@ -34,7 +34,8 @@ export default async function handler(req,res){
         order by m.scored_at desc,m.id desc
         limit 1
       ) b on true
-      where j.created_at between '2026-09-14T19:39:32.414Z'::timestamptz and '2026-09-14T19:45:32.749Z'::timestamptz
+      where j.created_at >= '2026-09-14T19:39:32Z'::timestamptz
+        and j.created_at < '2026-09-14T19:45:33Z'::timestamptz
         and j.scheduled_out_initial between '2026-09-14T20:50:00Z'::timestamptz and '2026-09-14T21:20:00Z'::timestamptz
         and j.terminal_state='SCOREABLE'
         and j.scoreable=true
@@ -55,7 +56,7 @@ export default async function handler(req,res){
     const good=rows.filter(x=>x.ok),abs=good.map(x=>x.abs).sort((a,b)=>a-b),signed=good.map(x=>x.signed);
     const bad=rows.filter(x=>!x.ok);
     const mean=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null;
-    json(res,200,{ok:true,cohort:jobs.length,evaluable:good.length,failures:bad.length,
+    json(res,200,{ok:true,scoreable_cohort:jobs.length,evaluable:good.length,failures:bad.length,
       mae_min:mean(abs),median_abs_min:pct(abs,.5),p90_abs_min:pct(abs,.9),p95_abs_min:pct(abs,.95),max_abs_min:abs.at(-1)??null,
       mean_signed_min:mean(signed),within5:good.filter(x=>x.abs<=5).length,within10:good.filter(x=>x.abs<=10).length,
       within5_pct:good.length?100*good.filter(x=>x.abs<=5).length/good.length:null,
