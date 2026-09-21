@@ -13,6 +13,8 @@ on:
       - "scripts/test-resolver-engine.mjs"
       - "scripts/test-resolver.mjs"
       - "scripts/probe-faa-pack.mjs"
+      - "scripts/reconstruct-us-aal516.mjs"
+      - "api/resolver/faa-nasr.js"
       - "package.json"
       - ".github/workflows/resolver-faa-pack.yml"
   workflow_dispatch:
@@ -30,6 +32,7 @@ jobs:
       - run: node scripts/test-resolver-engine.mjs
       - run: node scripts/test-resolver.mjs
       - run: node scripts/probe-faa-pack.mjs
+      - run: node scripts/reconstruct-us-aal516.mjs
       - uses: actions/upload-artifact@v4
         with:
           name: faa-pack-260903-summary
