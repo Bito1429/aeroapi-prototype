@@ -38,66 +38,68 @@ export function selectDepartureByNextFix(cifpText,{airport,procedure,nextFix}){
   const groups=groupRecords(records),next=String(nextFix||"").toUpperCase();
   const candidates=[];
   for(const [key,rows] of groups){
-    const fixes=fixesOf(rows);
-    if(fixes.includes(next))candidates.push({key,route_type:rows[0].route_type,transition_id:rows[0].transition_id,fixes,rows});
+    const fixes=fixesOf(rows),transition_id=rows[0].transition_id;
+    if(!transition_id.startsWith("RW")&&fixes.includes(next))candidates.push({key,route_type:rows[0].route_type,transition_id,fixes,rows});
   }
-  // Filed adjacent fix must select exactly one runway-independent procedure branch.
-  const nonRunway=candidates.filter(c=>!c.transition_id.startsWith("RW"));
-  if(nonRunway.length!==1){
-    return{status:nonRunway.length?"AMBIGUOUS":"UNRESOLVED",procedure,selector:{next_fix:next},candidates:nonRunway.map(c=>({route_type:c.route_type,transition_id:c.transition_id,fixes:c.fixes}))};
+  // Prefer the explicitly named enroute transition. FAA CIFP departure route types
+  // occur in parallel 1/2/3 and 4/5/6 families, so route_type alone is not a selector.
+  const exact=candidates.filter(x=>x.transition_id===next);
+  const pool=exact.length?exact:candidates;
+  if(pool.length!==1){
+    return{status:pool.length?"AMBIGUOUS":"UNRESOLVED",procedure,selector:{next_fix:next},candidates:pool.map(x=>({route_type:x.route_type,transition_id:x.transition_id,fixes:x.fixes}))};
   }
-  const c=nonRunway[0],idx=c.fixes.indexOf(next);
-  return{status:"RESOLVED",procedure,selector:{next_fix:next},route_type:c.route_type,transition_id:c.transition_id,fixes:c.fixes.slice(0,idx+1)};
+  const chosen=pool[0],idx=chosen.fixes.indexOf(next);
+  return{status:"RESOLVED",procedure,selector:{next_fix:next},route_type:chosen.route_type,transition_id:chosen.transition_id,fixes:chosen.fixes.slice(0,idx+1)};
 }
 
 export function selectArrivalByEntryFix(cifpText,{airport,procedure,entryFix}){
   const records=procedureRecords(cifpText,{airport,procedure,subsection:"E"});
   const groups=groupRecords(records),entry=String(entryFix||"").toUpperCase();
+  const all=[...groups.values()];
 
-  const entryGroups=[...groups.values()].filter(rows=>{
-    const fixes=fixesOf(rows);
-    return rows[0]?.route_type==="4"&&(rows[0]?.transition_id===entry||fixes[0]===entry);
+  // FAA CIFP STAR route-type families are parallel: 1/2/3 and 4/5/6
+  // represent entry/common/runway branches respectively.
+  let entryGroups=all.filter(rows=>{
+    const fixes=fixesOf(rows),rt=rows[0]?.route_type;
+    return ["1","4"].includes(rt)&&(rows[0]?.transition_id===entry||fixes[0]===entry);
   });
-  if(entryGroups.length!==1){
-    return{status:entryGroups.length?"AMBIGUOUS":"UNRESOLVED",procedure,selector:{entry_fix:entry},reason:"ENTRY_TRANSITION_NOT_UNIQUE"};
-  }
+  let transition=[];
+  if(entryGroups.length===1)transition=fixesOf(entryGroups[0]);
+  else if(entryGroups.length>1)return{status:"AMBIGUOUS",procedure,selector:{entry_fix:entry},reason:"ENTRY_TRANSITION_NOT_UNIQUE"};
 
-  const transition=fixesOf(entryGroups[0]);
-  const commonGroups=[...groups.values()].filter(rows=>rows[0]?.route_type==="5");
+  const commonGroups=all.filter(rows=>["2","5"].includes(rows[0]?.route_type));
   let common=[];
-  if(commonGroups.length===1)common=fixesOf(commonGroups[0]);
-  else if(commonGroups.length>1){
-    const tail=transition.at(-1);
-    const matches=commonGroups.filter(g=>fixesOf(g)[0]===tail);
+  if(commonGroups.length){
+    const tail=transition.at(-1)||entry;
+    const matches=commonGroups.filter(g=>{
+      const f=fixesOf(g); return f[0]===tail||rowsTransitionAll(g);
+    });
     if(matches.length===1)common=fixesOf(matches[0]);
-    else return{status:"AMBIGUOUS",procedure,selector:{entry_fix:entry},reason:"COMMON_BODY_NOT_UNIQUE"};
+    else if(matches.length>1){
+      const exact=matches.filter(g=>fixesOf(g)[0]===tail);
+      if(exact.length===1)common=fixesOf(exact[0]);
+      else return{status:"AMBIGUOUS",procedure,selector:{entry_fix:entry},reason:"COMMON_BODY_NOT_UNIQUE"};
+    }
   }
+  if(!transition.length&&common.length&&common[0]===entry)transition=[entry];
+  if(!transition.length)return{status:"UNRESOLVED",procedure,selector:{entry_fix:entry},reason:"ENTRY_TRANSITION_NOT_FOUND"};
 
   const prefix=[...transition];
   for(const f of common)if(prefix.at(-1)!==f)prefix.push(f);
   const tail=prefix.at(-1);
-
-  const runwayGroups=[...groups.values()]
-    .filter(rows=>rows[0]?.route_type==="6"&&rows[0]?.transition_id.startsWith("RW"))
+  const runwayGroups=all
+    .filter(rows=>["3","6"].includes(rows[0]?.route_type)&&rows[0]?.transition_id.startsWith("RW"))
     .map(rows=>({transition_id:rows[0].transition_id,fixes:fixesOf(rows)}))
     .filter(g=>!tail||g.fixes[0]===tail);
 
-  if(runwayGroups.length===0){
-    return{status:"RESOLVED",procedure,selector:{entry_fix:entry},fixes:prefix,runway_branch:null};
-  }
+  if(runwayGroups.length===0)return{status:"RESOLVED",procedure,selector:{entry_fix:entry},fixes:prefix,runway_branch:null};
   if(runwayGroups.length===1){
-    const full=[...prefix];
-    for(const f of runwayGroups[0].fixes.slice(1))if(full.at(-1)!==f)full.push(f);
+    const full=[...prefix]; for(const f of runwayGroups[0].fixes.slice(1))if(full.at(-1)!==f)full.push(f);
     return{status:"RESOLVED",procedure,selector:{entry_fix:entry},fixes:full,runway_branch:runwayGroups[0].transition_id};
   }
-  return{
-    status:"PARTIAL_AMBIGUOUS_RUNWAY",
-    procedure,
-    selector:{entry_fix:entry},
-    fixes:prefix,
-    ambiguous_runway_branches:runwayGroups
-  };
+  return{status:"PARTIAL_AMBIGUOUS_RUNWAY",procedure,selector:{entry_fix:entry},fixes:prefix,ambiguous_runway_branches:runwayGroups};
 }
+function rowsTransitionAll(rows){return String(rows?.[0]?.transition_id||"").toUpperCase()==="ALL";}
 
 
 export function selectDepartureByRunwayAndNextFix(cifpText,{airport,procedure,runway,nextFix}){
