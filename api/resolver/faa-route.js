@@ -47,7 +47,7 @@ export function resolveFiledRouteUS({route,origin,destination,nasrIndex,cifpText
   ];
   if(originResult.status!=="RESOLVED")problems.push({stage:"ORIGIN_AIRPORT",name:origin,status:originResult.status});
   if(destinationResult.status!=="RESOLVED")problems.push({stage:"DESTINATION_AIRPORT",name:destination,status:destinationResult.status});
-  if(depIsProcedure&&dep.status!=="RESOLVED")problems.push({stage:"DEPARTURE_PROCEDURE",status:dep.status});
+  if(depIsProcedure&&!["RESOLVED","PARTIAL_AMBIGUOUS_RUNWAY"].includes(dep.status))problems.push({stage:"DEPARTURE_PROCEDURE",status:dep.status});
   if(arrIsProcedure&&!["RESOLVED","PARTIAL_AMBIGUOUS_RUNWAY"].includes(arr.status))problems.push({stage:"ARRIVAL_PROCEDURE",status:arr.status});
 
   const fullyTerminalDetermined=
