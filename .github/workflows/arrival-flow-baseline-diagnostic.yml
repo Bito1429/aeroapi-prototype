@@ -1,0 +1,27 @@
+name: Arrival flow baseline diagnostics
+on:
+  push:
+    branches:
+      - resolver-engine-v0
+    paths:
+      - "scripts/benchmark-arrival-direction-baselines.mjs"
+      - "fixtures/us-shadow-100-260903-v1.json"
+      - "docs/arrival-persistence-diagnostic-split-v0.md"
+      - ".github/workflows/arrival-flow-baseline-diagnostic.yml"
+  workflow_dispatch:
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm install
+      - run: node scripts/benchmark-arrival-direction-baselines.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: arrival-flow-baseline-development
+          path: artifacts/arrival-direction-baselines-development-v0.json
