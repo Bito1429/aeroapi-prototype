@@ -1,0 +1,20 @@
+name: Score AeroAPI backfill 57
+on:
+  push:
+    branches: [resolver-engine-v0]
+    paths:
+      - "scripts/score-aeroapi-backfill-57.mjs"
+      - ".github/workflows/score-aeroapi-backfill-57.yml"
+jobs:
+  score:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 24}
+      - run: npm install
+      - run: node scripts/score-aeroapi-backfill-57.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: aeroapi-history-backfill-57-v0-score
+          path: artifacts/aeroapi-history-backfill-57-v0-score.json

@@ -1,0 +1,20 @@
+name: Score long-flight sealed holdout once
+on:
+  push:
+    branches: [resolver-engine-v0]
+    paths:
+      - "scripts/score-long-holdout-once.mjs"
+      - ".github/workflows/score-long-holdout-once.yml"
+jobs:
+  score:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 24}
+      - run: npm install
+      - run: node scripts/score-long-holdout-once.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: long-holdout-100-open-once-score
+          path: artifacts/long-holdout-100-open-once-score.json

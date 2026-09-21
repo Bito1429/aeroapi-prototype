@@ -1,0 +1,20 @@
+name: Score long dev persistence
+on:
+  push:
+    branches: [resolver-engine-v0]
+    paths:
+      - "scripts/score-long-dev-persistence.mjs"
+      - ".github/workflows/score-long-dev-persistence.yml"
+jobs:
+  score:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 24}
+      - run: npm install
+      - run: node scripts/score-long-dev-persistence.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: long-dev-persistence-2h-v0-score
+          path: artifacts/long-dev-persistence-2h-v0-score.json

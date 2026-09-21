@@ -1,0 +1,1664 @@
+{
+  "fixture_id": "AEROAPI_HISTORY_BACKFILL_57_V0_PART_10_11",
+  "batches": [
+    10,
+    11
+  ],
+  "records": [
+    {
+      "capture_id": "22782",
+      "ident": "SWA2402",
+      "destination": "KSTL",
+      "captured_at": "2026-09-20T13:40:44.660Z",
+      "scheduled_minutes": 205,
+      "start": "2026-09-20T11:40:44.660Z",
+      "end": "2026-09-20T13:40:44.660Z",
+      "qualifying_arrivals": [
+        {
+          "fa_flight_id": "SWA1643-1789707741-airline-6412p",
+          "ident": "SWA1643",
+          "actual_on": "2026-09-20T13:38:21Z",
+          "scheduled_on": "2026-09-20T13:40:00Z",
+          "origin": "KBNA",
+          "destination": "KSTL"
+        },
+        {
+          "fa_flight_id": "SWA2016-1789707772-airline-1782p",
+          "ident": "SWA2016",
+          "actual_on": "2026-09-20T13:14:53Z",
+          "scheduled_on": "2026-09-20T13:36:00Z",
+          "origin": "KHOU",
+          "destination": "KSTL"
+        },
+        {
+          "fa_flight_id": "EDV5286-1789684422-fa-1444p",
+          "ident": "EDV5286",
+          "actual_on": "2026-09-20T13:11:05Z",
+          "scheduled_on": "2026-09-20T13:14:00Z",
+          "origin": "KMSP",
+          "destination": "KSTL"
+        },
+        {
+          "fa_flight_id": "ENY3546-1789716800-airline-54p",
+          "ident": "ENY3546",
+          "actual_on": "2026-09-20T13:02:56Z",
+          "scheduled_on": "2026-09-20T13:19:00Z",
+          "origin": "KBOS",
+          "destination": "KSTL"
+        },
+        {
+          "fa_flight_id": "AAL2497-1789719267-airline-172p",
+          "ident": "AAL2497",
+          "actual_on": "2026-09-20T13:01:00Z",
+          "scheduled_on": "2026-09-20T13:13:00Z",
+          "origin": "KCLT",
+          "destination": "KSTL"
+        },
+        {
+          "fa_flight_id": "SWA2656-1789719081-airline-1650p",
+          "ident": "SWA2656",
+          "actual_on": "2026-09-20T12:50:11Z",
+          "scheduled_on": "2026-09-20T13:01:00Z",
+          "origin": "KMCO",
+          "destination": "KSTL"
+        },
+        {
+          "fa_flight_id": "SWA1373-1789707741-airline-6127p",
+          "ident": "SWA1373",
+          "actual_on": "2026-09-20T12:33:52Z",
+          "scheduled_on": "2026-09-20T12:36:00Z",
+          "origin": "KDAL",
+          "destination": "KSTL"
+        },
+        {
+          "fa_flight_id": "SWA244-1789719081-airline-1030p",
+          "ident": "SWA244",
+          "actual_on": "2026-09-20T12:32:00Z",
+          "scheduled_on": "2026-09-20T12:42:00Z",
+          "origin": "KATL",
+          "destination": "KSTL"
+        },
+        {
+          "fa_flight_id": "SWA3665-1789716977-airline-1566p",
+          "ident": "SWA3665",
+          "actual_on": "2026-09-20T12:29:56Z",
+          "scheduled_on": "2026-09-20T12:26:00Z",
+          "origin": "KPHL",
+          "destination": "KSTL"
+        },
+        {
+          "fa_flight_id": "SWA2151-1789707772-airline-1926p",
+          "ident": "SWA2151",
+          "actual_on": "2026-09-20T12:26:00Z",
+          "scheduled_on": "2026-09-20T12:26:00Z",
+          "origin": "KFLL",
+          "destination": "KSTL"
+        },
+        {
+          "fa_flight_id": "SWA2514-1789719081-airline-1116p",
+          "ident": "SWA2514",
+          "actual_on": "2026-09-20T12:25:08Z",
+          "scheduled_on": "2026-09-20T12:27:00Z",
+          "origin": "KRSW",
+          "destination": "KSTL"
+        },
+        {
+          "fa_flight_id": "SWA1699-1789707741-airline-6472p",
+          "ident": "SWA1699",
+          "actual_on": "2026-09-20T12:23:00Z",
+          "scheduled_on": "2026-09-20T12:37:00Z",
+          "origin": "KPNS",
+          "destination": "KSTL"
+        },
+        {
+          "fa_flight_id": "SWA3311-1789714022-airline-956p",
+          "ident": "SWA3311",
+          "actual_on": "2026-09-20T12:21:33Z",
+          "scheduled_on": "2026-09-20T12:34:00Z",
+          "origin": "KPIT",
+          "destination": "KSTL"
+        },
+        {
+          "fa_flight_id": "SWA1517-1789707741-airline-6279p",
+          "ident": "SWA1517",
+          "actual_on": "2026-09-20T12:20:08Z",
+          "scheduled_on": "2026-09-20T12:31:00Z",
+          "origin": "KMIA",
+          "destination": "KSTL"
+        },
+        {
+          "fa_flight_id": "SWA4905-1789712770-airline-1634p",
+          "ident": "SWA4905",
+          "actual_on": "2026-09-20T12:18:26Z",
+          "scheduled_on": "2026-09-20T12:26:00Z",
+          "origin": "KECP",
+          "destination": "KSTL"
+        },
+        {
+          "fa_flight_id": "SWA1147-1789712423-airline-2007p",
+          "ident": "SWA1147",
+          "actual_on": "2026-09-20T12:16:40Z",
+          "scheduled_on": "2026-09-20T12:12:00Z",
+          "origin": "KCLE",
+          "destination": "KSTL"
+        },
+        {
+          "fa_flight_id": "SWA3357-1789714022-airline-997p",
+          "ident": "SWA3357",
+          "actual_on": "2026-09-20T12:14:41Z",
+          "scheduled_on": "2026-09-20T12:31:00Z",
+          "origin": "KRDU",
+          "destination": "KSTL"
+        },
+        {
+          "fa_flight_id": "SWA1686-1789707741-airline-6459p",
+          "ident": "SWA1686",
+          "actual_on": "2026-09-20T12:09:47Z",
+          "scheduled_on": "2026-09-20T12:20:00Z",
+          "origin": "KJAX",
+          "destination": "KSTL"
+        },
+        {
+          "fa_flight_id": "SWA4587-1789712770-airline-1348p",
+          "ident": "SWA4587",
+          "actual_on": "2026-09-20T12:05:52Z",
+          "scheduled_on": "2026-09-20T12:20:00Z",
+          "origin": "KBOS",
+          "destination": "KSTL"
+        },
+        {
+          "fa_flight_id": "SWA1674-1789707741-airline-6446p",
+          "ident": "SWA1674",
+          "actual_on": "2026-09-20T11:52:07Z",
+          "scheduled_on": "2026-09-20T12:06:00Z",
+          "origin": "KDTW",
+          "destination": "KSTL"
+        },
+        {
+          "fa_flight_id": "SWA4572-1789712770-airline-1339p",
+          "ident": "SWA4572",
+          "actual_on": "2026-09-20T11:43:00Z",
+          "scheduled_on": "2026-09-20T11:50:00Z",
+          "origin": "KCMH",
+          "destination": "KSTL"
+        }
+      ],
+      "top_track": {
+        "fa_flight_id": "SWA1643-1789707741-airline-6412p",
+        "positions": [
+          {
+            "timestamp": "2026-09-20T13:32:10Z",
+            "latitude": 38.51752,
+            "longitude": -90.11327,
+            "altitude": 53,
+            "groundspeed": 269,
+            "heading": 348
+          },
+          {
+            "timestamp": "2026-09-20T13:32:26Z",
+            "latitude": 38.5378,
+            "longitude": -90.12133,
+            "altitude": 49,
+            "groundspeed": 258,
+            "heading": 339
+          },
+          {
+            "timestamp": "2026-09-20T13:32:42Z",
+            "latitude": 38.55363,
+            "longitude": -90.12946,
+            "altitude": 48,
+            "groundspeed": 246,
+            "heading": 338
+          },
+          {
+            "timestamp": "2026-09-20T13:32:58Z",
+            "latitude": 38.57109,
+            "longitude": -90.13831,
+            "altitude": 46,
+            "groundspeed": 240,
+            "heading": 338
+          },
+          {
+            "timestamp": "2026-09-20T13:33:14Z",
+            "latitude": 38.58829,
+            "longitude": -90.14694,
+            "altitude": 44,
+            "groundspeed": 235,
+            "heading": 339
+          },
+          {
+            "timestamp": "2026-09-20T13:33:30Z",
+            "latitude": 38.60442,
+            "longitude": -90.15491,
+            "altitude": 41,
+            "groundspeed": 227,
+            "heading": 339
+          },
+          {
+            "timestamp": "2026-09-20T13:33:46Z",
+            "latitude": 38.61857,
+            "longitude": -90.16193,
+            "altitude": 40,
+            "groundspeed": 223,
+            "heading": 338
+          },
+          {
+            "timestamp": "2026-09-20T13:34:02Z",
+            "latitude": 38.63505,
+            "longitude": -90.17035,
+            "altitude": 38,
+            "groundspeed": 222,
+            "heading": 338
+          },
+          {
+            "timestamp": "2026-09-20T13:34:26Z",
+            "latitude": 38.65599,
+            "longitude": -90.18098,
+            "altitude": 35,
+            "groundspeed": 209,
+            "heading": 337
+          },
+          {
+            "timestamp": "2026-09-20T13:34:45Z",
+            "latitude": 38.66798,
+            "longitude": -90.1962,
+            "altitude": 31,
+            "groundspeed": 194,
+            "heading": 299
+          },
+          {
+            "timestamp": "2026-09-20T13:35:15Z",
+            "latitude": 38.68231,
+            "longitude": -90.22582,
+            "altitude": 26,
+            "groundspeed": 185,
+            "heading": 302
+          },
+          {
+            "timestamp": "2026-09-20T13:35:34Z",
+            "latitude": 38.69147,
+            "longitude": -90.24421,
+            "altitude": 23,
+            "groundspeed": 180,
+            "heading": 304
+          },
+          {
+            "timestamp": "2026-09-20T13:35:57Z",
+            "latitude": 38.70007,
+            "longitude": -90.26176,
+            "altitude": 20,
+            "groundspeed": 164,
+            "heading": 302
+          },
+          {
+            "timestamp": "2026-09-20T13:36:27Z",
+            "latitude": 38.71298,
+            "longitude": -90.28761,
+            "altitude": 16,
+            "groundspeed": 159,
+            "heading": 302
+          },
+          {
+            "timestamp": "2026-09-20T13:36:30Z",
+            "latitude": 38.71405,
+            "longitude": -90.28979,
+            "altitude": 15,
+            "groundspeed": 159,
+            "heading": 302
+          },
+          {
+            "timestamp": "2026-09-20T13:36:43Z",
+            "latitude": 38.71871,
+            "longitude": -90.29938,
+            "altitude": 13,
+            "groundspeed": 155,
+            "heading": 302
+          },
+          {
+            "timestamp": "2026-09-20T13:36:59Z",
+            "latitude": 38.72457,
+            "longitude": -90.3111,
+            "altitude": 11,
+            "groundspeed": 154,
+            "heading": 303
+          },
+          {
+            "timestamp": "2026-09-20T13:37:15Z",
+            "latitude": 38.73106,
+            "longitude": -90.32434,
+            "altitude": 9,
+            "groundspeed": 154,
+            "heading": 302
+          },
+          {
+            "timestamp": "2026-09-20T13:37:31Z",
+            "latitude": 38.73733,
+            "longitude": -90.33704,
+            "altitude": 7,
+            "groundspeed": 155,
+            "heading": 302
+          },
+          {
+            "timestamp": "2026-09-20T13:37:49Z",
+            "latitude": 38.74319,
+            "longitude": -90.34882,
+            "altitude": 5,
+            "groundspeed": 123,
+            "heading": 302
+          }
+        ]
+      }
+    },
+    {
+      "capture_id": "22793",
+      "ident": "SKW4725",
+      "destination": "KBZN",
+      "captured_at": "2026-09-20T13:40:44.643Z",
+      "scheduled_minutes": 104,
+      "start": "2026-09-20T11:40:44.643Z",
+      "end": "2026-09-20T13:40:44.643Z",
+      "qualifying_arrivals": [],
+      "top_track": null
+    },
+    {
+      "capture_id": "22787",
+      "ident": "SWA4348",
+      "destination": "KDAL",
+      "captured_at": "2026-09-20T13:40:44.605Z",
+      "scheduled_minutes": 110,
+      "start": "2026-09-20T11:40:44.605Z",
+      "end": "2026-09-20T13:40:44.605Z",
+      "qualifying_arrivals": [
+        {
+          "fa_flight_id": "SWA301-1789714022-airline-711p",
+          "ident": "SWA301",
+          "actual_on": "2026-09-20T13:39:53Z",
+          "scheduled_on": "2026-09-20T13:38:00Z",
+          "origin": "KCOS",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA4809-1789712770-airline-1546p",
+          "ident": "SWA4809",
+          "actual_on": "2026-09-20T13:29:49Z",
+          "scheduled_on": "2026-09-20T13:29:00Z",
+          "origin": "KSAT",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA4178-1789716978-airline-290p",
+          "ident": "SWA4178",
+          "actual_on": "2026-09-20T13:19:52Z",
+          "scheduled_on": "2026-09-20T13:06:00Z",
+          "origin": "KLGA",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA4059-1789716978-airline-217p",
+          "ident": "SWA4059",
+          "actual_on": "2026-09-20T13:10:21Z",
+          "scheduled_on": "2026-09-20T13:05:00Z",
+          "origin": "KDCA",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA4025-1789716978-airline-192p",
+          "ident": "SWA4025",
+          "actual_on": "2026-09-20T13:09:16Z",
+          "scheduled_on": "2026-09-20T13:05:00Z",
+          "origin": "KMDW",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA4828-1789712770-airline-1567p",
+          "ident": "SWA4828",
+          "actual_on": "2026-09-20T13:05:40Z",
+          "scheduled_on": "2026-09-20T13:19:00Z",
+          "origin": "KJAX",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "LXJ351-1789850389-sw-751p",
+          "ident": "LXJ351",
+          "actual_on": "2026-09-20T12:59:18Z",
+          "scheduled_on": "2026-09-20T12:26:00Z",
+          "origin": "KSGR",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA4273-1789716978-airline-367p",
+          "ident": "SWA4273",
+          "actual_on": "2026-09-20T12:55:39Z",
+          "scheduled_on": "2026-09-20T12:39:00Z",
+          "origin": "KMSY",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA1139-1789712423-airline-1998p",
+          "ident": "SWA1139",
+          "actual_on": "2026-09-20T12:51:54Z",
+          "scheduled_on": "2026-09-20T13:04:00Z",
+          "origin": "KRDU",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA424-1789716978-airline-343p",
+          "ident": "SWA424",
+          "actual_on": "2026-09-20T12:42:43Z",
+          "scheduled_on": "2026-09-20T12:49:00Z",
+          "origin": "KOMA",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA175-1789707741-airline-6530p",
+          "ident": "SWA175",
+          "actual_on": "2026-09-20T12:34:42Z",
+          "scheduled_on": "2026-09-20T12:46:00Z",
+          "origin": "KMCO",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA2-1789712423-airline-1819p",
+          "ident": "SWA2",
+          "actual_on": "2026-09-20T12:31:51Z",
+          "scheduled_on": "2026-09-20T12:50:00Z",
+          "origin": "KHOU",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA2466-1789719081-airline-1065p",
+          "ident": "SWA2466",
+          "actual_on": "2026-09-20T12:30:05Z",
+          "scheduled_on": "2026-09-20T12:49:00Z",
+          "origin": "KLIT",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA833-1789711551-airline-232p",
+          "ident": "SWA833",
+          "actual_on": "2026-09-20T12:28:19Z",
+          "scheduled_on": "2026-09-20T12:44:00Z",
+          "origin": "KATL",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA4583-1789712770-airline-1346p",
+          "ident": "SWA4583",
+          "actual_on": "2026-09-20T12:23:49Z",
+          "scheduled_on": "2026-09-20T12:35:00Z",
+          "origin": "KSTL",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA4512-1789712770-airline-1294p",
+          "ident": "SWA4512",
+          "actual_on": "2026-09-20T12:21:52Z",
+          "scheduled_on": "2026-09-20T12:36:00Z",
+          "origin": "KBNA",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA1348-1789707741-airline-6103p",
+          "ident": "SWA1348",
+          "actual_on": "2026-09-20T12:13:25Z",
+          "scheduled_on": "2026-09-20T12:24:00Z",
+          "origin": "KSAT",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA184-1789707772-airline-967p",
+          "ident": "SWA184",
+          "actual_on": "2026-09-20T12:11:25Z",
+          "scheduled_on": "2026-09-20T12:07:00Z",
+          "origin": "KLBB",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA3526-1789714022-airline-1129p",
+          "ident": "SWA3526",
+          "actual_on": "2026-09-20T12:09:00Z",
+          "scheduled_on": "2026-09-20T12:14:00Z",
+          "origin": "KTUL",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA4190-1789716978-airline-297p",
+          "ident": "SWA4190",
+          "actual_on": "2026-09-20T12:07:45Z",
+          "scheduled_on": "2026-09-20T12:13:00Z",
+          "origin": "KMAF",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA1856-1789707772-airline-982p",
+          "ident": "SWA1856",
+          "actual_on": "2026-09-20T12:05:13Z",
+          "scheduled_on": "2026-09-20T12:04:00Z",
+          "origin": "KAMA",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA3216-1789714022-airline-884p",
+          "ident": "SWA3216",
+          "actual_on": "2026-09-20T12:02:08Z",
+          "scheduled_on": "2026-09-20T12:13:00Z",
+          "origin": "KAUS",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA3-1789712423-airline-1821p",
+          "ident": "SWA3",
+          "actual_on": "2026-09-20T11:55:39Z",
+          "scheduled_on": "2026-09-20T12:08:10Z",
+          "origin": "KOKC",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA3919-1789716978-airline-124p",
+          "ident": "SWA3919",
+          "actual_on": "2026-09-20T11:53:37Z",
+          "scheduled_on": "2026-09-20T12:10:00Z",
+          "origin": "KTPA",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA550-1789712770-airline-1782p",
+          "ident": "SWA550",
+          "actual_on": "2026-09-20T11:50:26Z",
+          "scheduled_on": "2026-09-20T11:59:00Z",
+          "origin": "KIND",
+          "destination": "KDAL"
+        }
+      ],
+      "top_track": {
+        "fa_flight_id": "SWA301-1789714022-airline-711p",
+        "positions": [
+          {
+            "timestamp": "2026-09-20T13:34:17Z",
+            "latitude": 33.08881,
+            "longitude": -96.87305,
+            "altitude": 33,
+            "groundspeed": 259,
+            "heading": 196
+          },
+          {
+            "timestamp": "2026-09-20T13:34:26Z",
+            "latitude": 33.07825,
+            "longitude": -96.87677,
+            "altitude": 32,
+            "groundspeed": 258,
+            "heading": 197
+          },
+          {
+            "timestamp": "2026-09-20T13:34:42Z",
+            "latitude": 33.05986,
+            "longitude": -96.88321,
+            "altitude": 30,
+            "groundspeed": 248,
+            "heading": 197
+          },
+          {
+            "timestamp": "2026-09-20T13:34:58Z",
+            "latitude": 33.04422,
+            "longitude": -96.88876,
+            "altitude": 30,
+            "groundspeed": 235,
+            "heading": 196
+          },
+          {
+            "timestamp": "2026-09-20T13:35:14Z",
+            "latitude": 33.02861,
+            "longitude": -96.8942,
+            "altitude": 30,
+            "groundspeed": 217,
+            "heading": 196
+          },
+          {
+            "timestamp": "2026-09-20T13:35:30Z",
+            "latitude": 33.01219,
+            "longitude": -96.89992,
+            "altitude": 30,
+            "groundspeed": 211,
+            "heading": 196
+          },
+          {
+            "timestamp": "2026-09-20T13:35:46Z",
+            "latitude": 32.99643,
+            "longitude": -96.9054,
+            "altitude": 30,
+            "groundspeed": 210,
+            "heading": 196
+          },
+          {
+            "timestamp": "2026-09-20T13:36:02Z",
+            "latitude": 32.98207,
+            "longitude": -96.91029,
+            "altitude": 30,
+            "groundspeed": 199,
+            "heading": 194
+          },
+          {
+            "timestamp": "2026-09-20T13:36:18Z",
+            "latitude": 32.96992,
+            "longitude": -96.91199,
+            "altitude": 29,
+            "groundspeed": 194,
+            "heading": 181
+          },
+          {
+            "timestamp": "2026-09-20T13:36:34Z",
+            "latitude": 32.95526,
+            "longitude": -96.91219,
+            "altitude": 26,
+            "groundspeed": 188,
+            "heading": 181
+          },
+          {
+            "timestamp": "2026-09-20T13:36:50Z",
+            "latitude": 32.94104,
+            "longitude": -96.9126,
+            "altitude": 24,
+            "groundspeed": 181,
+            "heading": 182
+          },
+          {
+            "timestamp": "2026-09-20T13:37:12Z",
+            "latitude": 32.92323,
+            "longitude": -96.91309,
+            "altitude": 21,
+            "groundspeed": 170,
+            "heading": 180
+          },
+          {
+            "timestamp": "2026-09-20T13:37:29Z",
+            "latitude": 32.90931,
+            "longitude": -96.91147,
+            "altitude": 18,
+            "groundspeed": 162,
+            "heading": 165
+          },
+          {
+            "timestamp": "2026-09-20T13:37:44Z",
+            "latitude": 32.90057,
+            "longitude": -96.90612,
+            "altitude": 17,
+            "groundspeed": 151,
+            "heading": 144
+          },
+          {
+            "timestamp": "2026-09-20T13:38:01Z",
+            "latitude": 32.89158,
+            "longitude": -96.89661,
+            "altitude": 15,
+            "groundspeed": 148,
+            "heading": 137
+          },
+          {
+            "timestamp": "2026-09-20T13:38:17Z",
+            "latitude": 32.88419,
+            "longitude": -96.88793,
+            "altitude": 12,
+            "groundspeed": 144,
+            "heading": 134
+          },
+          {
+            "timestamp": "2026-09-20T13:38:33Z",
+            "latitude": 32.87635,
+            "longitude": -96.87873,
+            "altitude": 10,
+            "groundspeed": 145,
+            "heading": 136
+          },
+          {
+            "timestamp": "2026-09-20T13:38:49Z",
+            "latitude": 32.86863,
+            "longitude": -96.86987,
+            "altitude": 8,
+            "groundspeed": 148,
+            "heading": 135
+          },
+          {
+            "timestamp": "2026-09-20T13:39:05Z",
+            "latitude": 32.86089,
+            "longitude": -96.86096,
+            "altitude": 6,
+            "groundspeed": 151,
+            "heading": 136
+          },
+          {
+            "timestamp": "2026-09-20T13:39:21Z",
+            "latitude": 32.85298,
+            "longitude": -96.85183,
+            "altitude": 5,
+            "groundspeed": 148,
+            "heading": 135
+          }
+        ]
+      }
+    },
+    {
+      "capture_id": "22795",
+      "ident": "DAL1087",
+      "destination": "KLAX",
+      "captured_at": "2026-09-20T13:40:44.601Z",
+      "scheduled_minutes": 113,
+      "start": "2026-09-20T11:40:44.601Z",
+      "end": "2026-09-20T13:40:44.601Z",
+      "qualifying_arrivals": [
+        {
+          "fa_flight_id": "UAL1670-1789639285-fa-608p",
+          "ident": "UAL1670",
+          "actual_on": "2026-09-20T13:02:00Z",
+          "scheduled_on": "2026-09-20T12:43:00Z",
+          "origin": "MSLP",
+          "destination": "KLAX"
+        },
+        {
+          "fa_flight_id": "WGN212-1789863323-fa-1108p",
+          "ident": "WGN212",
+          "actual_on": "2026-09-20T12:59:52Z",
+          "scheduled_on": "2026-09-20T12:18:00Z",
+          "origin": "RJAA",
+          "destination": "KLAX"
+        },
+        {
+          "fa_flight_id": "UAL842-1789624657-fa-1332p",
+          "ident": "UAL842",
+          "actual_on": "2026-09-20T12:54:41Z",
+          "scheduled_on": "2026-09-20T13:12:00Z",
+          "origin": "YSSY",
+          "destination": "KLAX"
+        },
+        {
+          "fa_flight_id": "DAL486-1789719388-schedule-846p",
+          "ident": "DAL486",
+          "actual_on": "2026-09-20T12:48:36Z",
+          "scheduled_on": "2026-09-20T13:03:00Z",
+          "origin": "PHKO",
+          "destination": "KLAX"
+        },
+        {
+          "fa_flight_id": "PAC992-1789872815-adhoc-1088p",
+          "ident": "PAC992",
+          "actual_on": "2026-09-20T12:45:53Z",
+          "scheduled_on": "2026-09-20T13:22:22Z",
+          "origin": "RJGG",
+          "destination": "KLAX"
+        },
+        {
+          "fa_flight_id": "GTI9511-1789877316-sw-737p",
+          "ident": "GTI9511",
+          "actual_on": "2026-09-20T12:40:00Z",
+          "scheduled_on": "2026-09-20T12:34:54Z",
+          "origin": "MMSM",
+          "destination": "KLAX"
+        },
+        {
+          "fa_flight_id": "AAL170-1789700423-airline-267p",
+          "ident": "AAL170",
+          "actual_on": "2026-09-20T12:33:54Z",
+          "scheduled_on": "2026-09-20T13:06:00Z",
+          "origin": "RJTT",
+          "destination": "KLAX"
+        },
+        {
+          "fa_flight_id": "DAL658-1789631921-airline-612p",
+          "ident": "DAL658",
+          "actual_on": "2026-09-20T12:28:00Z",
+          "scheduled_on": "2026-09-20T12:22:00Z",
+          "origin": "PHNL",
+          "destination": "KLAX"
+        },
+        {
+          "fa_flight_id": "AAL72-1789686752-schedule-13p",
+          "ident": "AAL72",
+          "actual_on": "2026-09-20T12:25:54Z",
+          "scheduled_on": "2026-09-20T12:50:00Z",
+          "origin": "YSSY",
+          "destination": "KLAX"
+        },
+        {
+          "fa_flight_id": "UAL1169-1789639289-fa-36p",
+          "ident": "UAL1169",
+          "actual_on": "2026-09-20T12:23:40Z",
+          "scheduled_on": "2026-09-20T12:23:00Z",
+          "origin": "PHNL",
+          "destination": "KLAX"
+        },
+        {
+          "fa_flight_id": "SIA7410-1789852232-sw-320p",
+          "ident": "SIA7410",
+          "actual_on": "2026-09-20T12:18:47Z",
+          "scheduled_on": "2026-09-20T12:40:33Z",
+          "origin": "RJGG",
+          "destination": "KLAX"
+        },
+        {
+          "fa_flight_id": "SWA1550-1789716488-schedule-554p",
+          "ident": "SWA1550",
+          "actual_on": "2026-09-20T12:14:50Z",
+          "scheduled_on": "2026-09-20T12:31:00Z",
+          "origin": "PHNL",
+          "destination": "KLAX"
+        },
+        {
+          "fa_flight_id": "CKS256-1789875900-sw-274p",
+          "ident": "CKS256",
+          "actual_on": "2026-09-20T12:11:51Z",
+          "scheduled_on": "2026-09-20T11:57:00Z",
+          "origin": "KMIA",
+          "destination": "KLAX"
+        },
+        {
+          "fa_flight_id": "ASA1465-1789629351-airline-708p",
+          "ident": "ASA1465",
+          "actual_on": "2026-09-20T11:50:23Z",
+          "scheduled_on": "2026-09-20T12:08:00Z",
+          "origin": "PANC",
+          "destination": "KLAX"
+        },
+        {
+          "fa_flight_id": "AAL144-1789713879-airline-48p",
+          "ident": "AAL144",
+          "actual_on": "2026-09-20T11:46:33Z",
+          "scheduled_on": "2026-09-20T12:00:00Z",
+          "origin": "PHNL",
+          "destination": "KLAX"
+        }
+      ],
+      "top_track": {
+        "fa_flight_id": "UAL1670-1789639285-fa-608p",
+        "positions": [
+          {
+            "timestamp": "2026-09-20T12:55:24Z",
+            "latitude": 33.98346,
+            "longitude": -118.74741,
+            "altitude": 62,
+            "groundspeed": 217,
+            "heading": 238
+          },
+          {
+            "timestamp": "2026-09-20T12:55:42Z",
+            "latitude": 33.96968,
+            "longitude": -118.75901,
+            "altitude": 57,
+            "groundspeed": 213,
+            "heading": 199
+          },
+          {
+            "timestamp": "2026-09-20T12:55:59Z",
+            "latitude": 33.95393,
+            "longitude": -118.75924,
+            "altitude": 54,
+            "groundspeed": 205,
+            "heading": 167
+          },
+          {
+            "timestamp": "2026-09-20T12:56:17Z",
+            "latitude": 33.94054,
+            "longitude": -118.74687,
+            "altitude": 49,
+            "groundspeed": 199,
+            "heading": 118
+          },
+          {
+            "timestamp": "2026-09-20T12:56:42Z",
+            "latitude": 33.93235,
+            "longitude": -118.72164,
+            "altitude": 45,
+            "groundspeed": 188,
+            "heading": 112
+          },
+          {
+            "timestamp": "2026-09-20T12:57:09Z",
+            "latitude": 33.92427,
+            "longitude": -118.69646,
+            "altitude": 42,
+            "groundspeed": 179,
+            "heading": 108
+          },
+          {
+            "timestamp": "2026-09-20T12:57:27Z",
+            "latitude": 33.92345,
+            "longitude": -118.67804,
+            "altitude": 40,
+            "groundspeed": 180,
+            "heading": 89
+          },
+          {
+            "timestamp": "2026-09-20T12:57:50Z",
+            "latitude": 33.92377,
+            "longitude": -118.65621,
+            "altitude": 38,
+            "groundspeed": 176,
+            "heading": 88
+          },
+          {
+            "timestamp": "2026-09-20T12:58:06Z",
+            "latitude": 33.92477,
+            "longitude": -118.63956,
+            "altitude": 34,
+            "groundspeed": 178,
+            "heading": 85
+          },
+          {
+            "timestamp": "2026-09-20T12:58:24Z",
+            "latitude": 33.92661,
+            "longitude": -118.62264,
+            "altitude": 31,
+            "groundspeed": 176,
+            "heading": 81
+          },
+          {
+            "timestamp": "2026-09-20T12:58:54Z",
+            "latitude": 33.93081,
+            "longitude": -118.59341,
+            "altitude": 28,
+            "groundspeed": 182,
+            "heading": 82
+          },
+          {
+            "timestamp": "2026-09-20T12:59:18Z",
+            "latitude": 33.93324,
+            "longitude": -118.56939,
+            "altitude": 23,
+            "groundspeed": 174,
+            "heading": 84
+          },
+          {
+            "timestamp": "2026-09-20T12:59:48Z",
+            "latitude": 33.93585,
+            "longitude": -118.54209,
+            "altitude": 19,
+            "groundspeed": 163,
+            "heading": 84
+          },
+          {
+            "timestamp": "2026-09-20T13:00:18Z",
+            "latitude": 33.93849,
+            "longitude": -118.51576,
+            "altitude": 14,
+            "groundspeed": 165,
+            "heading": 84
+          },
+          {
+            "timestamp": "2026-09-20T13:00:41Z",
+            "latitude": 33.94077,
+            "longitude": -118.49476,
+            "altitude": 11,
+            "groundspeed": 166,
+            "heading": 82
+          },
+          {
+            "timestamp": "2026-09-20T13:00:56Z",
+            "latitude": 33.94212,
+            "longitude": -118.48127,
+            "altitude": 9,
+            "groundspeed": 165,
+            "heading": 83
+          },
+          {
+            "timestamp": "2026-09-20T13:01:12Z",
+            "latitude": 33.94352,
+            "longitude": -118.46724,
+            "altitude": 7,
+            "groundspeed": 164,
+            "heading": 83
+          },
+          {
+            "timestamp": "2026-09-20T13:01:28Z",
+            "latitude": 33.94505,
+            "longitude": -118.45218,
+            "altitude": 4,
+            "groundspeed": 166,
+            "heading": 83
+          },
+          {
+            "timestamp": "2026-09-20T13:01:44Z",
+            "latitude": 33.9465,
+            "longitude": -118.43805,
+            "altitude": 2,
+            "groundspeed": 165,
+            "heading": 83
+          },
+          {
+            "timestamp": "2026-09-20T13:02:00Z",
+            "latitude": 33.94813,
+            "longitude": -118.42197,
+            "altitude": 1,
+            "groundspeed": 149,
+            "heading": 83
+          }
+        ]
+      }
+    },
+    {
+      "capture_id": "22780",
+      "ident": "SKW5476",
+      "destination": "KGPI",
+      "captured_at": "2026-09-20T13:40:44.600Z",
+      "scheduled_minutes": 134,
+      "start": "2026-09-20T11:40:44.600Z",
+      "end": "2026-09-20T13:40:44.600Z",
+      "qualifying_arrivals": [],
+      "top_track": null
+    },
+    {
+      "capture_id": "22789",
+      "ident": "SWA1247",
+      "destination": "KDAL",
+      "captured_at": "2026-09-20T13:40:44.590Z",
+      "scheduled_minutes": 150,
+      "start": "2026-09-20T11:40:44.590Z",
+      "end": "2026-09-20T13:40:44.590Z",
+      "qualifying_arrivals": [
+        {
+          "fa_flight_id": "SWA301-1789714022-airline-711p",
+          "ident": "SWA301",
+          "actual_on": "2026-09-20T13:39:53Z",
+          "scheduled_on": "2026-09-20T13:38:00Z",
+          "origin": "KCOS",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA4809-1789712770-airline-1546p",
+          "ident": "SWA4809",
+          "actual_on": "2026-09-20T13:29:49Z",
+          "scheduled_on": "2026-09-20T13:29:00Z",
+          "origin": "KSAT",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA4178-1789716978-airline-290p",
+          "ident": "SWA4178",
+          "actual_on": "2026-09-20T13:19:52Z",
+          "scheduled_on": "2026-09-20T13:06:00Z",
+          "origin": "KLGA",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA4059-1789716978-airline-217p",
+          "ident": "SWA4059",
+          "actual_on": "2026-09-20T13:10:21Z",
+          "scheduled_on": "2026-09-20T13:05:00Z",
+          "origin": "KDCA",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA4025-1789716978-airline-192p",
+          "ident": "SWA4025",
+          "actual_on": "2026-09-20T13:09:16Z",
+          "scheduled_on": "2026-09-20T13:05:00Z",
+          "origin": "KMDW",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA4828-1789712770-airline-1567p",
+          "ident": "SWA4828",
+          "actual_on": "2026-09-20T13:05:40Z",
+          "scheduled_on": "2026-09-20T13:19:00Z",
+          "origin": "KJAX",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "LXJ351-1789850389-sw-751p",
+          "ident": "LXJ351",
+          "actual_on": "2026-09-20T12:59:18Z",
+          "scheduled_on": "2026-09-20T12:26:00Z",
+          "origin": "KSGR",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA4273-1789716978-airline-367p",
+          "ident": "SWA4273",
+          "actual_on": "2026-09-20T12:55:39Z",
+          "scheduled_on": "2026-09-20T12:39:00Z",
+          "origin": "KMSY",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA1139-1789712423-airline-1998p",
+          "ident": "SWA1139",
+          "actual_on": "2026-09-20T12:51:54Z",
+          "scheduled_on": "2026-09-20T13:04:00Z",
+          "origin": "KRDU",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA424-1789716978-airline-343p",
+          "ident": "SWA424",
+          "actual_on": "2026-09-20T12:42:43Z",
+          "scheduled_on": "2026-09-20T12:49:00Z",
+          "origin": "KOMA",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA175-1789707741-airline-6530p",
+          "ident": "SWA175",
+          "actual_on": "2026-09-20T12:34:42Z",
+          "scheduled_on": "2026-09-20T12:46:00Z",
+          "origin": "KMCO",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA2-1789712423-airline-1819p",
+          "ident": "SWA2",
+          "actual_on": "2026-09-20T12:31:51Z",
+          "scheduled_on": "2026-09-20T12:50:00Z",
+          "origin": "KHOU",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA2466-1789719081-airline-1065p",
+          "ident": "SWA2466",
+          "actual_on": "2026-09-20T12:30:05Z",
+          "scheduled_on": "2026-09-20T12:49:00Z",
+          "origin": "KLIT",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA833-1789711551-airline-232p",
+          "ident": "SWA833",
+          "actual_on": "2026-09-20T12:28:19Z",
+          "scheduled_on": "2026-09-20T12:44:00Z",
+          "origin": "KATL",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA4583-1789712770-airline-1346p",
+          "ident": "SWA4583",
+          "actual_on": "2026-09-20T12:23:49Z",
+          "scheduled_on": "2026-09-20T12:35:00Z",
+          "origin": "KSTL",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA4512-1789712770-airline-1294p",
+          "ident": "SWA4512",
+          "actual_on": "2026-09-20T12:21:52Z",
+          "scheduled_on": "2026-09-20T12:36:00Z",
+          "origin": "KBNA",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA1348-1789707741-airline-6103p",
+          "ident": "SWA1348",
+          "actual_on": "2026-09-20T12:13:25Z",
+          "scheduled_on": "2026-09-20T12:24:00Z",
+          "origin": "KSAT",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA184-1789707772-airline-967p",
+          "ident": "SWA184",
+          "actual_on": "2026-09-20T12:11:25Z",
+          "scheduled_on": "2026-09-20T12:07:00Z",
+          "origin": "KLBB",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA3526-1789714022-airline-1129p",
+          "ident": "SWA3526",
+          "actual_on": "2026-09-20T12:09:00Z",
+          "scheduled_on": "2026-09-20T12:14:00Z",
+          "origin": "KTUL",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA4190-1789716978-airline-297p",
+          "ident": "SWA4190",
+          "actual_on": "2026-09-20T12:07:45Z",
+          "scheduled_on": "2026-09-20T12:13:00Z",
+          "origin": "KMAF",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA1856-1789707772-airline-982p",
+          "ident": "SWA1856",
+          "actual_on": "2026-09-20T12:05:13Z",
+          "scheduled_on": "2026-09-20T12:04:00Z",
+          "origin": "KAMA",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA3216-1789714022-airline-884p",
+          "ident": "SWA3216",
+          "actual_on": "2026-09-20T12:02:08Z",
+          "scheduled_on": "2026-09-20T12:13:00Z",
+          "origin": "KAUS",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA3-1789712423-airline-1821p",
+          "ident": "SWA3",
+          "actual_on": "2026-09-20T11:55:39Z",
+          "scheduled_on": "2026-09-20T12:08:10Z",
+          "origin": "KOKC",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA3919-1789716978-airline-124p",
+          "ident": "SWA3919",
+          "actual_on": "2026-09-20T11:53:37Z",
+          "scheduled_on": "2026-09-20T12:10:00Z",
+          "origin": "KTPA",
+          "destination": "KDAL"
+        },
+        {
+          "fa_flight_id": "SWA550-1789712770-airline-1782p",
+          "ident": "SWA550",
+          "actual_on": "2026-09-20T11:50:26Z",
+          "scheduled_on": "2026-09-20T11:59:00Z",
+          "origin": "KIND",
+          "destination": "KDAL"
+        }
+      ],
+      "top_track": {
+        "fa_flight_id": "SWA301-1789714022-airline-711p",
+        "positions": [
+          {
+            "timestamp": "2026-09-20T13:34:17Z",
+            "latitude": 33.08881,
+            "longitude": -96.87305,
+            "altitude": 33,
+            "groundspeed": 259,
+            "heading": 196
+          },
+          {
+            "timestamp": "2026-09-20T13:34:26Z",
+            "latitude": 33.07825,
+            "longitude": -96.87677,
+            "altitude": 32,
+            "groundspeed": 258,
+            "heading": 197
+          },
+          {
+            "timestamp": "2026-09-20T13:34:42Z",
+            "latitude": 33.05986,
+            "longitude": -96.88321,
+            "altitude": 30,
+            "groundspeed": 248,
+            "heading": 197
+          },
+          {
+            "timestamp": "2026-09-20T13:34:58Z",
+            "latitude": 33.04422,
+            "longitude": -96.88876,
+            "altitude": 30,
+            "groundspeed": 235,
+            "heading": 196
+          },
+          {
+            "timestamp": "2026-09-20T13:35:14Z",
+            "latitude": 33.02861,
+            "longitude": -96.8942,
+            "altitude": 30,
+            "groundspeed": 217,
+            "heading": 196
+          },
+          {
+            "timestamp": "2026-09-20T13:35:30Z",
+            "latitude": 33.01219,
+            "longitude": -96.89992,
+            "altitude": 30,
+            "groundspeed": 211,
+            "heading": 196
+          },
+          {
+            "timestamp": "2026-09-20T13:35:46Z",
+            "latitude": 32.99643,
+            "longitude": -96.9054,
+            "altitude": 30,
+            "groundspeed": 210,
+            "heading": 196
+          },
+          {
+            "timestamp": "2026-09-20T13:36:02Z",
+            "latitude": 32.98207,
+            "longitude": -96.91029,
+            "altitude": 30,
+            "groundspeed": 199,
+            "heading": 194
+          },
+          {
+            "timestamp": "2026-09-20T13:36:18Z",
+            "latitude": 32.96992,
+            "longitude": -96.91199,
+            "altitude": 29,
+            "groundspeed": 194,
+            "heading": 181
+          },
+          {
+            "timestamp": "2026-09-20T13:36:34Z",
+            "latitude": 32.95526,
+            "longitude": -96.91219,
+            "altitude": 26,
+            "groundspeed": 188,
+            "heading": 181
+          },
+          {
+            "timestamp": "2026-09-20T13:36:50Z",
+            "latitude": 32.94104,
+            "longitude": -96.9126,
+            "altitude": 24,
+            "groundspeed": 181,
+            "heading": 182
+          },
+          {
+            "timestamp": "2026-09-20T13:37:12Z",
+            "latitude": 32.92323,
+            "longitude": -96.91309,
+            "altitude": 21,
+            "groundspeed": 170,
+            "heading": 180
+          },
+          {
+            "timestamp": "2026-09-20T13:37:29Z",
+            "latitude": 32.90931,
+            "longitude": -96.91147,
+            "altitude": 18,
+            "groundspeed": 162,
+            "heading": 165
+          },
+          {
+            "timestamp": "2026-09-20T13:37:44Z",
+            "latitude": 32.90057,
+            "longitude": -96.90612,
+            "altitude": 17,
+            "groundspeed": 151,
+            "heading": 144
+          },
+          {
+            "timestamp": "2026-09-20T13:38:01Z",
+            "latitude": 32.89158,
+            "longitude": -96.89661,
+            "altitude": 15,
+            "groundspeed": 148,
+            "heading": 137
+          },
+          {
+            "timestamp": "2026-09-20T13:38:17Z",
+            "latitude": 32.88419,
+            "longitude": -96.88793,
+            "altitude": 12,
+            "groundspeed": 144,
+            "heading": 134
+          },
+          {
+            "timestamp": "2026-09-20T13:38:33Z",
+            "latitude": 32.87635,
+            "longitude": -96.87873,
+            "altitude": 10,
+            "groundspeed": 145,
+            "heading": 136
+          },
+          {
+            "timestamp": "2026-09-20T13:38:49Z",
+            "latitude": 32.86863,
+            "longitude": -96.86987,
+            "altitude": 8,
+            "groundspeed": 148,
+            "heading": 135
+          },
+          {
+            "timestamp": "2026-09-20T13:39:05Z",
+            "latitude": 32.86089,
+            "longitude": -96.86096,
+            "altitude": 6,
+            "groundspeed": 151,
+            "heading": 136
+          },
+          {
+            "timestamp": "2026-09-20T13:39:21Z",
+            "latitude": 32.85298,
+            "longitude": -96.85183,
+            "altitude": 5,
+            "groundspeed": 148,
+            "heading": 135
+          }
+        ]
+      }
+    },
+    {
+      "capture_id": "22785",
+      "ident": "SWA888",
+      "destination": "KMCI",
+      "captured_at": "2026-09-20T13:40:44.581Z",
+      "scheduled_minutes": 155,
+      "start": "2026-09-20T11:40:44.581Z",
+      "end": "2026-09-20T13:40:44.581Z",
+      "qualifying_arrivals": [
+        {
+          "fa_flight_id": "EDV5043-1789708496-airline-632p",
+          "ident": "EDV5043",
+          "actual_on": "2026-09-20T13:37:00Z",
+          "scheduled_on": "2026-09-20T13:06:00Z",
+          "origin": "KMSP",
+          "destination": "KMCI"
+        },
+        {
+          "fa_flight_id": "DAL675-1789704717-fa-677p",
+          "ident": "DAL675",
+          "actual_on": "2026-09-20T13:32:42Z",
+          "scheduled_on": "2026-09-20T13:22:00Z",
+          "origin": "KBOS",
+          "destination": "KMCI"
+        },
+        {
+          "fa_flight_id": "SWA1956-1789707772-airline-1087p",
+          "ident": "SWA1956",
+          "actual_on": "2026-09-20T13:20:17Z",
+          "scheduled_on": "2026-09-20T13:33:00Z",
+          "origin": "KDEN",
+          "destination": "KMCI"
+        },
+        {
+          "fa_flight_id": "SWA726-1789711551-airline-142p",
+          "ident": "SWA726",
+          "actual_on": "2026-09-20T13:08:00Z",
+          "scheduled_on": "2026-09-20T13:16:00Z",
+          "origin": "KMCO",
+          "destination": "KMCI"
+        },
+        {
+          "fa_flight_id": "SWA2948-1789714022-airline-659p",
+          "ident": "SWA2948",
+          "actual_on": "2026-09-20T13:05:28Z",
+          "scheduled_on": "2026-09-20T13:17:00Z",
+          "origin": "KLGA",
+          "destination": "KMCI"
+        },
+        {
+          "fa_flight_id": "SWA294-1789714022-airline-652p",
+          "ident": "SWA294",
+          "actual_on": "2026-09-20T12:46:02Z",
+          "scheduled_on": "2026-09-20T12:58:00Z",
+          "origin": "KAUS",
+          "destination": "KMCI"
+        },
+        {
+          "fa_flight_id": "SWA3143-1789714022-airline-824p",
+          "ident": "SWA3143",
+          "actual_on": "2026-09-20T12:41:00Z",
+          "scheduled_on": "2026-09-20T12:56:00Z",
+          "origin": "KDCA",
+          "destination": "KMCI"
+        },
+        {
+          "fa_flight_id": "SWA4221-1789716978-airline-329p",
+          "ident": "SWA4221",
+          "actual_on": "2026-09-20T12:29:34Z",
+          "scheduled_on": "2026-09-20T12:32:00Z",
+          "origin": "KDAL",
+          "destination": "KMCI"
+        }
+      ],
+      "top_track": {
+        "fa_flight_id": "EDV5043-1789708496-airline-632p",
+        "positions": [
+          {
+            "timestamp": "2026-09-20T13:31:08Z",
+            "latitude": 39.16534,
+            "longitude": -94.88068,
+            "altitude": 47,
+            "groundspeed": 227,
+            "heading": 193
+          },
+          {
+            "timestamp": "2026-09-20T13:31:26Z",
+            "latitude": 39.14834,
+            "longitude": -94.8855,
+            "altitude": 43,
+            "groundspeed": 229,
+            "heading": 189
+          },
+          {
+            "timestamp": "2026-09-20T13:31:42Z",
+            "latitude": 39.13225,
+            "longitude": -94.88223,
+            "altitude": 39,
+            "groundspeed": 232,
+            "heading": 154
+          },
+          {
+            "timestamp": "2026-09-20T13:31:59Z",
+            "latitude": 39.1191,
+            "longitude": -94.86444,
+            "altitude": 35,
+            "groundspeed": 234,
+            "heading": 117
+          },
+          {
+            "timestamp": "2026-09-20T13:32:17Z",
+            "latitude": 39.11627,
+            "longitude": -94.83906,
+            "altitude": 31,
+            "groundspeed": 235,
+            "heading": 92
+          },
+          {
+            "timestamp": "2026-09-20T13:32:35Z",
+            "latitude": 39.11729,
+            "longitude": -94.81421,
+            "altitude": 30,
+            "groundspeed": 225,
+            "heading": 77
+          },
+          {
+            "timestamp": "2026-09-20T13:32:53Z",
+            "latitude": 39.12662,
+            "longitude": -94.79726,
+            "altitude": 30,
+            "groundspeed": 219,
+            "heading": 44
+          },
+          {
+            "timestamp": "2026-09-20T13:33:14Z",
+            "latitude": 39.1431,
+            "longitude": -94.77804,
+            "altitude": 30,
+            "groundspeed": 221,
+            "heading": 41
+          },
+          {
+            "timestamp": "2026-09-20T13:33:33Z",
+            "latitude": 39.16049,
+            "longitude": -94.76819,
+            "altitude": 30,
+            "groundspeed": 213,
+            "heading": 16
+          },
+          {
+            "timestamp": "2026-09-20T13:33:59Z",
+            "latitude": 39.18246,
+            "longitude": -94.7616,
+            "altitude": 30,
+            "groundspeed": 180,
+            "heading": 11
+          },
+          {
+            "timestamp": "2026-09-20T13:34:29Z",
+            "latitude": 39.20444,
+            "longitude": -94.75577,
+            "altitude": 28,
+            "groundspeed": 149,
+            "heading": 13
+          },
+          {
+            "timestamp": "2026-09-20T13:34:59Z",
+            "latitude": 39.22454,
+            "longitude": -94.74982,
+            "altitude": 24,
+            "groundspeed": 140,
+            "heading": 13
+          },
+          {
+            "timestamp": "2026-09-20T13:35:09Z",
+            "latitude": 39.23069,
+            "longitude": -94.74792,
+            "altitude": 23,
+            "groundspeed": 140,
+            "heading": 13
+          },
+          {
+            "timestamp": "2026-09-20T13:35:15Z",
+            "latitude": 39.23428,
+            "longitude": -94.74681,
+            "altitude": 22,
+            "groundspeed": 140,
+            "heading": 13
+          },
+          {
+            "timestamp": "2026-09-20T13:35:31Z",
+            "latitude": 39.24493,
+            "longitude": -94.74365,
+            "altitude": 20,
+            "groundspeed": 138,
+            "heading": 13
+          },
+          {
+            "timestamp": "2026-09-20T13:35:47Z",
+            "latitude": 39.25429,
+            "longitude": -94.74084,
+            "altitude": 18,
+            "groundspeed": 135,
+            "heading": 13
+          },
+          {
+            "timestamp": "2026-09-20T13:36:03Z",
+            "latitude": 39.26376,
+            "longitude": -94.73809,
+            "altitude": 16,
+            "groundspeed": 133,
+            "heading": 13
+          },
+          {
+            "timestamp": "2026-09-20T13:36:19Z",
+            "latitude": 39.27366,
+            "longitude": -94.73517,
+            "altitude": 15,
+            "groundspeed": 133,
+            "heading": 13
+          },
+          {
+            "timestamp": "2026-09-20T13:36:35Z",
+            "latitude": 39.28348,
+            "longitude": -94.73224,
+            "altitude": 13,
+            "groundspeed": 133,
+            "heading": 14
+          },
+          {
+            "timestamp": "2026-09-20T13:36:52Z",
+            "latitude": 39.29352,
+            "longitude": -94.72932,
+            "altitude": 11,
+            "groundspeed": 133,
+            "heading": 13
+          }
+        ]
+      }
+    }
+  ],
+  "errors": []
+}

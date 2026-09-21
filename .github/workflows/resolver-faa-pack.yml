@@ -1,0 +1,51 @@
+name: Resolver FAA pack validation
+
+on:
+  push:
+    branches:
+      - resolver-engine-v0
+  pull_request:
+    branches:
+      - resolver-fail-closed-v1
+    paths:
+      - "api/resolver-**"
+      - "api/lib.js"
+      - "scripts/test-resolver-engine.mjs"
+      - "scripts/test-resolver.mjs"
+      - "scripts/probe-faa-pack.mjs"
+      - "scripts/reconstruct-us-aal516.mjs"
+      - "scripts/inspect-cifp-aal516.mjs"
+      - "api/resolver/faa-nasr.js"
+      - "package.json"
+      - ".github/workflows/resolver-faa-pack.yml"
+  workflow_dispatch:
+
+jobs:
+  validate-faa-pack:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm install
+      - run: node scripts/test-resolver-engine.mjs
+      - run: node scripts/test-resolver.mjs
+      - run: node scripts/probe-faa-pack.mjs
+      - run: node scripts/reconstruct-us-aal516.mjs
+      - run: node scripts/inspect-cifp-aal516.mjs
+      - run: node scripts/inspect-cifp-transitions.mjs
+      - run: node scripts/test-cifp-aal516.mjs
+      - run: node scripts/test-us-filed-route-aal516.mjs
+      - run: node scripts/replay-us-resolver-sample.mjs
+      - run: node scripts/replay-us-shadow-100.mjs
+      - run: node scripts/inspect-unresolved-procedures-260903.mjs
+      - run: node scripts/inspect-sid-groups.mjs
+      - run: node scripts/benchmark-departure-most-used-runway.mjs
+      - run: node scripts/infer-development-arrival-runways.mjs
+      - run: node scripts/diagnose-arrival-inference-v0.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: faa-pack-260903-summary
+          path: artifacts/

@@ -1,0 +1,16 @@
+name: Inspect resolver remaining fixes
+on:
+  push:
+    branches: [resolver-engine-v0]
+    paths:
+      - "scripts/inspect-resolver-fixes.mjs"
+      - ".github/workflows/inspect-resolver-fixes.yml"
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 24}
+      - run: npm install
+      - run: node scripts/inspect-resolver-fixes.mjs
