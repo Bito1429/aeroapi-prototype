@@ -114,7 +114,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T16:05:00.000Z",
+      "scheduled_on_initial": "2026-09-20T17:37:00.000Z",
+      "scheduled_minutes": 92
     },
     {
       "baseline_capture_id": "23702",
@@ -295,7 +298,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T15:40:00.000Z",
+      "scheduled_on_initial": "2026-09-20T17:00:00.000Z",
+      "scheduled_minutes": 80
     },
     {
       "baseline_capture_id": "23688",
@@ -536,7 +542,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T15:20:00.000Z",
+      "scheduled_on_initial": "2026-09-20T17:05:00.000Z",
+      "scheduled_minutes": 105
     },
     {
       "baseline_capture_id": "23692",
@@ -667,7 +676,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T15:20:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:25:00.000Z",
+      "scheduled_minutes": 65
     },
     {
       "baseline_capture_id": "23660",
@@ -838,7 +850,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T15:15:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:20:00.000Z",
+      "scheduled_minutes": 65
     },
     {
       "baseline_capture_id": "23646",
@@ -949,7 +964,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T15:30:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:37:00.000Z",
+      "scheduled_minutes": 67
     },
     {
       "baseline_capture_id": "23636",
@@ -1110,7 +1128,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T15:30:00.000Z",
+      "scheduled_on_initial": "2026-09-20T17:20:00.000Z",
+      "scheduled_minutes": 110
     },
     {
       "baseline_capture_id": "23633",
@@ -1301,7 +1322,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T15:35:00.000Z",
+      "scheduled_on_initial": "2026-09-20T17:13:00.000Z",
+      "scheduled_minutes": 98
     },
     {
       "baseline_capture_id": "23631",
@@ -1402,7 +1426,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T15:30:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:21:00.000Z",
+      "scheduled_minutes": 51
     },
     {
       "baseline_capture_id": "23607",
@@ -1593,7 +1620,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T15:20:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:40:00.000Z",
+      "scheduled_minutes": 80
     },
     {
       "baseline_capture_id": "23617",
@@ -1794,7 +1824,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T15:20:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:30:00.000Z",
+      "scheduled_minutes": 70
     },
     {
       "baseline_capture_id": "23588",
@@ -1945,7 +1978,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:45:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:20:00.000Z",
+      "scheduled_minutes": 95
     },
     {
       "baseline_capture_id": "23584",
@@ -2136,7 +2172,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T15:00:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:05:00.000Z",
+      "scheduled_minutes": 65
     },
     {
       "baseline_capture_id": "23576",
@@ -2287,7 +2326,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T15:15:00.000Z",
+      "scheduled_on_initial": "2026-09-20T17:35:00.000Z",
+      "scheduled_minutes": 140
     },
     {
       "baseline_capture_id": "23561",
@@ -2438,7 +2480,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T11:30:00.000Z",
+      "scheduled_on_initial": "2026-09-20T13:29:00.000Z",
+      "scheduled_minutes": 119
     },
     {
       "baseline_capture_id": "23571",
@@ -2529,7 +2574,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T15:15:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:19:00.000Z",
+      "scheduled_minutes": 64
     },
     {
       "baseline_capture_id": "23531",
@@ -2770,7 +2818,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T15:15:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:35:00.000Z",
+      "scheduled_minutes": 80
     },
     {
       "baseline_capture_id": "23545",
@@ -2981,7 +3032,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T15:20:00.000Z",
+      "scheduled_on_initial": "2026-09-20T17:01:00.000Z",
+      "scheduled_minutes": 101
     },
     {
       "baseline_capture_id": "23528",
@@ -3132,7 +3186,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T15:15:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:56:00.000Z",
+      "scheduled_minutes": 101
     },
     {
       "baseline_capture_id": "23529",
@@ -3323,7 +3380,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T15:15:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:36:00.000Z",
+      "scheduled_minutes": 81
     },
     {
       "baseline_capture_id": "23503",
@@ -3554,7 +3614,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T15:05:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:50:00.000Z",
+      "scheduled_minutes": 105
     },
     {
       "baseline_capture_id": "23492",
@@ -3805,7 +3868,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:00:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:20:00.000Z",
+      "scheduled_minutes": 140
     },
     {
       "baseline_capture_id": "23476",
@@ -4006,7 +4072,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:45:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:10:00.000Z",
+      "scheduled_minutes": 85
     },
     {
       "baseline_capture_id": "23463",
@@ -4217,7 +4286,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T15:00:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:35:00.000Z",
+      "scheduled_minutes": 95
     },
     {
       "baseline_capture_id": "23453",
@@ -4388,7 +4460,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T15:00:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:00:00.000Z",
+      "scheduled_minutes": 60
     },
     {
       "baseline_capture_id": "23446",
@@ -4629,7 +4704,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T15:02:00.000Z",
+      "scheduled_on_initial": "2026-09-20T17:35:00.000Z",
+      "scheduled_minutes": 153
     },
     {
       "baseline_capture_id": "23432",
@@ -4920,7 +4998,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T15:00:00.000Z",
+      "scheduled_on_initial": "2026-09-20T17:12:00.000Z",
+      "scheduled_minutes": 132
     },
     {
       "baseline_capture_id": "23412",
@@ -5111,7 +5192,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T15:00:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:00:00.000Z",
+      "scheduled_minutes": 60
     },
     {
       "baseline_capture_id": "23403",
@@ -5272,7 +5356,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T15:02:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:07:00.000Z",
+      "scheduled_minutes": 65
     },
     {
       "baseline_capture_id": "23396",
@@ -5513,7 +5600,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:56:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:21:00.000Z",
+      "scheduled_minutes": 85
     },
     {
       "baseline_capture_id": "23391",
@@ -5764,7 +5854,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T15:00:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:17:00.000Z",
+      "scheduled_minutes": 77
     },
     {
       "baseline_capture_id": "23382",
@@ -5985,7 +6078,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T15:00:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:57:00.000Z",
+      "scheduled_minutes": 117
     },
     {
       "baseline_capture_id": "23380",
@@ -6176,7 +6272,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:50:00.000Z",
+      "scheduled_on_initial": "2026-09-20T17:10:00.000Z",
+      "scheduled_minutes": 140
     },
     {
       "baseline_capture_id": "23364",
@@ -6527,7 +6626,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:48:00.000Z",
+      "scheduled_on_initial": "2026-09-20T17:32:00.000Z",
+      "scheduled_minutes": 164
     },
     {
       "baseline_capture_id": "23357",
@@ -6758,7 +6860,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:57:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:02:00.000Z",
+      "scheduled_minutes": 65
     },
     {
       "baseline_capture_id": "23359",
@@ -6979,7 +7084,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:15:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:24:00.000Z",
+      "scheduled_minutes": 129
     },
     {
       "baseline_capture_id": "23338",
@@ -7180,7 +7288,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:46:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:12:00.000Z",
+      "scheduled_minutes": 86
     },
     {
       "baseline_capture_id": "23344",
@@ -7301,7 +7412,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:30:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:33:00.000Z",
+      "scheduled_minutes": 63
     },
     {
       "baseline_capture_id": "23337",
@@ -7492,7 +7606,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:30:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:25:00.000Z",
+      "scheduled_minutes": 55
     },
     {
       "baseline_capture_id": "23347",
@@ -7693,7 +7810,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:51:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:01:00.000Z",
+      "scheduled_minutes": 70
     },
     {
       "baseline_capture_id": "23322",
@@ -7944,7 +8064,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:45:00.000Z",
+      "scheduled_on_initial": "2026-09-20T17:30:00.000Z",
+      "scheduled_minutes": 165
     },
     {
       "baseline_capture_id": "23312",
@@ -8085,7 +8208,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T11:45:00.000Z",
+      "scheduled_on_initial": "2026-09-20T12:51:00.000Z",
+      "scheduled_minutes": 66
     },
     {
       "baseline_capture_id": "23292",
@@ -8276,7 +8402,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:45:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:07:00.000Z",
+      "scheduled_minutes": 82
     },
     {
       "baseline_capture_id": "23235",
@@ -8507,7 +8636,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:15:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:59:00.000Z",
+      "scheduled_minutes": 164
     },
     {
       "baseline_capture_id": "23214",
@@ -8668,7 +8800,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:30:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:30:00.000Z",
+      "scheduled_minutes": 120
     },
     {
       "baseline_capture_id": "23219",
@@ -8979,7 +9114,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:30:00.000Z",
+      "scheduled_on_initial": "2026-09-20T17:15:00.000Z",
+      "scheduled_minutes": 165
     },
     {
       "baseline_capture_id": "23216",
@@ -9150,7 +9288,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:30:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:10:00.000Z",
+      "scheduled_minutes": 100
     },
     {
       "baseline_capture_id": "23211",
@@ -9341,7 +9482,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:30:00.000Z",
+      "scheduled_on_initial": "2026-09-20T17:22:00.000Z",
+      "scheduled_minutes": 172
     },
     {
       "baseline_capture_id": "23221",
@@ -9512,7 +9656,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:30:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:51:00.000Z",
+      "scheduled_minutes": 81
     },
     {
       "baseline_capture_id": "23217",
@@ -9673,7 +9820,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:30:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:27:00.000Z",
+      "scheduled_minutes": 57
     },
     {
       "baseline_capture_id": "23175",
@@ -9914,7 +10064,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:30:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:51:00.000Z",
+      "scheduled_minutes": 141
     },
     {
       "baseline_capture_id": "23182",
@@ -10155,7 +10308,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:30:00.000Z",
+      "scheduled_on_initial": "2026-09-20T17:12:00.000Z",
+      "scheduled_minutes": 162
     },
     {
       "baseline_capture_id": "23176",
@@ -10246,7 +10402,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:30:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:24:00.000Z",
+      "scheduled_minutes": 54
     },
     {
       "baseline_capture_id": "23163",
@@ -10507,7 +10666,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:30:00.000Z",
+      "scheduled_on_initial": "2026-09-20T17:19:00.000Z",
+      "scheduled_minutes": 169
     },
     {
       "baseline_capture_id": "23166",
@@ -10618,7 +10780,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:30:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:54:00.000Z",
+      "scheduled_minutes": 84
     },
     {
       "baseline_capture_id": "23084",
@@ -10849,7 +11014,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:15:00.000Z",
+      "scheduled_on_initial": "2026-09-20T17:30:00.000Z",
+      "scheduled_minutes": 195
     },
     {
       "baseline_capture_id": "23080",
@@ -11020,7 +11188,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:15:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:25:00.000Z",
+      "scheduled_minutes": 70
     },
     {
       "baseline_capture_id": "23099",
@@ -11201,7 +11372,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:15:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:14:00.000Z",
+      "scheduled_minutes": 119
     },
     {
       "baseline_capture_id": "23082",
@@ -11372,7 +11546,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:15:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:16:00.000Z",
+      "scheduled_minutes": 61
     },
     {
       "baseline_capture_id": "23078",
@@ -11553,7 +11730,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:15:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:50:00.000Z",
+      "scheduled_minutes": 95
     },
     {
       "baseline_capture_id": "23085",
@@ -11684,7 +11864,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:15:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:46:00.000Z",
+      "scheduled_minutes": 91
     },
     {
       "baseline_capture_id": "23071",
@@ -11785,7 +11968,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T11:30:00.000Z",
+      "scheduled_on_initial": "2026-09-20T13:12:00.000Z",
+      "scheduled_minutes": 102
     },
     {
       "baseline_capture_id": "23062",
@@ -11906,7 +12092,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:15:00.000Z",
+      "scheduled_on_initial": "2026-09-20T14:57:30.000Z",
+      "scheduled_minutes": 42.5
     },
     {
       "baseline_capture_id": "23054",
@@ -12007,7 +12196,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:15:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:27:00.000Z",
+      "scheduled_minutes": 72
     },
     {
       "baseline_capture_id": "23057",
@@ -12138,7 +12330,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:15:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:44:00.000Z",
+      "scheduled_minutes": 89
     },
     {
       "baseline_capture_id": "23066",
@@ -12309,7 +12504,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:15:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:24:00.000Z",
+      "scheduled_minutes": 69
     },
     {
       "baseline_capture_id": "23042",
@@ -12500,7 +12698,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:15:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:36:00.000Z",
+      "scheduled_minutes": 81
     },
     {
       "baseline_capture_id": "22990",
@@ -12771,7 +12972,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:15:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:03:00.000Z",
+      "scheduled_minutes": 108
     },
     {
       "baseline_capture_id": "22967",
@@ -13002,7 +13206,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T13:30:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:02:00.000Z",
+      "scheduled_minutes": 152
     },
     {
       "baseline_capture_id": "22961",
@@ -13083,7 +13290,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T13:45:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:05:00.000Z",
+      "scheduled_minutes": 80
     },
     {
       "baseline_capture_id": "22943",
@@ -13274,7 +13484,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:00:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:25:00.000Z",
+      "scheduled_minutes": 85
     },
     {
       "baseline_capture_id": "22945",
@@ -13525,7 +13738,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:00:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:34:00.000Z",
+      "scheduled_minutes": 154
     },
     {
       "baseline_capture_id": "22927",
@@ -13756,7 +13972,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:00:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:55:00.000Z",
+      "scheduled_minutes": 115
     },
     {
       "baseline_capture_id": "22940",
@@ -13887,7 +14106,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:00:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:34:00.000Z",
+      "scheduled_minutes": 94
     },
     {
       "baseline_capture_id": "22947",
@@ -14068,7 +14290,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:00:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:27:00.000Z",
+      "scheduled_minutes": 147
     },
     {
       "baseline_capture_id": "22890",
@@ -14229,7 +14454,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:00:00.000Z",
+      "scheduled_on_initial": "2026-09-20T14:48:50.000Z",
+      "scheduled_minutes": 48.833333333333336
     },
     {
       "baseline_capture_id": "22903",
@@ -14440,7 +14668,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:00:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:06:00.000Z",
+      "scheduled_minutes": 126
     },
     {
       "baseline_capture_id": "22886",
@@ -14791,7 +15022,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:00:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:22:00.000Z",
+      "scheduled_minutes": 142
     },
     {
       "baseline_capture_id": "22901",
@@ -14942,7 +15176,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:00:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:31:00.000Z",
+      "scheduled_minutes": 91
     },
     {
       "baseline_capture_id": "22897",
@@ -15073,7 +15310,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:00:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:40:00.000Z",
+      "scheduled_minutes": 100
     },
     {
       "baseline_capture_id": "22894",
@@ -15434,7 +15674,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:00:00.000Z",
+      "scheduled_on_initial": "2026-09-20T17:02:00.000Z",
+      "scheduled_minutes": 182
     },
     {
       "baseline_capture_id": "22887",
@@ -15615,7 +15858,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:00:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:24:00.000Z",
+      "scheduled_minutes": 84
     },
     {
       "baseline_capture_id": "22907",
@@ -15766,7 +16012,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:00:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:09:00.000Z",
+      "scheduled_minutes": 129
     },
     {
       "baseline_capture_id": "22888",
@@ -16027,7 +16276,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:00:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:42:00.000Z",
+      "scheduled_minutes": 162
     },
     {
       "baseline_capture_id": "22878",
@@ -16278,7 +16530,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T10:55:00.000Z",
+      "scheduled_on_initial": "2026-09-20T13:24:00.000Z",
+      "scheduled_minutes": 149
     },
     {
       "baseline_capture_id": "22861",
@@ -16539,7 +16794,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:15:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:55:00.000Z",
+      "scheduled_minutes": 160
     },
     {
       "baseline_capture_id": "22851",
@@ -16750,7 +17008,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T13:35:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:20:00.000Z",
+      "scheduled_minutes": 105
     },
     {
       "baseline_capture_id": "22845",
@@ -16871,7 +17132,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T14:00:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:47:00.000Z",
+      "scheduled_minutes": 107
     },
     {
       "baseline_capture_id": "22814",
@@ -17232,7 +17496,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T13:00:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:02:00.000Z",
+      "scheduled_minutes": 182
     },
     {
       "baseline_capture_id": "22811",
@@ -17453,7 +17720,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T13:15:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:53:00.000Z",
+      "scheduled_minutes": 158
     },
     {
       "baseline_capture_id": "22782",
@@ -17784,7 +18054,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T13:45:00.000Z",
+      "scheduled_on_initial": "2026-09-20T17:10:00.000Z",
+      "scheduled_minutes": 205
     },
     {
       "baseline_capture_id": "22793",
@@ -17935,7 +18208,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T13:45:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:29:00.000Z",
+      "scheduled_minutes": 104
     },
     {
       "baseline_capture_id": "22799",
@@ -18136,7 +18412,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T13:45:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:52:00.000Z",
+      "scheduled_minutes": 127
     },
     {
       "baseline_capture_id": "22786",
@@ -18357,7 +18636,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T13:45:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:57:00.000Z",
+      "scheduled_minutes": 132
     },
     {
       "baseline_capture_id": "22787",
@@ -18548,7 +18830,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T13:45:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:35:00.000Z",
+      "scheduled_minutes": 110
     },
     {
       "baseline_capture_id": "22795",
@@ -18749,7 +19034,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T13:45:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:38:00.000Z",
+      "scheduled_minutes": 113
     },
     {
       "baseline_capture_id": "22780",
@@ -18880,7 +19168,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T13:45:00.000Z",
+      "scheduled_on_initial": "2026-09-20T15:59:00.000Z",
+      "scheduled_minutes": 134
     },
     {
       "baseline_capture_id": "22789",
@@ -19081,7 +19372,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T13:45:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:15:00.000Z",
+      "scheduled_minutes": 150
     },
     {
       "baseline_capture_id": "22794",
@@ -19262,7 +19556,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T13:45:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:15:00.000Z",
+      "scheduled_minutes": 150
     },
     {
       "baseline_capture_id": "22785",
@@ -19483,7 +19780,10 @@
         }
       ],
       "actual_runway_on": null,
-      "actual_runway_off": null
+      "actual_runway_off": null,
+      "scheduled_out_initial": "2026-09-20T13:45:00.000Z",
+      "scheduled_on_initial": "2026-09-20T16:20:00.000Z",
+      "scheduled_minutes": 155
     }
   ]
 }
