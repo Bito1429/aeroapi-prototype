@@ -44,6 +44,7 @@ jobs:
       - run: node scripts/inspect-sid-groups.mjs
       - run: node scripts/benchmark-departure-most-used-runway.mjs
       - run: node scripts/infer-development-arrival-runways.mjs
+      - run: node scripts/diagnose-arrival-inference-v0.mjs
       - uses: actions/upload-artifact@v4
         with:
           name: faa-pack-260903-summary
