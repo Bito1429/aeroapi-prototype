@@ -34,7 +34,8 @@ Track match rule:
 Dumb baseline:
 - "Most-used runway" must be estimated only from runway observations available before the evaluated flight's departure time.
 - No future runway observations from the evaluated flight or later flights may enter the runway-frequency estimate.
-- Ties or insufficient historical runway evidence => REFUSE.
+- Historical runway evidence must contain at least 5 distinct prior completed flights at that airport for that side (departure/arrival).
+- The modal runway must be unique. Fewer than 5 observations or a tie for modal runway => REFUSE.
 - The selected runway branch is then evaluated against the same flown-track benchmark.
 - Report coverage, conditional accuracy, overall correct rate, refusal rate and wrong-answer rate identically.
 
