@@ -3,7 +3,7 @@ on:
   pull_request:
     branches: [resolver-fail-closed-v1]
     paths:
-      - "api/resolver-**"
+      - "api/resolver-**"\n      - "api/lib.js"
       - "scripts/probe-faa-pack.mjs"
       - "package.json"
       - ".github/workflows/resolver-faa-pack.yml"
