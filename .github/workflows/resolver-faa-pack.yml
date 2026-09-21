@@ -37,6 +37,7 @@ jobs:
       - run: node scripts/inspect-cifp-aal516.mjs
       - run: node scripts/inspect-cifp-transitions.mjs
       - run: node scripts/test-cifp-aal516.mjs
+      - run: node scripts/test-us-filed-route-aal516.mjs
       - uses: actions/upload-artifact@v4
         with:
           name: faa-pack-260903-summary
