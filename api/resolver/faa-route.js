@@ -1,4 +1,5 @@
 import{resolveEnrouteNasr,resolvePoint}from"./faa-nasr.js";
+import{classifyToken}from"../resolver-lib.js";
 import{selectDepartureByNextFix,selectArrivalByEntryFix}from"./faa-cifp.js";
 
 function pointSequence(index,names){
@@ -16,10 +17,17 @@ export function resolveFiledRouteUS({route,origin,destination,nasrIndex,cifpText
   if(tokens.length<2)return{status:"INVALID",reason:"ROUTE_TOO_SHORT"};
 
   const depToken=tokens[0],arrToken=tokens.at(-1);
-  const nextFix=tokens[1],entryFix=tokens.at(-2);
+  const depIsProcedure=classifyToken(depToken)==="PROCEDURE_CANDIDATE";
+  const arrIsProcedure=classifyToken(arrToken)==="PROCEDURE_CANDIDATE";
+  const nextFix=depIsProcedure?tokens[1]:null;
+  const entryFix=arrIsProcedure?tokens.at(-2):null;
 
-  const dep=selectDepartureByNextFix(cifpText,{airport:origin,procedure:depToken,nextFix});
-  const arr=selectArrivalByEntryFix(cifpText,{airport:destination,procedure:arrToken,entryFix});
+  const dep=depIsProcedure
+    ? selectDepartureByNextFix(cifpText,{airport:origin,procedure:depToken,nextFix})
+    : {status:"NOT_FILED",procedure:null,fixes:[]};
+  const arr=arrIsProcedure
+    ? selectArrivalByEntryFix(cifpText,{airport:destination,procedure:arrToken,entryFix})
+    : {status:"NOT_FILED",procedure:null,fixes:[]};
   const enroute=resolveEnrouteNasr(route,nasrIndex);
 
   const names=[];
@@ -29,19 +37,19 @@ export function resolveFiledRouteUS({route,origin,destination,nasrIndex,cifpText
 
   const pts=pointSequence(nasrIndex,names);
   const terminalAmbiguity={
-    departure_runway_path: dep.status==="RESOLVED" ? "NOT_SELECTED_FROM_FILED_ROUTE" : dep.status,
-    arrival_runway_path: arr.status==="PARTIAL_AMBIGUOUS_RUNWAY" ? "AMBIGUOUS" : arr.runway_branch||null
+    departure_runway_path: depIsProcedure ? (dep.status==="RESOLVED" ? "NOT_SELECTED_FROM_FILED_ROUTE" : dep.status) : null,
+    arrival_runway_path: arrIsProcedure ? (arr.status==="PARTIAL_AMBIGUOUS_RUNWAY" ? "AMBIGUOUS" : arr.runway_branch||arr.status) : null
   };
   const problems=[
     ...enroute.unresolved.map(x=>({stage:"ENROUTE",...x})),
     ...pts.unresolved.map(x=>({stage:"POINT_LOOKUP",...x}))
   ];
-  if(dep.status!=="RESOLVED")problems.push({stage:"DEPARTURE_PROCEDURE",status:dep.status});
-  if(!["RESOLVED","PARTIAL_AMBIGUOUS_RUNWAY"].includes(arr.status))problems.push({stage:"ARRIVAL_PROCEDURE",status:arr.status});
+  if(depIsProcedure&&dep.status!=="RESOLVED")problems.push({stage:"DEPARTURE_PROCEDURE",status:dep.status});
+  if(arrIsProcedure&&!["RESOLVED","PARTIAL_AMBIGUOUS_RUNWAY"].includes(arr.status))problems.push({stage:"ARRIVAL_PROCEDURE",status:arr.status});
 
   const fullyTerminalDetermined=
-    dep.status==="RESOLVED" &&
-    arr.status==="RESOLVED" &&
+    (!depIsProcedure||dep.status==="RESOLVED") &&
+    (!arrIsProcedure||arr.status==="RESOLVED") &&
     !terminalAmbiguity.departure_runway_path &&
     !terminalAmbiguity.arrival_runway_path;
 
