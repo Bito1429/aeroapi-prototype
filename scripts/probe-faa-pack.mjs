@@ -4,8 +4,10 @@ import{unzipSync,strFromU8}from"fflate";
 
 const SOURCES={
   FIX:"https://nfdc.faa.gov/webContent/28DaySub/extra/03_Sep_2026_FIX_CSV.zip",
+  NAV:"https://nfdc.faa.gov/webContent/28DaySub/extra/03_Sep_2026_NAV_CSV.zip",
   AWY:"https://nfdc.faa.gov/webContent/28DaySub/extra/03_Sep_2026_AWY_CSV.zip",
-  STAR:"https://nfdc.faa.gov/webContent/28DaySub/extra/03_Sep_2026_STAR_CSV.zip"
+  STAR:"https://nfdc.faa.gov/webContent/28DaySub/extra/03_Sep_2026_STAR_CSV.zip",
+  CIFP:"https://aeronav.faa.gov/Upload_313-d/cifp/CIFP_260903.zip"
 };
 
 function summarizeCsv(bytes){
