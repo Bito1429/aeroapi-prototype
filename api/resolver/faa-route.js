@@ -35,15 +35,18 @@ export function resolveFiledRouteUS({route,origin,destination,nasrIndex,cifpText
   for(const p of enroute.geometry)if(names.at(-1)!==p.name)names.push(p.name);
   if(arr.fixes)for(const x of arr.fixes)if(names.at(-1)!==x)names.push(x);
 
-  const pts=pointSequence(nasrIndex,names);
+  const corePts=pointSequence(nasrIndex,names);
+  const originResult=resolvePoint(nasrIndex,origin),destinationResult=resolvePoint(nasrIndex,destination);
   const terminalAmbiguity={
     departure_runway_path: depIsProcedure ? (dep.status==="RESOLVED" ? "NOT_SELECTED_FROM_FILED_ROUTE" : dep.status) : null,
     arrival_runway_path: arrIsProcedure ? (arr.status==="PARTIAL_AMBIGUOUS_RUNWAY" ? "AMBIGUOUS" : arr.runway_branch||arr.status) : null
   };
   const problems=[
     ...enroute.unresolved.map(x=>({stage:"ENROUTE",...x})),
-    ...pts.unresolved.map(x=>({stage:"POINT_LOOKUP",...x}))
+    ...corePts.unresolved.map(x=>({stage:"POINT_LOOKUP",...x}))
   ];
+  if(originResult.status!=="RESOLVED")problems.push({stage:"ORIGIN_AIRPORT",name:origin,status:originResult.status});
+  if(destinationResult.status!=="RESOLVED")problems.push({stage:"DESTINATION_AIRPORT",name:destination,status:destinationResult.status});
   if(depIsProcedure&&dep.status!=="RESOLVED")problems.push({stage:"DEPARTURE_PROCEDURE",status:dep.status});
   if(arrIsProcedure&&!["RESOLVED","PARTIAL_AMBIGUOUS_RUNWAY"].includes(arr.status))problems.push({stage:"ARRIVAL_PROCEDURE",status:arr.status});
 
@@ -53,13 +56,21 @@ export function resolveFiledRouteUS({route,origin,destination,nasrIndex,cifpText
     !terminalAmbiguity.departure_runway_path &&
     !terminalAmbiguity.arrival_runway_path;
 
+  const fullRouteValid=problems.length===0&&fullyTerminalDetermined;
+  const fullNames=fullRouteValid
+    ? [origin,...names.filter(x=>x!==origin&&x!==destination),destination]
+    : names;
+  const fullPts=fullRouteValid?pointSequence(nasrIndex,fullNames):corePts;
+
   return{
-    status:problems.length?"PARTIAL":fullyTerminalDetermined?"VALID":"PARTIAL",
-    validity_reason:problems.length?"UNRESOLVED_COMPONENT":"RUNWAY_DEPENDENT_TERMINAL_GEOMETRY_NOT_FILED",
+    status:problems.length?"PARTIAL":fullRouteValid?"VALID":"PARTIAL",
+    validity_reason:problems.length?"UNRESOLVED_COMPONENT":fullRouteValid?"DETERMINISTIC_FULL_FILED_ROUTE":"RUNWAY_DEPENDENT_TERMINAL_GEOMETRY_NOT_FILED",
     filed_core_valid:problems.length===0,
-    scoring_valid:false,
-    geometry:pts.geometry,
-    names,
+    scoring_valid:fullRouteValid,
+    geometry:fullPts.geometry,
+    names:fullNames,
+    origin_point:originResult.point||null,
+    destination_point:destinationResult.point||null,
     departure:dep,
     arrival:arr,
     terminal_ambiguity:terminalAmbiguity,
