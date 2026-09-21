@@ -112,7 +112,9 @@
           "distance_from_origin": 532,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23702",
@@ -291,7 +293,9 @@
           "distance_from_origin": 368,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23688",
@@ -530,7 +534,9 @@
           "distance_from_origin": 621,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23692",
@@ -659,7 +665,9 @@
           "distance_from_origin": 304,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23660",
@@ -828,7 +836,9 @@
           "distance_from_origin": 256,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23646",
@@ -937,7 +947,9 @@
           "distance_from_origin": 273,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23636",
@@ -1096,7 +1108,9 @@
           "distance_from_origin": 603,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23633",
@@ -1285,7 +1299,9 @@
           "distance_from_origin": 494,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23631",
@@ -1384,7 +1400,9 @@
           "distance_from_origin": 150,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23607",
@@ -1573,7 +1591,9 @@
           "distance_from_origin": 370,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23617",
@@ -1772,7 +1792,9 @@
           "distance_from_origin": 338,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23588",
@@ -1921,7 +1943,9 @@
           "distance_from_origin": 521,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23584",
@@ -2110,7 +2134,9 @@
           "distance_from_origin": 282,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23576",
@@ -2259,7 +2285,9 @@
           "distance_from_origin": 1037,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23561",
@@ -2408,7 +2436,9 @@
           "distance_from_origin": 639,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23571",
@@ -2497,7 +2527,9 @@
           "distance_from_origin": 192,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23531",
@@ -2736,7 +2768,9 @@
           "distance_from_origin": 369,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23545",
@@ -2945,7 +2979,9 @@
           "distance_from_origin": 551,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23528",
@@ -3094,7 +3130,9 @@
           "distance_from_origin": 523,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23529",
@@ -3283,7 +3321,9 @@
           "distance_from_origin": 370,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23503",
@@ -3512,7 +3552,9 @@
           "distance_from_origin": 714,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23492",
@@ -3761,7 +3803,9 @@
           "distance_from_origin": 885,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23476",
@@ -3960,7 +4004,9 @@
           "distance_from_origin": 407,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23463",
@@ -4169,7 +4215,9 @@
           "distance_from_origin": 602,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23453",
@@ -4338,7 +4386,9 @@
           "distance_from_origin": 256,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23446",
@@ -4577,7 +4627,9 @@
           "distance_from_origin": 1011,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23432",
@@ -4866,7 +4918,9 @@
           "distance_from_origin": 862,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23412",
@@ -5055,7 +5109,9 @@
           "distance_from_origin": 236,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23403",
@@ -5214,7 +5270,9 @@
           "distance_from_origin": 290,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23396",
@@ -5453,7 +5511,9 @@
           "distance_from_origin": 369,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23391",
@@ -5702,7 +5762,9 @@
           "distance_from_origin": 370,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23382",
@@ -5921,7 +5983,9 @@
           "distance_from_origin": 651,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23380",
@@ -6110,7 +6174,9 @@
           "distance_from_origin": 1043,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23364",
@@ -6459,7 +6525,9 @@
           "distance_from_origin": 949,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23357",
@@ -6688,7 +6756,9 @@
           "distance_from_origin": 308,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23359",
@@ -6907,7 +6977,9 @@
           "distance_from_origin": 680,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23338",
@@ -7106,7 +7178,9 @@
           "distance_from_origin": 407,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23344",
@@ -7225,7 +7299,9 @@
           "distance_from_origin": 129,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23337",
@@ -7414,7 +7490,9 @@
           "distance_from_origin": 227,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23347",
@@ -7613,7 +7691,9 @@
           "distance_from_origin": 338,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23322",
@@ -7862,7 +7942,9 @@
           "distance_from_origin": 1261,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23312",
@@ -8001,7 +8083,9 @@
           "distance_from_origin": 178,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23292",
@@ -8190,7 +8274,9 @@
           "distance_from_origin": 338,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23235",
@@ -8419,7 +8505,9 @@
           "distance_from_origin": 1053,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23214",
@@ -8578,7 +8666,9 @@
           "distance_from_origin": 842,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23219",
@@ -8887,7 +8977,9 @@
           "distance_from_origin": 927,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23216",
@@ -9056,7 +9148,9 @@
           "distance_from_origin": 604,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23211",
@@ -9245,7 +9339,9 @@
           "distance_from_origin": 914,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23221",
@@ -9414,7 +9510,9 @@
           "distance_from_origin": 225,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23217",
@@ -9573,7 +9671,9 @@
           "distance_from_origin": 190,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23175",
@@ -9812,7 +9912,9 @@
           "distance_from_origin": 867,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23182",
@@ -10051,7 +10153,9 @@
           "distance_from_origin": 1008,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23176",
@@ -10140,7 +10244,9 @@
           "distance_from_origin": 192,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23163",
@@ -10399,7 +10505,9 @@
           "distance_from_origin": 1210,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23166",
@@ -10508,7 +10616,9 @@
           "distance_from_origin": 440,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23084",
@@ -10737,7 +10847,9 @@
           "distance_from_origin": 1522,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23080",
@@ -10906,7 +11018,9 @@
           "distance_from_origin": 236,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23099",
@@ -11085,7 +11199,9 @@
           "distance_from_origin": 647,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23082",
@@ -11254,7 +11370,9 @@
           "distance_from_origin": 256,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23078",
@@ -11433,7 +11551,9 @@
           "distance_from_origin": 584,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23085",
@@ -11562,7 +11682,9 @@
           "distance_from_origin": 399,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23071",
@@ -11661,7 +11783,9 @@
           "distance_from_origin": 416,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23062",
@@ -11780,7 +11904,9 @@
           "distance_from_origin": 110,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23054",
@@ -11879,7 +12005,9 @@
           "distance_from_origin": 223,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23057",
@@ -12008,7 +12136,9 @@
           "distance_from_origin": 399,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23066",
@@ -12177,7 +12307,9 @@
           "distance_from_origin": 259,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "23042",
@@ -12366,7 +12498,9 @@
           "distance_from_origin": 370,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22990",
@@ -12635,7 +12769,9 @@
           "distance_from_origin": 591,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22967",
@@ -12864,7 +13000,9 @@
           "distance_from_origin": 867,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22961",
@@ -12943,7 +13081,9 @@
           "distance_from_origin": 419,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22943",
@@ -13132,7 +13272,9 @@
           "distance_from_origin": 397,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22945",
@@ -13381,7 +13523,9 @@
           "distance_from_origin": 1068,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22927",
@@ -13610,7 +13754,9 @@
           "distance_from_origin": 602,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22940",
@@ -13739,7 +13885,9 @@
           "distance_from_origin": 483,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22947",
@@ -13918,7 +14066,9 @@
           "distance_from_origin": 908,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22890",
@@ -14077,7 +14227,9 @@
           "distance_from_origin": 125,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22903",
@@ -14286,7 +14438,9 @@
           "distance_from_origin": 777,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22886",
@@ -14635,7 +14789,9 @@
           "distance_from_origin": 862,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22901",
@@ -14784,7 +14940,9 @@
           "distance_from_origin": 456,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22897",
@@ -14913,7 +15071,9 @@
           "distance_from_origin": 495,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22894",
@@ -15272,7 +15432,9 @@
           "distance_from_origin": 1234,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22887",
@@ -15451,7 +15613,9 @@
           "distance_from_origin": 390,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22907",
@@ -15600,7 +15764,9 @@
           "distance_from_origin": 807,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22888",
@@ -15859,7 +16025,9 @@
           "distance_from_origin": 1054,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22878",
@@ -16108,7 +16276,9 @@
           "distance_from_origin": 887,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22861",
@@ -16367,7 +16537,9 @@
           "distance_from_origin": 956,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22851",
@@ -16576,7 +16748,9 @@
           "distance_from_origin": 628,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22845",
@@ -16695,7 +16869,9 @@
           "distance_from_origin": 574,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22814",
@@ -17054,7 +17230,9 @@
           "distance_from_origin": 1234,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22811",
@@ -17273,7 +17451,9 @@
           "distance_from_origin": 966,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22782",
@@ -17602,7 +17782,9 @@
           "distance_from_origin": 1590,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22793",
@@ -17751,7 +17933,9 @@
           "distance_from_origin": 524,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22799",
@@ -17950,7 +18134,9 @@
           "distance_from_origin": 679,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22786",
@@ -18169,7 +18355,9 @@
           "distance_from_origin": 628,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22787",
@@ -18358,7 +18546,9 @@
           "distance_from_origin": 652,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22795",
@@ -18557,7 +18747,9 @@
           "distance_from_origin": 591,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22780",
@@ -18686,7 +18878,9 @@
           "distance_from_origin": 753,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22789",
@@ -18885,7 +19079,9 @@
           "distance_from_origin": 1066,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22794",
@@ -19064,7 +19260,9 @@
           "distance_from_origin": 1012,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     },
     {
       "baseline_capture_id": "22785",
@@ -19283,7 +19481,9 @@
           "distance_from_origin": 1138,
           "distance_to_destination": 0
         }
-      ]
+      ],
+      "actual_runway_on": null,
+      "actual_runway_off": null
     }
   ]
 }
