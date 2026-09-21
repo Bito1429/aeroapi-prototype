@@ -3,7 +3,7 @@ const BASE="https://aeroapi.flightaware.com/aeroapi";
 export function json(res,status,body){res.statusCode=status;res.setHeader("content-type","application/json; charset=utf-8");res.end(JSON.stringify(body));}
 export async function aero(path,params={}){const key=process.env.AEROAPI_KEY;if(!key)throw new Error("AEROAPI_KEY is not configured");const u=new URL(BASE+path);for(const[k,v]of Object.entries(params))if(v!==undefined&&v!==null&&v!=="")u.searchParams.set(k,String(v));const r=await fetch(u,{headers:{"x-apikey":key}}),t=await r.text();let b;try{b=JSON.parse(t)}catch{b={raw:t}};if(!r.ok){const e=new Error("AeroAPI "+r.status);e.status=r.status;e.body=b;throw e;}return b;}
 export function havKm(a,b){const R=6371.0088,rad=Math.PI/180,p1=a.latitude*rad,p2=b.latitude*rad,dp=(b.latitude-a.latitude)*rad,dl=(b.longitude-a.longitude)*rad,h=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;return 2*R*Math.asin(Math.min(1,Math.sqrt(h)));}
-export function polyKm(p){let d=0;for(let i=1;i<p.length;i++)d+=havKm(p[i-1],p[i]);return d;}
+export function polyKm(p){let d=0;for(let i=1;i<p.length;i++)d+=havKm(p[i-1],p[i]);return d;}\nexport const RESOLVER_RULE_VERSION="R1_FAIL_CLOSED_2026-09-21";
 const AIRWAY_RE=/^(?:[JQVTLRYAMBGNPW]\\d{1,3}|U[JQVTLRYAMBGNPW]\\d{1,3}|RTE\\d{1,3})$/i;
 function finiteFix(f){return Number.isFinite(f?.latitude)&&Number.isFinite(f?.longitude);}
 function cloneFix(f){return{...f};}
