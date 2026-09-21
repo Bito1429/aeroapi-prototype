@@ -30,7 +30,7 @@ function segNm(p,a,b){
 function minTrack(p,tr){let best=Infinity;for(let i=1;i<tr.length;i++)best=Math.min(best,segNm([p.latitude,p.longitude],tr[i-1],tr[i]));return best;}
 function median(a){const s=[...a].sort((x,y)=>x-y),m=Math.floor(s.length/2);return s.length?(s.length%2?s[m]:(s[m-1]+s[m])/2):null;}
 
-let denominator=0,answered=0,matches=0,wrong=0,refused=0;
+let denominator=0,answered=0,matches=0,wrong=0,refused=0,aeroSame60Matches=0,aeroSame60Wrong=0,hybridMatches=0,hybridWrong=0;
 const reasons={},rows=[];
 for(const c of fixture.cases){
  const route=String(c.route||"").trim().split(/\s+/).filter(Boolean).map(x=>x.toUpperCase());
@@ -51,8 +51,43 @@ for(const c of fixture.cases){
  if(tr.length<2){refused++;reasons.NO_TRACK=(reasons.NO_TRACK||0)+1;continue;}
  const ds=pts.map(p=>minTrack(p,tr)),cov3=ds.filter(d=>d<=3).length/ds.length,med=median(ds),match=cov3>=.75&&med<=3;
  answered++;if(match)matches++;else wrong++;
- rows.push({ident:c.ident,origin:c.origin,procedure:route[0],modal_runway:modal,n:pts.length,coverage3:cov3,median_nm:med,match,branch_names:names});
+
+ // AeroAPI branch on the exact same baseline-answered flight.
+ const oldBranch=(c.old_canonical_fixes||[]).slice(1,idx).filter(p=>Number.isFinite(p?.latitude)&&Number.isFinite(p?.longitude));
+ let aeroMatch=null,aeroCov3=null,aeroMed=null;
+ if(oldBranch.length){
+   const ads=oldBranch.map(p=>minTrack(p,tr));
+   aeroCov3=ads.filter(d=>d<=3).length/ads.length;
+   aeroMed=median(ads);
+   aeroMatch=aeroCov3>=.75&&aeroMed<=3;
+   if(aeroMatch)aeroSame60Matches++;else aeroSame60Wrong++;
+ }
+
+ // Frozen development-only hybrid: modal-runway result if answered, otherwise AeroAPI.
+ if(match)hybridMatches++;else hybridWrong++;
+
+ rows.push({ident:c.ident,origin:c.origin,procedure:route[0],modal_runway:modal,n:pts.length,coverage3:cov3,median_nm:med,match,
+   aeroapi_same_flight_match:aeroMatch,aeroapi_same_flight_coverage3:aeroCov3,aeroapi_same_flight_median_nm:aeroMed,
+   branch_names:names});
 }
+// Complete hybrid denominator by using AeroAPI on modal-runway refusals.
+for(const c of fixture.cases){
+ const route=String(c.route||"").trim().split(/\s+/).filter(Boolean).map(x=>x.toUpperCase());
+ const old=c.old_canonical_fixes||[],oldNames=old.map(x=>String(x?.name||"").toUpperCase());
+ if(!PROC.test(route[0]||""))continue;
+ const selector=route[1], idx=oldNames.indexOf(selector);
+ if(!(idx>1))continue;
+ const already=rows.find(r=>r.ident===c.ident&&r.origin===c.origin&&r.procedure===route[0]);
+ if(already)continue;
+ const tr=tracks[c.baseline_capture_id]||[];
+ const oldBranch=old.slice(1,idx).filter(p=>Number.isFinite(p?.latitude)&&Number.isFinite(p?.longitude));
+ if(oldBranch.length&&tr.length>1){
+   const ds=oldBranch.map(p=>minTrack(p,tr)),cov3=ds.filter(d=>d<=3).length/ds.length,med=median(ds);
+   const ok=cov3>=.75&&med<=3;
+   if(ok)hybridMatches++;else hybridWrong++;
+ }
+}
+
 const report={
  population:fixture.fixture_id,denominator,answered,refused,matches,wrong,
  coverage:answered/denominator,
@@ -61,6 +96,21 @@ const report={
  refusal_rate:refused/denominator,
  wrong_answer_rate:wrong/denominator,
  aeroapi_reference:{answered:95,matches:67,coverage:1,conditional_accuracy:67/95,overall_correct_rate:67/95,wrong_answer_rate:28/95},
+ aeroapi_on_same_answered_set:{
+   denominator:answered,
+   matches:aeroSame60Matches,
+   wrong:aeroSame60Wrong,
+   accuracy:answered?aeroSame60Matches/answered:null
+ },
+ history_then_aeroapi_hybrid:{
+   denominator,
+   answered:denominator,
+   matches:hybridMatches,
+   wrong:hybridWrong,
+   coverage:1,
+   overall_correct_rate:hybridMatches/denominator,
+   wrong_answer_rate:hybridWrong/denominator
+ },
  refusal_reasons:reasons,
  worst_wrong:rows.filter(x=>x.match===false).sort((a,b)=>b.median_nm-a.median_nm).slice(0,10)
 };
