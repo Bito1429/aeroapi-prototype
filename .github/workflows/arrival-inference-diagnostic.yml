@@ -5,6 +5,8 @@ on:
       - resolver-engine-v0
     paths:
       - "scripts/diagnose-arrival-inference-v0.mjs"
+      - "scripts/infer-development-arrival-direction-v1.mjs"
+      - "docs/historical-landing-direction-inference-policy-v1.md"
       - ".github/workflows/arrival-inference-diagnostic.yml"
   workflow_dispatch:
 
@@ -19,3 +21,4 @@ jobs:
           node-version: 24
       - run: npm install
       - run: node scripts/diagnose-arrival-inference-v0.mjs
+      - run: node scripts/infer-development-arrival-direction-v1.mjs
