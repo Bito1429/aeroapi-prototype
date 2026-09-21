@@ -12,7 +12,15 @@
       "destination": "KGPI",
       "captured_at": "2026-09-20T16:00:44.487Z",
       "route": "RUGGD3 HOLTR HIA FCA",
-      "old_canonical_fix_count": 9
+      "old_canonical_fix_count": 9,
+      "departure_dumb_baseline": {
+        "capture_id": "23764",
+        "origin": "KSLC",
+        "eval_time": "2026-09-20T16:00:44.487Z",
+        "nobs": "16",
+        "nmodes": "2",
+        "baseline_runway": null
+      }
     },
     {
       "baseline_capture_id": "23702",
@@ -21,7 +29,15 @@
       "destination": "KLAS",
       "captured_at": "2026-09-20T15:35:44.426Z",
       "route": "ZIONZ1 EHK STEWW CHOWW4",
-      "old_canonical_fix_count": 16
+      "old_canonical_fix_count": 16,
+      "departure_dumb_baseline": {
+        "capture_id": "23702",
+        "origin": "KSLC",
+        "eval_time": "2026-09-20T15:35:44.426Z",
+        "nobs": "16",
+        "nmodes": "2",
+        "baseline_runway": null
+      }
     },
     {
       "baseline_capture_id": "23688",
@@ -30,7 +46,15 @@
       "destination": "KSJC",
       "captured_at": "2026-09-20T15:31:44.331Z",
       "route": "KEENS3 HRRBR CURIV J212 DECAS PMD J6 AVE TROXX SILCN6",
-      "old_canonical_fix_count": 22
+      "old_canonical_fix_count": 22,
+      "departure_dumb_baseline": {
+        "capture_id": "23688",
+        "origin": "KPHX",
+        "eval_time": "2026-09-20T15:31:44.331Z",
+        "nobs": "26",
+        "nmodes": "1",
+        "baseline_runway": "07L"
+      }
     },
     {
       "baseline_capture_id": "23692",
@@ -39,7 +63,15 @@
       "destination": "KSAN",
       "captured_at": "2026-09-20T15:31:44.322Z",
       "route": "FYRBD1 MOHAK J2 HOGGZ LUCKI1",
-      "old_canonical_fix_count": 11
+      "old_canonical_fix_count": 11,
+      "departure_dumb_baseline": {
+        "capture_id": "23692",
+        "origin": "KPHX",
+        "eval_time": "2026-09-20T15:31:44.322Z",
+        "nobs": "25",
+        "nmodes": "1",
+        "baseline_runway": "07L"
+      }
     },
     {
       "baseline_capture_id": "23660",
@@ -48,7 +80,15 @@
       "destination": "KLAS",
       "captured_at": "2026-09-20T15:26:44.484Z",
       "route": "ZEPER2 RRSTA ELLDA RKSTR4",
-      "old_canonical_fix_count": 15
+      "old_canonical_fix_count": 15,
+      "departure_dumb_baseline": {
+        "capture_id": "23660",
+        "origin": "KPHX",
+        "eval_time": "2026-09-20T15:26:44.484Z",
+        "nobs": "25",
+        "nmodes": "1",
+        "baseline_runway": "07L"
+      }
     },
     {
       "baseline_capture_id": "23646",
@@ -57,7 +97,15 @@
       "destination": "KWYS",
       "captured_at": "2026-09-20T15:25:44.400Z",
       "route": "RUGGD3 HOLTR SABAT TARGY",
-      "old_canonical_fix_count": 9
+      "old_canonical_fix_count": 9,
+      "departure_dumb_baseline": {
+        "capture_id": "23646",
+        "origin": "KSLC",
+        "eval_time": "2026-09-20T15:25:44.400Z",
+        "nobs": "16",
+        "nmodes": "2",
+        "baseline_runway": null
+      }
     },
     {
       "baseline_capture_id": "23636",
@@ -66,7 +114,15 @@
       "destination": "KTUS",
       "captured_at": "2026-09-20T15:20:44.478Z",
       "route": "ZIONZ1 BCE CORKR PXR DINGO6",
-      "old_canonical_fix_count": 14
+      "old_canonical_fix_count": 14,
+      "departure_dumb_baseline": {
+        "capture_id": "23636",
+        "origin": "KSLC",
+        "eval_time": "2026-09-20T15:20:44.478Z",
+        "nobs": "16",
+        "nmodes": "2",
+        "baseline_runway": null
+      }
     },
     {
       "baseline_capture_id": "23633",
@@ -75,7 +131,15 @@
       "destination": "KABQ",
       "captured_at": "2026-09-20T15:20:44.475Z",
       "route": "ZIONZ1 EYELO ROSEI LOWBO3",
-      "old_canonical_fix_count": 17
+      "old_canonical_fix_count": 17,
+      "departure_dumb_baseline": {
+        "capture_id": "23633",
+        "origin": "KSLC",
+        "eval_time": "2026-09-20T15:20:44.475Z",
+        "nobs": "16",
+        "nmodes": "2",
+        "baseline_runway": null
+      }
     },
     {
       "baseline_capture_id": "23631",
@@ -84,7 +148,15 @@
       "destination": "KPIH",
       "captured_at": "2026-09-20T15:20:44.470Z",
       "route": "RUGGD3 HOLTR PIH",
-      "old_canonical_fix_count": 8
+      "old_canonical_fix_count": 8,
+      "departure_dumb_baseline": {
+        "capture_id": "23631",
+        "origin": "KSLC",
+        "eval_time": "2026-09-20T15:20:44.470Z",
+        "nobs": "16",
+        "nmodes": "2",
+        "baseline_runway": null
+      }
     },
     {
       "baseline_capture_id": "23607",
@@ -93,7 +165,15 @@
       "destination": "KLAX",
       "captured_at": "2026-09-20T15:15:44.487Z",
       "route": "KEENS3 WLVRN ESTWD HLYWD1",
-      "old_canonical_fix_count": 17
+      "old_canonical_fix_count": 17,
+      "departure_dumb_baseline": {
+        "capture_id": "23607",
+        "origin": "KPHX",
+        "eval_time": "2026-09-20T15:15:44.487Z",
+        "nobs": "25",
+        "nmodes": "1",
+        "baseline_runway": "07L"
+      }
     },
     {
       "baseline_capture_id": "23617",
@@ -102,7 +182,15 @@
       "destination": "KSNA",
       "captured_at": "2026-09-20T15:15:44.480Z",
       "route": "KEENS3 HRRBR EMLLD DSNEE6",
-      "old_canonical_fix_count": 18
+      "old_canonical_fix_count": 18,
+      "departure_dumb_baseline": {
+        "capture_id": "23617",
+        "origin": "KPHX",
+        "eval_time": "2026-09-20T15:15:44.480Z",
+        "nobs": "25",
+        "nmodes": "1",
+        "baseline_runway": "07L"
+      }
     },
     {
       "baseline_capture_id": "23588",
@@ -111,7 +199,15 @@
       "destination": "KBOI",
       "captured_at": "2026-09-20T15:12:44.482Z",
       "route": "RATPK3 FRNCK BROPH SPUUD4",
-      "old_canonical_fix_count": 13
+      "old_canonical_fix_count": 13,
+      "departure_dumb_baseline": {
+        "capture_id": "23588",
+        "origin": "KLAS",
+        "eval_time": "2026-09-20T15:12:44.482Z",
+        "nobs": "32",
+        "nmodes": "1",
+        "baseline_runway": "26R"
+      }
     },
     {
       "baseline_capture_id": "23584",
@@ -120,7 +216,15 @@
       "destination": "KBUF",
       "captured_at": "2026-09-20T15:11:44.428Z",
       "route": "LINSE2 JERES Q221 DLMAR BENEE",
-      "old_canonical_fix_count": 17
+      "old_canonical_fix_count": 17,
+      "departure_dumb_baseline": {
+        "capture_id": "23584",
+        "origin": "KBWI",
+        "eval_time": "2026-09-20T15:11:44.428Z",
+        "nobs": "27",
+        "nmodes": "1",
+        "baseline_runway": "15R"
+      }
     },
     {
       "baseline_capture_id": "23576",
@@ -129,7 +233,15 @@
       "destination": "KOMA",
       "captured_at": "2026-09-20T15:10:44.528Z",
       "route": "FORPE1 ABQ CIM LAA OATHE GRI HOWRY3",
-      "old_canonical_fix_count": 13
+      "old_canonical_fix_count": 13,
+      "departure_dumb_baseline": {
+        "capture_id": "23576",
+        "origin": "KPHX",
+        "eval_time": "2026-09-20T15:10:44.528Z",
+        "nobs": "25",
+        "nmodes": "1",
+        "baseline_runway": "07L"
+      }
     },
     {
       "baseline_capture_id": "23561",
@@ -138,7 +250,15 @@
       "destination": "KLIT",
       "captured_at": "2026-09-20T15:10:44.515Z",
       "route": "ESTRR8 IPTAY CHOPZ THRSR VUZ J14 LIT",
-      "old_canonical_fix_count": 13
+      "old_canonical_fix_count": 13,
+      "departure_dumb_baseline": {
+        "capture_id": "23561",
+        "origin": "KCLT",
+        "eval_time": "2026-09-20T15:10:44.515Z",
+        "nobs": "12",
+        "nmodes": "1",
+        "baseline_runway": "01R"
+      }
     },
     {
       "baseline_capture_id": "23571",
@@ -147,7 +267,15 @@
       "destination": "KRNO",
       "captured_at": "2026-09-20T15:10:44.496Z",
       "route": "TRUKN2 ORRCA ORRCA1",
-      "old_canonical_fix_count": 7
+      "old_canonical_fix_count": 7,
+      "departure_dumb_baseline": {
+        "capture_id": "23571",
+        "origin": "KSFO",
+        "eval_time": "2026-09-20T15:10:44.496Z",
+        "nobs": "1",
+        "nmodes": "1",
+        "baseline_runway": null
+      }
     },
     {
       "baseline_capture_id": "23531",
@@ -156,7 +284,15 @@
       "destination": "KBUR",
       "captured_at": "2026-09-20T15:05:44.904Z",
       "route": "KEENS3 HRRBR PHRED THRNE4",
-      "old_canonical_fix_count": 22
+      "old_canonical_fix_count": 22,
+      "departure_dumb_baseline": {
+        "capture_id": "23531",
+        "origin": "KPHX",
+        "eval_time": "2026-09-20T15:05:44.904Z",
+        "nobs": "24",
+        "nmodes": "1",
+        "baseline_runway": "07L"
+      }
     },
     {
       "baseline_capture_id": "23545",
@@ -165,7 +301,15 @@
       "destination": "KPDX",
       "captured_at": "2026-09-20T15:05:44.893Z",
       "route": "TRUKN2 GRTFL MACHU TMBRS4",
-      "old_canonical_fix_count": 19
+      "old_canonical_fix_count": 19,
+      "departure_dumb_baseline": {
+        "capture_id": "23545",
+        "origin": "KSFO",
+        "eval_time": "2026-09-20T15:05:44.893Z",
+        "nobs": "1",
+        "nmodes": "1",
+        "baseline_runway": null
+      }
     },
     {
       "baseline_capture_id": "23528",
@@ -174,7 +318,15 @@
       "destination": "KBOI",
       "captured_at": "2026-09-20T15:05:44.663Z",
       "route": "TRUKN2 ORRCA FMG PRNCS SADYL4",
-      "old_canonical_fix_count": 13
+      "old_canonical_fix_count": 13,
+      "departure_dumb_baseline": {
+        "capture_id": "23528",
+        "origin": "KSFO",
+        "eval_time": "2026-09-20T15:05:44.663Z",
+        "nobs": "1",
+        "nmodes": "1",
+        "baseline_runway": null
+      }
     },
     {
       "baseline_capture_id": "23529",
@@ -183,7 +335,15 @@
       "destination": "KLAX",
       "captured_at": "2026-09-20T15:05:44.641Z",
       "route": "KEENS3 WLVRN ESTWD HLYWD1",
-      "old_canonical_fix_count": 17
+      "old_canonical_fix_count": 17,
+      "departure_dumb_baseline": {
+        "capture_id": "23529",
+        "origin": "KPHX",
+        "eval_time": "2026-09-20T15:05:44.641Z",
+        "nobs": "24",
+        "nmodes": "1",
+        "baseline_runway": "07L"
+      }
     },
     {
       "baseline_capture_id": "23503",
@@ -192,7 +352,15 @@
       "destination": "KELP",
       "captured_at": "2026-09-20T15:00:44.379Z",
       "route": "DOTSS2 CNERY BLH BBALL TEEES MOLLY5",
-      "old_canonical_fix_count": 21
+      "old_canonical_fix_count": 21,
+      "departure_dumb_baseline": {
+        "capture_id": "23503",
+        "origin": "KLAX",
+        "eval_time": "2026-09-20T15:00:44.379Z",
+        "nobs": "21",
+        "nmodes": "1",
+        "baseline_runway": "24L"
+      }
     },
     {
       "baseline_capture_id": "23492",
@@ -201,7 +369,15 @@
       "destination": "KHOU",
       "captured_at": "2026-09-20T14:59:44.439Z",
       "route": "SLEEK2 SLEEK NOSEW MQP NNEAL KIDDZ5",
-      "old_canonical_fix_count": 23
+      "old_canonical_fix_count": 23,
+      "departure_dumb_baseline": {
+        "capture_id": "23492",
+        "origin": "KDEN",
+        "eval_time": "2026-09-20T14:59:44.439Z",
+        "nobs": "39",
+        "nmodes": "1",
+        "baseline_runway": "08"
+      }
     },
     {
       "baseline_capture_id": "23476",
@@ -210,7 +386,15 @@
       "destination": "KOAK",
       "captured_at": "2026-09-20T14:56:44.259Z",
       "route": "JOHKR5 KENNO RUSME OAKES3",
-      "old_canonical_fix_count": 18
+      "old_canonical_fix_count": 18,
+      "departure_dumb_baseline": {
+        "capture_id": "23476",
+        "origin": "KLAS",
+        "eval_time": "2026-09-20T14:56:44.259Z",
+        "nobs": "32",
+        "nmodes": "1",
+        "baseline_runway": "26R"
+      }
     },
     {
       "baseline_capture_id": "23463",
@@ -219,7 +403,15 @@
       "destination": "KDEN",
       "captured_at": "2026-09-20T14:55:44.572Z",
       "route": "MRBIL1 JARPA CRUDD TBARR4",
-      "old_canonical_fix_count": 19
+      "old_canonical_fix_count": 19,
+      "departure_dumb_baseline": {
+        "capture_id": "23463",
+        "origin": "KPHX",
+        "eval_time": "2026-09-20T14:55:44.572Z",
+        "nobs": "24",
+        "nmodes": "1",
+        "baseline_runway": "07L"
+      }
     },
     {
       "baseline_capture_id": "23453",
@@ -228,7 +420,15 @@
       "destination": "KLAS",
       "captured_at": "2026-09-20T14:55:44.552Z",
       "route": "ZEPER2 RRSTA ELLDA RKSTR4",
-      "old_canonical_fix_count": 15
+      "old_canonical_fix_count": 15,
+      "departure_dumb_baseline": {
+        "capture_id": "23453",
+        "origin": "KPHX",
+        "eval_time": "2026-09-20T14:55:44.552Z",
+        "nobs": "24",
+        "nmodes": "1",
+        "baseline_runway": "07L"
+      }
     },
     {
       "baseline_capture_id": "23446",
@@ -237,7 +437,15 @@
       "destination": "KPDX",
       "captured_at": "2026-09-20T14:52:44.390Z",
       "route": "QUAKY1 GCN WINEN NEERO IMB JOTBA HHOOD6",
-      "old_canonical_fix_count": 22
+      "old_canonical_fix_count": 22,
+      "departure_dumb_baseline": {
+        "capture_id": "23446",
+        "origin": "KPHX",
+        "eval_time": "2026-09-20T14:52:44.390Z",
+        "nobs": "24",
+        "nmodes": "1",
+        "baseline_runway": "07L"
+      }
     },
     {
       "baseline_capture_id": "23432",
@@ -246,7 +454,15 @@
       "destination": "KDEN",
       "captured_at": "2026-09-20T14:50:44.441Z",
       "route": "ORCKA5 LAS J146 DICEE BUMMP SSKII4",
-      "old_canonical_fix_count": 27
+      "old_canonical_fix_count": 27,
+      "departure_dumb_baseline": {
+        "capture_id": "23432",
+        "origin": "KLAX",
+        "eval_time": "2026-09-20T14:50:44.441Z",
+        "nobs": "21",
+        "nmodes": "1",
+        "baseline_runway": "24L"
+      }
     },
     {
       "baseline_capture_id": "23412",
@@ -255,7 +471,15 @@
       "destination": "KLAS",
       "captured_at": "2026-09-20T14:50:44.438Z",
       "route": "ORCKA5 MISEN RNDRZ4",
-      "old_canonical_fix_count": 17
+      "old_canonical_fix_count": 17,
+      "departure_dumb_baseline": {
+        "capture_id": "23412",
+        "origin": "KLAX",
+        "eval_time": "2026-09-20T14:50:44.438Z",
+        "nobs": "21",
+        "nmodes": "1",
+        "baseline_runway": "24L"
+      }
     },
     {
       "baseline_capture_id": "23403",
@@ -264,7 +488,15 @@
       "destination": "KBOI",
       "captured_at": "2026-09-20T14:47:44.503Z",
       "route": "CGULL1 TWF BROPH SPUUD4",
-      "old_canonical_fix_count": 14
+      "old_canonical_fix_count": 14,
+      "departure_dumb_baseline": {
+        "capture_id": "23403",
+        "origin": "KSLC",
+        "eval_time": "2026-09-20T14:47:44.503Z",
+        "nobs": "16",
+        "nmodes": "2",
+        "baseline_runway": null
+      }
     },
     {
       "baseline_capture_id": "23396",
@@ -273,7 +505,15 @@
       "destination": "KBUR",
       "captured_at": "2026-09-20T14:46:44.397Z",
       "route": "KEENS3 HRRBR PHRED THRNE4",
-      "old_canonical_fix_count": 22
+      "old_canonical_fix_count": 22,
+      "departure_dumb_baseline": {
+        "capture_id": "23396",
+        "origin": "KPHX",
+        "eval_time": "2026-09-20T14:46:44.397Z",
+        "nobs": "24",
+        "nmodes": "1",
+        "baseline_runway": "07L"
+      }
     },
     {
       "baseline_capture_id": "23391",
@@ -282,7 +522,15 @@
       "destination": "KLAX",
       "captured_at": "2026-09-20T14:45:44.588Z",
       "route": "KEENS3 WLVRN ESTWD BRUEN2",
-      "old_canonical_fix_count": 23
+      "old_canonical_fix_count": 23,
+      "departure_dumb_baseline": {
+        "capture_id": "23391",
+        "origin": "KPHX",
+        "eval_time": "2026-09-20T14:45:44.588Z",
+        "nobs": "24",
+        "nmodes": "1",
+        "baseline_runway": "07L"
+      }
     },
     {
       "baseline_capture_id": "23382",
@@ -291,7 +539,15 @@
       "destination": "KPHX",
       "captured_at": "2026-09-20T14:45:44.579Z",
       "route": "WESLA5 KAYEX LOSHN BOILE BLH HYDRR1",
-      "old_canonical_fix_count": 20
+      "old_canonical_fix_count": 20,
+      "departure_dumb_baseline": {
+        "capture_id": "23382",
+        "origin": "KSFO",
+        "eval_time": "2026-09-20T14:45:44.579Z",
+        "nobs": "1",
+        "nmodes": "1",
+        "baseline_runway": null
+      }
     },
     {
       "baseline_capture_id": "23380",
@@ -300,7 +556,15 @@
       "destination": "KMCI",
       "captured_at": "2026-09-20T14:45:44.495Z",
       "route": "FORPE1 ABQ FTI KA39Y KK42A FRACA ZOURA WUTNG3",
-      "old_canonical_fix_count": 17
+      "old_canonical_fix_count": 17,
+      "departure_dumb_baseline": {
+        "capture_id": "23380",
+        "origin": "KPHX",
+        "eval_time": "2026-09-20T14:45:44.495Z",
+        "nobs": "24",
+        "nmodes": "1",
+        "baseline_runway": "07L"
+      }
     },
     {
       "baseline_capture_id": "23364",
@@ -309,7 +573,15 @@
       "destination": "KMIA",
       "captured_at": "2026-09-20T14:43:44.346Z",
       "route": "CONLE5 SCOOB PAACK Q97 DEBRL CSTAL3",
-      "old_canonical_fix_count": 33
+      "old_canonical_fix_count": 33,
+      "departure_dumb_baseline": {
+        "capture_id": "23364",
+        "origin": "KBWI",
+        "eval_time": "2026-09-20T14:43:44.346Z",
+        "nobs": "27",
+        "nmodes": "1",
+        "baseline_runway": "15R"
+      }
     },
     {
       "baseline_capture_id": "23357",
@@ -318,7 +590,15 @@
       "destination": "KSJC",
       "captured_at": "2026-09-20T14:42:44.401Z",
       "route": "SUMMR2 SCTRR TROXX SILCN6",
-      "old_canonical_fix_count": 21
+      "old_canonical_fix_count": 21,
+      "departure_dumb_baseline": {
+        "capture_id": "23357",
+        "origin": "KLAX",
+        "eval_time": "2026-09-20T14:42:44.401Z",
+        "nobs": "21",
+        "nmodes": "1",
+        "baseline_runway": "24L"
+      }
     },
     {
       "baseline_capture_id": "23359",
@@ -327,7 +607,15 @@
       "destination": "KSFO",
       "captured_at": "2026-09-20T14:42:44.387Z",
       "route": "HAROB6 FEPOT Q3 FOWND MLBEC BDEGA4",
-      "old_canonical_fix_count": 20
+      "old_canonical_fix_count": 20,
+      "departure_dumb_baseline": {
+        "capture_id": "23359",
+        "origin": "KSEA",
+        "eval_time": "2026-09-20T14:42:44.387Z",
+        "nobs": "7",
+        "nmodes": "1",
+        "baseline_runway": "16L"
+      }
     },
     {
       "baseline_capture_id": "23338",
@@ -336,7 +624,15 @@
       "destination": "KOAK",
       "captured_at": "2026-09-20T14:41:44.476Z",
       "route": "JOHKR5 KENNO RUSME OAKES3",
-      "old_canonical_fix_count": 18
+      "old_canonical_fix_count": 18,
+      "departure_dumb_baseline": {
+        "capture_id": "23338",
+        "origin": "KLAS",
+        "eval_time": "2026-09-20T14:41:44.476Z",
+        "nobs": "32",
+        "nmodes": "1",
+        "baseline_runway": "26R"
+      }
     },
     {
       "baseline_capture_id": "23344",
@@ -345,7 +641,15 @@
       "destination": "KPDX",
       "captured_at": "2026-09-20T14:41:44.461Z",
       "route": "SEA BUWZO KRATR3",
-      "old_canonical_fix_count": 10
+      "old_canonical_fix_count": 10,
+      "departure_dumb_baseline": {
+        "capture_id": "23344",
+        "origin": "KSEA",
+        "eval_time": "2026-09-20T14:41:44.461Z",
+        "nobs": "7",
+        "nmodes": "1",
+        "baseline_runway": "16L"
+      }
     },
     {
       "baseline_capture_id": "23337",
@@ -354,7 +658,15 @@
       "destination": "KSNA",
       "captured_at": "2026-09-20T14:41:44.420Z",
       "route": "RADYR2 SLVRR FEYLA DSNEE6",
-      "old_canonical_fix_count": 17
+      "old_canonical_fix_count": 17,
+      "departure_dumb_baseline": {
+        "capture_id": "23337",
+        "origin": "KLAS",
+        "eval_time": "2026-09-20T14:41:44.420Z",
+        "nobs": "32",
+        "nmodes": "1",
+        "baseline_runway": "26R"
+      }
     },
     {
       "baseline_capture_id": "23347",
@@ -363,7 +675,15 @@
       "destination": "KSNA",
       "captured_at": "2026-09-20T14:41:44.413Z",
       "route": "KEENS3 HRRBR EMLLD DSNEE6",
-      "old_canonical_fix_count": 18
+      "old_canonical_fix_count": 18,
+      "departure_dumb_baseline": {
+        "capture_id": "23347",
+        "origin": "KPHX",
+        "eval_time": "2026-09-20T14:41:44.413Z",
+        "nobs": "24",
+        "nmodes": "1",
+        "baseline_runway": "07L"
+      }
     },
     {
       "baseline_capture_id": "23322",
@@ -372,7 +692,15 @@
       "destination": "KSTL",
       "captured_at": "2026-09-20T14:40:44.465Z",
       "route": "FORPE1 ABQ FTI KA39Y VARNR KK48E BUM KAYLA3",
-      "old_canonical_fix_count": 23
+      "old_canonical_fix_count": 23,
+      "departure_dumb_baseline": {
+        "capture_id": "23322",
+        "origin": "KPHX",
+        "eval_time": "2026-09-20T14:40:44.465Z",
+        "nobs": "23",
+        "nmodes": "1",
+        "baseline_runway": "07L"
+      }
     },
     {
       "baseline_capture_id": "23312",
@@ -381,7 +709,15 @@
       "destination": "KIND",
       "captured_at": "2026-09-20T14:37:44.409Z",
       "route": "EARND ELANR JAKKS2",
-      "old_canonical_fix_count": 12
+      "old_canonical_fix_count": 12,
+      "departure_dumb_baseline": {
+        "capture_id": "23312",
+        "origin": "KORD",
+        "eval_time": "2026-09-20T14:37:44.409Z",
+        "nobs": "11",
+        "nmodes": "1",
+        "baseline_runway": "10L"
+      }
     },
     {
       "baseline_capture_id": "23292",
@@ -390,7 +726,15 @@
       "destination": "KSFO",
       "captured_at": "2026-09-20T14:35:44.698Z",
       "route": "SUMMR2 STOKD SERFR SERFR4",
-      "old_canonical_fix_count": 17
+      "old_canonical_fix_count": 17,
+      "departure_dumb_baseline": {
+        "capture_id": "23292",
+        "origin": "KLAX",
+        "eval_time": "2026-09-20T14:35:44.698Z",
+        "nobs": "21",
+        "nmodes": "1",
+        "baseline_runway": "24L"
+      }
     },
     {
       "baseline_capture_id": "23235",
@@ -399,7 +743,15 @@
       "destination": "KSAN",
       "captured_at": "2026-09-20T14:26:44.554Z",
       "route": "SUMMA2 SUMMA PAAGE Q11 PASKE HUULK COMIX2",
-      "old_canonical_fix_count": 21
+      "old_canonical_fix_count": 21,
+      "departure_dumb_baseline": {
+        "capture_id": "23235",
+        "origin": "KSEA",
+        "eval_time": "2026-09-20T14:26:44.554Z",
+        "nobs": "7",
+        "nmodes": "1",
+        "baseline_runway": "16L"
+      }
     },
     {
       "baseline_capture_id": "23214",
@@ -408,7 +760,15 @@
       "destination": "KSAT",
       "captured_at": "2026-09-20T14:25:44.490Z",
       "route": "ECLPS1 PHASE ELP FST MOPPP DNKIN2",
-      "old_canonical_fix_count": 14
+      "old_canonical_fix_count": 14,
+      "departure_dumb_baseline": {
+        "capture_id": "23214",
+        "origin": "KPHX",
+        "eval_time": "2026-09-20T14:25:44.490Z",
+        "nobs": "23",
+        "nmodes": "1",
+        "baseline_runway": "07L"
+      }
     },
     {
       "baseline_capture_id": "23219",
@@ -417,7 +777,15 @@
       "destination": "KORD",
       "captured_at": "2026-09-20T14:25:44.486Z",
       "route": "STYCK8 DOLEY IRW PWE OVR HANKU FOD MYRRS FYTTE7",
-      "old_canonical_fix_count": 29
+      "old_canonical_fix_count": 29,
+      "departure_dumb_baseline": {
+        "capture_id": "23219",
+        "origin": "KIAH",
+        "eval_time": "2026-09-20T14:25:44.486Z",
+        "nobs": "14",
+        "nmodes": "1",
+        "baseline_runway": "15L"
+      }
     },
     {
       "baseline_capture_id": "23216",
@@ -426,7 +794,15 @@
       "destination": "KCOS",
       "captured_at": "2026-09-20T14:25:44.481Z",
       "route": "GIDGT4 TUKRR DVC HAVWU ETL HBU DBRY5",
-      "old_canonical_fix_count": 15
+      "old_canonical_fix_count": 15,
+      "departure_dumb_baseline": {
+        "capture_id": "23216",
+        "origin": "KLAS",
+        "eval_time": "2026-09-20T14:25:44.481Z",
+        "nobs": "32",
+        "nmodes": "1",
+        "baseline_runway": "26R"
+      }
     },
     {
       "baseline_capture_id": "23211",
@@ -435,7 +811,15 @@
       "destination": "KASE",
       "captured_at": "2026-09-20T14:25:44.473Z",
       "route": "STYCK8 DOLEY FUZ SPS DHT MMUTT HAREI1",
-      "old_canonical_fix_count": 17
+      "old_canonical_fix_count": 17,
+      "departure_dumb_baseline": {
+        "capture_id": "23211",
+        "origin": "KIAH",
+        "eval_time": "2026-09-20T14:25:44.473Z",
+        "nobs": "14",
+        "nmodes": "1",
+        "baseline_runway": "15L"
+      }
     },
     {
       "baseline_capture_id": "23221",
@@ -444,7 +828,15 @@
       "destination": "KDFW",
       "captured_at": "2026-09-20T14:25:44.465Z",
       "route": "BLTWY7 CRIED BEREE3",
-      "old_canonical_fix_count": 15
+      "old_canonical_fix_count": 15,
+      "departure_dumb_baseline": {
+        "capture_id": "23221",
+        "origin": "KIAH",
+        "eval_time": "2026-09-20T14:25:44.465Z",
+        "nobs": "14",
+        "nmodes": "1",
+        "baseline_runway": "15L"
+      }
     },
     {
       "baseline_capture_id": "23217",
@@ -453,7 +845,15 @@
       "destination": "KSAT",
       "captured_at": "2026-09-20T14:25:44.463Z",
       "route": "BNDTO6 WAILN QERVO3",
-      "old_canonical_fix_count": 14
+      "old_canonical_fix_count": 14,
+      "departure_dumb_baseline": {
+        "capture_id": "23217",
+        "origin": "KIAH",
+        "eval_time": "2026-09-20T14:25:44.463Z",
+        "nobs": "14",
+        "nmodes": "1",
+        "baseline_runway": "15L"
+      }
     },
     {
       "baseline_capture_id": "23175",
@@ -462,7 +862,15 @@
       "destination": "KDFW",
       "captured_at": "2026-09-20T14:20:44.586Z",
       "route": "ECLPS1 PHASE EWM J4 INK GEEKY BOOVE7",
-      "old_canonical_fix_count": 22
+      "old_canonical_fix_count": 22,
+      "departure_dumb_baseline": {
+        "capture_id": "23175",
+        "origin": "KPHX",
+        "eval_time": "2026-09-20T14:20:44.586Z",
+        "nobs": "23",
+        "nmodes": "1",
+        "baseline_runway": "07L"
+      }
     },
     {
       "baseline_capture_id": "23182",
@@ -471,7 +879,15 @@
       "destination": "KPHX",
       "captured_at": "2026-09-20T14:20:44.573Z",
       "route": "BNDTO6 CRGER ELP DRRVR PINNG1",
-      "old_canonical_fix_count": 22
+      "old_canonical_fix_count": 22,
+      "departure_dumb_baseline": {
+        "capture_id": "23182",
+        "origin": "KIAH",
+        "eval_time": "2026-09-20T14:20:44.573Z",
+        "nobs": "14",
+        "nmodes": "1",
+        "baseline_runway": "15L"
+      }
     },
     {
       "baseline_capture_id": "23176",
@@ -480,7 +896,15 @@
       "destination": "KSHV",
       "captured_at": "2026-09-20T14:20:44.560Z",
       "route": "INDIE8 INDIE",
-      "old_canonical_fix_count": 7
+      "old_canonical_fix_count": 7,
+      "departure_dumb_baseline": {
+        "capture_id": "23176",
+        "origin": "KIAH",
+        "eval_time": "2026-09-20T14:20:44.560Z",
+        "nobs": "14",
+        "nmodes": "1",
+        "baseline_runway": "15L"
+      }
     },
     {
       "baseline_capture_id": "23163",
@@ -489,7 +913,15 @@
       "destination": "KMFE",
       "captured_at": "2026-09-20T14:20:44.553Z",
       "route": "NIITZ4 SSKEE INW J86 ELP FST KOBLE DLF LRD V17 MFE",
-      "old_canonical_fix_count": 24
+      "old_canonical_fix_count": 24,
+      "departure_dumb_baseline": {
+        "capture_id": "23163",
+        "origin": "KLAS",
+        "eval_time": "2026-09-20T14:20:44.553Z",
+        "nobs": "32",
+        "nmodes": "1",
+        "baseline_runway": "26R"
+      }
     },
     {
       "baseline_capture_id": "23166",
@@ -498,7 +930,15 @@
       "destination": "KXNA",
       "captured_at": "2026-09-20T14:20:44.542Z",
       "route": "INDIE8 INDIE TXK RZC",
-      "old_canonical_fix_count": 9
+      "old_canonical_fix_count": 9,
+      "departure_dumb_baseline": {
+        "capture_id": "23166",
+        "origin": "KIAH",
+        "eval_time": "2026-09-20T14:20:44.542Z",
+        "nobs": "14",
+        "nmodes": "1",
+        "baseline_runway": "15L"
+      }
     },
     {
       "baseline_capture_id": "23084",
@@ -507,7 +947,15 @@
       "destination": "KMKE",
       "captured_at": "2026-09-20T14:10:44.529Z",
       "route": "GIDGT4 TUKRR DVC KD66A OBH ZZEEE OGECA GOPAC3",
-      "old_canonical_fix_count": 21
+      "old_canonical_fix_count": 21,
+      "departure_dumb_baseline": {
+        "capture_id": "23084",
+        "origin": "KLAS",
+        "eval_time": "2026-09-20T14:10:44.529Z",
+        "nobs": "31",
+        "nmodes": "1",
+        "baseline_runway": "26R"
+      }
     },
     {
       "baseline_capture_id": "23080",
@@ -516,7 +964,15 @@
       "destination": "KLAX",
       "captured_at": "2026-09-20T14:10:44.494Z",
       "route": "RADYR2 BLAQQ SHTNR ANJLL4",
-      "old_canonical_fix_count": 15
+      "old_canonical_fix_count": 15,
+      "departure_dumb_baseline": {
+        "capture_id": "23080",
+        "origin": "KLAS",
+        "eval_time": "2026-09-20T14:10:44.494Z",
+        "nobs": "31",
+        "nmodes": "1",
+        "baseline_runway": "26R"
+      }
     },
     {
       "baseline_capture_id": "23099",
@@ -525,7 +981,15 @@
       "destination": "KSMF",
       "captured_at": "2026-09-20T14:10:44.493Z",
       "route": "ZEPER2 RRSTA DOVEE BTY KENNO DONNR SLMMR5",
-      "old_canonical_fix_count": 16
+      "old_canonical_fix_count": 16,
+      "departure_dumb_baseline": {
+        "capture_id": "23099",
+        "origin": "KPHX",
+        "eval_time": "2026-09-20T14:10:44.493Z",
+        "nobs": "23",
+        "nmodes": "1",
+        "baseline_runway": "07L"
+      }
     },
     {
       "baseline_capture_id": "23082",
@@ -534,7 +998,15 @@
       "destination": "KLAS",
       "captured_at": "2026-09-20T14:10:44.491Z",
       "route": "ZEPER2 RRSTA ELLDA RKSTR4",
-      "old_canonical_fix_count": 15
+      "old_canonical_fix_count": 15,
+      "departure_dumb_baseline": {
+        "capture_id": "23082",
+        "origin": "KPHX",
+        "eval_time": "2026-09-20T14:10:44.491Z",
+        "nobs": "23",
+        "nmodes": "1",
+        "baseline_runway": "07L"
+      }
     },
     {
       "baseline_capture_id": "23078",
@@ -543,7 +1015,15 @@
       "destination": "KELP",
       "captured_at": "2026-09-20T14:10:44.478Z",
       "route": "NIITZ4 SSKEE INW GREBE MOLLY5",
-      "old_canonical_fix_count": 16
+      "old_canonical_fix_count": 16,
+      "departure_dumb_baseline": {
+        "capture_id": "23078",
+        "origin": "KLAS",
+        "eval_time": "2026-09-20T14:10:44.478Z",
+        "nobs": "31",
+        "nmodes": "1",
+        "baseline_runway": "26R"
+      }
     },
     {
       "baseline_capture_id": "23085",
@@ -552,7 +1032,15 @@
       "destination": "KBOI",
       "captured_at": "2026-09-20T14:10:44.472Z",
       "route": "SUMMA2 SUMMA J54 BKE DEVLE KYAAN4",
-      "old_canonical_fix_count": 11
+      "old_canonical_fix_count": 11,
+      "departure_dumb_baseline": {
+        "capture_id": "23085",
+        "origin": "KSEA",
+        "eval_time": "2026-09-20T14:10:44.472Z",
+        "nobs": "7",
+        "nmodes": "1",
+        "baseline_runway": "16L"
+      }
     },
     {
       "baseline_capture_id": "23071",
@@ -561,7 +1049,15 @@
       "destination": "KCRW",
       "captured_at": "2026-09-20T14:06:44.396Z",
       "route": "EARND ELANR EMMLY ETAME EMEGE FLM",
-      "old_canonical_fix_count": 8
+      "old_canonical_fix_count": 8,
+      "departure_dumb_baseline": {
+        "capture_id": "23071",
+        "origin": "KORD",
+        "eval_time": "2026-09-20T14:06:44.396Z",
+        "nobs": "11",
+        "nmodes": "1",
+        "baseline_runway": "10L"
+      }
     },
     {
       "baseline_capture_id": "23062",
@@ -570,7 +1066,15 @@
       "destination": "KTUS",
       "captured_at": "2026-09-20T14:05:44.406Z",
       "route": "STRRM1 STRRM BASER DINGO DINGO6",
-      "old_canonical_fix_count": 10
+      "old_canonical_fix_count": 10,
+      "departure_dumb_baseline": {
+        "capture_id": "23062",
+        "origin": "KPHX",
+        "eval_time": "2026-09-20T14:05:44.406Z",
+        "nobs": "23",
+        "nmodes": "1",
+        "baseline_runway": "07L"
+      }
     },
     {
       "baseline_capture_id": "23054",
@@ -579,7 +1083,15 @@
       "destination": "KGEG",
       "captured_at": "2026-09-20T14:05:44.404Z",
       "route": "MONTN2 SEA ZADON ZELAK ZIRAN ZOOMR ZOOMR2",
-      "old_canonical_fix_count": 8
+      "old_canonical_fix_count": 8,
+      "departure_dumb_baseline": {
+        "capture_id": "23054",
+        "origin": "KSEA",
+        "eval_time": "2026-09-20T14:05:44.404Z",
+        "nobs": "7",
+        "nmodes": "1",
+        "baseline_runway": "16L"
+      }
     },
     {
       "baseline_capture_id": "23057",
@@ -588,7 +1100,15 @@
       "destination": "KBOI",
       "captured_at": "2026-09-20T14:05:44.388Z",
       "route": "SUMMA2 SUMMA J54 BKE DEVLE KYAAN4",
-      "old_canonical_fix_count": 11
+      "old_canonical_fix_count": 11,
+      "departure_dumb_baseline": {
+        "capture_id": "23057",
+        "origin": "KSEA",
+        "eval_time": "2026-09-20T14:05:44.388Z",
+        "nobs": "7",
+        "nmodes": "1",
+        "baseline_runway": "16L"
+      }
     },
     {
       "baseline_capture_id": "23066",
@@ -597,7 +1117,15 @@
       "destination": "KFAT",
       "captured_at": "2026-09-20T14:05:44.369Z",
       "route": "JOHKR5 KENNO TTMSN CABAB FRA",
-      "old_canonical_fix_count": 15
+      "old_canonical_fix_count": 15,
+      "departure_dumb_baseline": {
+        "capture_id": "23066",
+        "origin": "KLAS",
+        "eval_time": "2026-09-20T14:05:44.369Z",
+        "nobs": "31",
+        "nmodes": "1",
+        "baseline_runway": "26R"
+      }
     },
     {
       "baseline_capture_id": "23042",
@@ -606,7 +1134,15 @@
       "destination": "KLAX",
       "captured_at": "2026-09-20T14:05:44.358Z",
       "route": "KEENS3 WLVRN ESTWD HLYWD1",
-      "old_canonical_fix_count": 17
+      "old_canonical_fix_count": 17,
+      "departure_dumb_baseline": {
+        "capture_id": "23042",
+        "origin": "KPHX",
+        "eval_time": "2026-09-20T14:05:44.358Z",
+        "nobs": "23",
+        "nmodes": "1",
+        "baseline_runway": "07L"
+      }
     },
     {
       "baseline_capture_id": "22990",
@@ -615,7 +1151,15 @@
       "destination": "KSLC",
       "captured_at": "2026-09-20T14:00:44.507Z",
       "route": "ORCKA5 LAS Q70 BLIPP Q842 WINEN MLF PITTT2",
-      "old_canonical_fix_count": 25
+      "old_canonical_fix_count": 25,
+      "departure_dumb_baseline": {
+        "capture_id": "22990",
+        "origin": "KLAX",
+        "eval_time": "2026-09-20T14:00:44.507Z",
+        "nobs": "21",
+        "nmodes": "1",
+        "baseline_runway": "24L"
+      }
     },
     {
       "baseline_capture_id": "22967",
@@ -624,7 +1168,15 @@
       "destination": "KDFW",
       "captured_at": "2026-09-20T13:57:44.347Z",
       "route": "BROAK1 MAXXO TXO TURKI VKTRY2",
-      "old_canonical_fix_count": 21
+      "old_canonical_fix_count": 21,
+      "departure_dumb_baseline": {
+        "capture_id": "22967",
+        "origin": "KPHX",
+        "eval_time": "2026-09-20T13:57:44.347Z",
+        "nobs": "23",
+        "nmodes": "1",
+        "baseline_runway": "07L"
+      }
     },
     {
       "baseline_capture_id": "22961",
@@ -633,7 +1185,15 @@
       "destination": "KICT",
       "captured_at": "2026-09-20T13:56:44.683Z",
       "route": "EPKEE7 GAETR ICT",
-      "old_canonical_fix_count": 6
+      "old_canonical_fix_count": 6,
+      "departure_dumb_baseline": {
+        "capture_id": "22961",
+        "origin": "KDEN",
+        "eval_time": "2026-09-20T13:56:44.683Z",
+        "nobs": "36",
+        "nmodes": "1",
+        "baseline_runway": "08"
+      }
     },
     {
       "baseline_capture_id": "22943",
@@ -642,7 +1202,15 @@
       "destination": "KSMF",
       "captured_at": "2026-09-20T13:55:44.568Z",
       "route": "JOHKR5 KENNO DONNR SLMMR5",
-      "old_canonical_fix_count": 17
+      "old_canonical_fix_count": 17,
+      "departure_dumb_baseline": {
+        "capture_id": "22943",
+        "origin": "KLAS",
+        "eval_time": "2026-09-20T13:55:44.568Z",
+        "nobs": "31",
+        "nmodes": "1",
+        "baseline_runway": "26R"
+      }
     },
     {
       "baseline_capture_id": "22945",
@@ -651,7 +1219,15 @@
       "destination": "KSAT",
       "captured_at": "2026-09-20T13:55:44.518Z",
       "route": "NIITZ4 SSKEE INW J86 FST J138 SHUCK MOPPP DNKIN2",
-      "old_canonical_fix_count": 23
+      "old_canonical_fix_count": 23,
+      "departure_dumb_baseline": {
+        "capture_id": "22945",
+        "origin": "KLAS",
+        "eval_time": "2026-09-20T13:55:44.518Z",
+        "nobs": "31",
+        "nmodes": "1",
+        "baseline_runway": "26R"
+      }
     },
     {
       "baseline_capture_id": "22927",
@@ -660,7 +1236,15 @@
       "destination": "KPHX",
       "captured_at": "2026-09-20T13:55:44.507Z",
       "route": "SMMUR2 DAAYE GUP EAGUL6",
-      "old_canonical_fix_count": 21
+      "old_canonical_fix_count": 21,
+      "departure_dumb_baseline": {
+        "capture_id": "22927",
+        "origin": "KDEN",
+        "eval_time": "2026-09-20T13:55:44.507Z",
+        "nobs": "36",
+        "nmodes": "1",
+        "baseline_runway": "08"
+      }
     },
     {
       "baseline_capture_id": "22940",
@@ -669,7 +1253,15 @@
       "destination": "KFSD",
       "captured_at": "2026-09-20T13:55:44.487Z",
       "route": "CHUWY1 CHUWY PUKIC FSD",
-      "old_canonical_fix_count": 11
+      "old_canonical_fix_count": 11,
+      "departure_dumb_baseline": {
+        "capture_id": "22940",
+        "origin": "KDEN",
+        "eval_time": "2026-09-20T13:55:44.487Z",
+        "nobs": "36",
+        "nmodes": "1",
+        "baseline_runway": "08"
+      }
     },
     {
       "baseline_capture_id": "22947",
@@ -678,7 +1270,15 @@
       "destination": "KSMF",
       "captured_at": "2026-09-20T13:55:44.484Z",
       "route": "COORZ7 VOAXA DTA CRASY SLMMR5",
-      "old_canonical_fix_count": 16
+      "old_canonical_fix_count": 16,
+      "departure_dumb_baseline": {
+        "capture_id": "22947",
+        "origin": "KDEN",
+        "eval_time": "2026-09-20T13:55:44.484Z",
+        "nobs": "36",
+        "nmodes": "1",
+        "baseline_runway": "08"
+      }
     },
     {
       "baseline_capture_id": "22890",
@@ -687,7 +1287,15 @@
       "destination": "KASE",
       "captured_at": "2026-09-20T13:50:44.695Z",
       "route": "CONNR8 CONNR MMARY MMARY1",
-      "old_canonical_fix_count": 14
+      "old_canonical_fix_count": 14,
+      "departure_dumb_baseline": {
+        "capture_id": "22890",
+        "origin": "KDEN",
+        "eval_time": "2026-09-20T13:50:44.695Z",
+        "nobs": "36",
+        "nmodes": "1",
+        "baseline_runway": "08"
+      }
     },
     {
       "baseline_capture_id": "22903",
@@ -696,7 +1304,15 @@
       "destination": "KAUS",
       "captured_at": "2026-09-20T13:50:44.692Z",
       "route": "SLEEK2 SLEEK PNH J17 ABI DILLO LAIKS4",
-      "old_canonical_fix_count": 19
+      "old_canonical_fix_count": 19,
+      "departure_dumb_baseline": {
+        "capture_id": "22903",
+        "origin": "KDEN",
+        "eval_time": "2026-09-20T13:50:44.692Z",
+        "nobs": "36",
+        "nmodes": "1",
+        "baseline_runway": "08"
+      }
     },
     {
       "baseline_capture_id": "22886",
@@ -705,7 +1321,15 @@
       "destination": "KDEN",
       "captured_at": "2026-09-20T13:50:44.688Z",
       "route": "OSHNN1 BEALE J146 DICEE BUMMP SSKII4",
-      "old_canonical_fix_count": 33
+      "old_canonical_fix_count": 33,
+      "departure_dumb_baseline": {
+        "capture_id": "22886",
+        "origin": "KLAX",
+        "eval_time": "2026-09-20T13:50:44.688Z",
+        "nobs": "20",
+        "nmodes": "1",
+        "baseline_runway": "24L"
+      }
     },
     {
       "baseline_capture_id": "22901",
@@ -714,7 +1338,15 @@
       "destination": "KBIL",
       "captured_at": "2026-09-20T13:50:44.683Z",
       "route": "XXWNG1 XXWNG BGHRN BGHRN3",
-      "old_canonical_fix_count": 13
+      "old_canonical_fix_count": 13,
+      "departure_dumb_baseline": {
+        "capture_id": "22901",
+        "origin": "KDEN",
+        "eval_time": "2026-09-20T13:50:44.683Z",
+        "nobs": "36",
+        "nmodes": "1",
+        "baseline_runway": "08"
+      }
     },
     {
       "baseline_capture_id": "22897",
@@ -723,7 +1355,15 @@
       "destination": "KOKC",
       "captured_at": "2026-09-20T13:50:44.679Z",
       "route": "EPKEE7 DUUZE ROLLS CAMET3",
-      "old_canonical_fix_count": 11
+      "old_canonical_fix_count": 11,
+      "departure_dumb_baseline": {
+        "capture_id": "22897",
+        "origin": "KDEN",
+        "eval_time": "2026-09-20T13:50:44.679Z",
+        "nobs": "36",
+        "nmodes": "1",
+        "baseline_runway": "08"
+      }
     },
     {
       "baseline_capture_id": "22894",
@@ -732,7 +1372,15 @@
       "destination": "KDFW",
       "captured_at": "2026-09-20T13:50:44.667Z",
       "route": "DOTSS2 CNERY BLH BXK TFD J50 SSO J4 INK GEEKY BOOVE7",
-      "old_canonical_fix_count": 34
+      "old_canonical_fix_count": 34,
+      "departure_dumb_baseline": {
+        "capture_id": "22894",
+        "origin": "KLAX",
+        "eval_time": "2026-09-20T13:50:44.667Z",
+        "nobs": "20",
+        "nmodes": "1",
+        "baseline_runway": "24L"
+      }
     },
     {
       "baseline_capture_id": "22887",
@@ -741,7 +1389,15 @@
       "destination": "KSLC",
       "captured_at": "2026-09-20T13:50:44.664Z",
       "route": "ZIMMR4 CHNGY EKR RACER JAZZZ1",
-      "old_canonical_fix_count": 16
+      "old_canonical_fix_count": 16,
+      "departure_dumb_baseline": {
+        "capture_id": "22887",
+        "origin": "KDEN",
+        "eval_time": "2026-09-20T13:50:44.664Z",
+        "nobs": "36",
+        "nmodes": "1",
+        "baseline_runway": "08"
+      }
     },
     {
       "baseline_capture_id": "22907",
@@ -750,7 +1406,15 @@
       "destination": "KGEG",
       "captured_at": "2026-09-20T13:50:44.657Z",
       "route": "RATPK3 FRNCK WINEN CRITO Q73 ZATIP",
-      "old_canonical_fix_count": 13
+      "old_canonical_fix_count": 13,
+      "departure_dumb_baseline": {
+        "capture_id": "22907",
+        "origin": "KLAS",
+        "eval_time": "2026-09-20T13:50:44.657Z",
+        "nobs": "31",
+        "nmodes": "1",
+        "baseline_runway": "26R"
+      }
     },
     {
       "baseline_capture_id": "22888",
@@ -759,7 +1423,15 @@
       "destination": "KDFW",
       "captured_at": "2026-09-20T13:50:44.654Z",
       "route": "NIITZ4 SSKEE GUP ABQ CRTTR TXO TURKI VKTRY2",
-      "old_canonical_fix_count": 24
+      "old_canonical_fix_count": 24,
+      "departure_dumb_baseline": {
+        "capture_id": "22888",
+        "origin": "KLAS",
+        "eval_time": "2026-09-20T13:50:44.654Z",
+        "nobs": "31",
+        "nmodes": "1",
+        "baseline_runway": "26R"
+      }
     },
     {
       "baseline_capture_id": "22878",
@@ -768,7 +1440,15 @@
       "destination": "KDEN",
       "captured_at": "2026-09-20T13:47:44.487Z",
       "route": "PMPKN NEATO DLLAN RONIC BAE J34 DLL J34 HILRO J34 ODI ONL PORDR AALLE4",
-      "old_canonical_fix_count": 23
+      "old_canonical_fix_count": 23,
+      "departure_dumb_baseline": {
+        "capture_id": "22878",
+        "origin": "KORD",
+        "eval_time": "2026-09-20T13:47:44.487Z",
+        "nobs": "11",
+        "nmodes": "1",
+        "baseline_runway": "10L"
+      }
     },
     {
       "baseline_capture_id": "22861",
@@ -777,7 +1457,15 @@
       "destination": "KLAX",
       "captured_at": "2026-09-20T13:46:44.463Z",
       "route": "SUMMA2 SUMMA JINMO Q7 JAGWA BURGL IRNMN2",
-      "old_canonical_fix_count": 24
+      "old_canonical_fix_count": 24,
+      "departure_dumb_baseline": {
+        "capture_id": "22861",
+        "origin": "KSEA",
+        "eval_time": "2026-09-20T13:46:44.463Z",
+        "nobs": "7",
+        "nmodes": "1",
+        "baseline_runway": "16L"
+      }
     },
     {
       "baseline_capture_id": "22851",
@@ -786,7 +1474,15 @@
       "destination": "KLAS",
       "captured_at": "2026-09-20T13:46:44.457Z",
       "route": "BAYLR6 TEHRU BRICK GGAPP CHOWW4",
-      "old_canonical_fix_count": 19
+      "old_canonical_fix_count": 19,
+      "departure_dumb_baseline": {
+        "capture_id": "22851",
+        "origin": "KDEN",
+        "eval_time": "2026-09-20T13:46:44.457Z",
+        "nobs": "36",
+        "nmodes": "1",
+        "baseline_runway": "08"
+      }
     },
     {
       "baseline_capture_id": "22845",
@@ -795,7 +1491,15 @@
       "destination": "KJMS",
       "captured_at": "2026-09-20T13:45:44.477Z",
       "route": "HHOTH2 JOBBA CAXOL JMS",
-      "old_canonical_fix_count": 10
+      "old_canonical_fix_count": 10,
+      "departure_dumb_baseline": {
+        "capture_id": "22845",
+        "origin": "KDEN",
+        "eval_time": "2026-09-20T13:45:44.477Z",
+        "nobs": "36",
+        "nmodes": "1",
+        "baseline_runway": "08"
+      }
     },
     {
       "baseline_capture_id": "22814",
@@ -804,7 +1508,15 @@
       "destination": "KDFW",
       "captured_at": "2026-09-20T13:43:44.483Z",
       "route": "DOTSS2 CNERY BLH BXK TFD J50 SSO J4 INK GEEKY BOOVE7",
-      "old_canonical_fix_count": 34
+      "old_canonical_fix_count": 34,
+      "departure_dumb_baseline": {
+        "capture_id": "22814",
+        "origin": "KLAX",
+        "eval_time": "2026-09-20T13:43:44.483Z",
+        "nobs": "20",
+        "nmodes": "1",
+        "baseline_runway": "24L"
+      }
     },
     {
       "baseline_capture_id": "22811",
@@ -813,7 +1525,15 @@
       "destination": "KDEN",
       "captured_at": "2026-09-20T13:42:44.351Z",
       "route": "SNTNA2 SYRAH Q128 JSICA LUDOH BUMMP SSKII4",
-      "old_canonical_fix_count": 20
+      "old_canonical_fix_count": 20,
+      "departure_dumb_baseline": {
+        "capture_id": "22811",
+        "origin": "KSFO",
+        "eval_time": "2026-09-20T13:42:44.351Z",
+        "nobs": "1",
+        "nmodes": "1",
+        "baseline_runway": null
+      }
     },
     {
       "baseline_capture_id": "22782",
@@ -822,7 +1542,15 @@
       "destination": "KSTL",
       "captured_at": "2026-09-20T13:40:44.660Z",
       "route": "DOTSS2 CLEEE PKE FLG KD36Q KD45U TODDE OATHE SLN ANX KAYLA3",
-      "old_canonical_fix_count": 31
+      "old_canonical_fix_count": 31,
+      "departure_dumb_baseline": {
+        "capture_id": "22782",
+        "origin": "KLAX",
+        "eval_time": "2026-09-20T13:40:44.660Z",
+        "nobs": "20",
+        "nmodes": "1",
+        "baseline_runway": "24L"
+      }
     },
     {
       "baseline_capture_id": "22793",
@@ -831,7 +1559,15 @@
       "destination": "KBZN",
       "captured_at": "2026-09-20T13:40:44.643Z",
       "route": "DDRTH1 DDRTH RIW TOCUD LOSST1",
-      "old_canonical_fix_count": 13
+      "old_canonical_fix_count": 13,
+      "departure_dumb_baseline": {
+        "capture_id": "22793",
+        "origin": "KDEN",
+        "eval_time": "2026-09-20T13:40:44.643Z",
+        "nobs": "36",
+        "nmodes": "1",
+        "baseline_runway": "08"
+      }
     },
     {
       "baseline_capture_id": "22799",
@@ -840,7 +1576,15 @@
       "destination": "KDEN",
       "captured_at": "2026-09-20T13:40:44.611Z",
       "route": "SCHEP1 RXANN TEYOU LLUKY PORDR AALLE4",
-      "old_canonical_fix_count": 18
+      "old_canonical_fix_count": 18,
+      "departure_dumb_baseline": {
+        "capture_id": "22799",
+        "origin": "KMSP",
+        "eval_time": "2026-09-20T13:40:44.611Z",
+        "nobs": "13",
+        "nmodes": "1",
+        "baseline_runway": "12R"
+      }
     },
     {
       "baseline_capture_id": "22786",
@@ -849,7 +1593,15 @@
       "destination": "KDEN",
       "captured_at": "2026-09-20T13:40:44.606Z",
       "route": "GIDGT4 TUKRR BUMMP SSKII4",
-      "old_canonical_fix_count": 20
+      "old_canonical_fix_count": 20,
+      "departure_dumb_baseline": {
+        "capture_id": "22786",
+        "origin": "KLAS",
+        "eval_time": "2026-09-20T13:40:44.606Z",
+        "nobs": "30",
+        "nmodes": "1",
+        "baseline_runway": "26R"
+      }
     },
     {
       "baseline_capture_id": "22787",
@@ -858,7 +1610,15 @@
       "destination": "KDAL",
       "captured_at": "2026-09-20T13:40:44.605Z",
       "route": "SLEEK2 SLEEK KA39Y STNLI JFRYE5",
-      "old_canonical_fix_count": 17
+      "old_canonical_fix_count": 17,
+      "departure_dumb_baseline": {
+        "capture_id": "22787",
+        "origin": "KDEN",
+        "eval_time": "2026-09-20T13:40:44.605Z",
+        "nobs": "36",
+        "nmodes": "1",
+        "baseline_runway": "08"
+      }
     },
     {
       "baseline_capture_id": "22795",
@@ -867,7 +1627,15 @@
       "destination": "KLAX",
       "captured_at": "2026-09-20T13:40:44.601Z",
       "route": "ZIONZ1 EHK LAKRR HAKMN ANJLL4",
-      "old_canonical_fix_count": 18
+      "old_canonical_fix_count": 18,
+      "departure_dumb_baseline": {
+        "capture_id": "22795",
+        "origin": "KSLC",
+        "eval_time": "2026-09-20T13:40:44.601Z",
+        "nobs": "15",
+        "nmodes": "1",
+        "baseline_runway": "34L"
+      }
     },
     {
       "baseline_capture_id": "22780",
@@ -876,7 +1644,15 @@
       "destination": "KGPI",
       "captured_at": "2026-09-20T13:40:44.600Z",
       "route": "DDRTH1 DDRTH BOY HLN FCA",
-      "old_canonical_fix_count": 11
+      "old_canonical_fix_count": 11,
+      "departure_dumb_baseline": {
+        "capture_id": "22780",
+        "origin": "KDEN",
+        "eval_time": "2026-09-20T13:40:44.600Z",
+        "nobs": "36",
+        "nmodes": "1",
+        "baseline_runway": "08"
+      }
     },
     {
       "baseline_capture_id": "22789",
@@ -885,7 +1661,15 @@
       "destination": "KDAL",
       "captured_at": "2026-09-20T13:40:44.590Z",
       "route": "NIITZ4 SSKEE ABQ CRTTR TXO J72 TURKI JFRYE5",
-      "old_canonical_fix_count": 18
+      "old_canonical_fix_count": 18,
+      "departure_dumb_baseline": {
+        "capture_id": "22789",
+        "origin": "KLAS",
+        "eval_time": "2026-09-20T13:40:44.590Z",
+        "nobs": "30",
+        "nmodes": "1",
+        "baseline_runway": "26R"
+      }
     },
     {
       "baseline_capture_id": "22794",
@@ -894,7 +1678,15 @@
       "destination": "KBNA",
       "captured_at": "2026-09-20T13:40:44.588Z",
       "route": "EXTAN7 SHAYK SLN BUM NMANN RYYMN4",
-      "old_canonical_fix_count": 16
+      "old_canonical_fix_count": 16,
+      "departure_dumb_baseline": {
+        "capture_id": "22794",
+        "origin": "KDEN",
+        "eval_time": "2026-09-20T13:40:44.588Z",
+        "nobs": "36",
+        "nmodes": "1",
+        "baseline_runway": "08"
+      }
     },
     {
       "baseline_capture_id": "22785",
@@ -903,7 +1695,15 @@
       "destination": "KMCI",
       "captured_at": "2026-09-20T13:40:44.581Z",
       "route": "GIDGT4 TUKRR PGA TAHIB ALS GCK KK48A FRACA ZOURA WUTNG3",
-      "old_canonical_fix_count": 20
+      "old_canonical_fix_count": 20,
+      "departure_dumb_baseline": {
+        "capture_id": "22785",
+        "origin": "KLAS",
+        "eval_time": "2026-09-20T13:40:44.581Z",
+        "nobs": "30",
+        "nmodes": "1",
+        "baseline_runway": "26R"
+      }
     }
   ]
 }
