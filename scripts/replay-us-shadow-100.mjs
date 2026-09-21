@@ -32,10 +32,17 @@ const results=fixture.cases.map(c=>{
     route:c.route,origin:c.origin,destination:c.destination,nasrIndex:index,cifpText:cifp
   });
   const bucket=classify(r);
+  const oldCount=Number(c.old_canonical_fix_count)||null;
+  const detCount=r.geometry?.length||0;
+  const omittedCount=oldCount?Math.max(0,oldCount-detCount):null;
+  const omittedFraction=oldCount?omittedCount/oldCount:null;
   return{
     ...c,bucket,status:r.status,validity_reason:r.validity_reason,
     filed_core_valid:r.filed_core_valid,scoring_valid:r.scoring_valid,
-    deterministic_point_count:r.geometry?.length||0,
+    deterministic_point_count:detCount,
+    old_canonical_fix_count:oldCount,
+    omitted_terminal_or_unresolved_point_count:omittedCount,
+    omitted_fraction_of_old_geometry:omittedFraction,
     terminal_ambiguity:r.terminal_ambiguity,
     problems:r.problems,
     departure_status:r.departure?.status||null,
@@ -71,6 +78,17 @@ for(const x of results){
     const k=toks.at(-1)||"UNKNOWN"; unresolvedArrivals[k]=(unresolvedArrivals[k]||0)+1;
   }
 }
+const coreRows=results.filter(x=>x.bucket==="DETERMINISTIC_FILED_CORE_WITH_TERMINAL_AMBIGUITY"&&x.old_canonical_fix_count);
+const omittedFractions=coreRows.map(x=>x.omitted_fraction_of_old_geometry).sort((a,b)=>a-b);
+const median=arr=>arr.length?arr[Math.floor(arr.length/2)]:null;
+const terminalCoverage={
+  n:coreRows.length,
+  mean_omitted_fraction:coreRows.length?coreRows.reduce((s,x)=>s+x.omitted_fraction_of_old_geometry,0)/coreRows.length:null,
+  median_omitted_fraction:median(omittedFractions),
+  p90_omitted_fraction:omittedFractions.length?omittedFractions[Math.min(omittedFractions.length-1,Math.floor(0.9*omittedFractions.length))]:null,
+  mean_omitted_points:coreRows.length?coreRows.reduce((s,x)=>s+x.omitted_terminal_or_unresolved_point_count,0)/coreRows.length:null
+};
+
 const report={
   fixture_id:fixture.fixture_id,
   airac_cycle:fixture.airac_cycle,
@@ -80,10 +98,11 @@ const report={
   ambiguous_tokens:ambiguousTokens,
   unresolved_departures:unresolvedDepartures,
   unresolved_arrivals:unresolvedArrivals,
+  terminal_coverage:terminalCoverage,
   results
 };
 await fs.mkdir("artifacts",{recursive:true});
 await fs.writeFile("artifacts/us-shadow-100-260903-v1-results.json",JSON.stringify(report,null,2));
-console.log(JSON.stringify({fixture_id:report.fixture_id,n:report.n,counts:report.counts,problem_reasons:report.problem_reasons,ambiguous_tokens:report.ambiguous_tokens,unresolved_departures:report.unresolved_departures,unresolved_arrivals:report.unresolved_arrivals,
+console.log(JSON.stringify({fixture_id:report.fixture_id,n:report.n,counts:report.counts,problem_reasons:report.problem_reasons,ambiguous_tokens:report.ambiguous_tokens,unresolved_departures:report.unresolved_departures,unresolved_arrivals:report.unresolved_arrivals,terminal_coverage:report.terminal_coverage,
   examples:Object.fromEntries(Object.keys(counts).map(k=>[k,results.filter(x=>x.bucket===k).slice(0,5).map(x=>({ident:x.ident,origin:x.origin,destination:x.destination,route:x.route,problems:x.problems,terminal_ambiguity:x.terminal_ambiguity}))]))
 },null,2));
