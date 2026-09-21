@@ -1,0 +1,15 @@
+name: Probe SENEAM 2026 AIRAC archive
+on:
+  push:
+    branches: [resolver-engine-v0]
+    paths:
+      - "scripts/probe-seneam-airac-2026.mjs"
+      - ".github/workflows/probe-seneam-airac-2026.yml"
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 24}
+      - run: node scripts/probe-seneam-airac-2026.mjs
