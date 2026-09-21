@@ -25,4 +25,4 @@ assert.equal(r.status,"PARTIAL");
 assert.equal(r.validity_reason,"RUNWAY_DEPENDENT_TERMINAL_GEOMETRY_NOT_FILED");
 assert.equal(r.terminal_ambiguity.arrival_runway_path,"AMBIGUOUS");
 
-console.log(JSON.stringify({ok:true,route,status:r.status,filed_core_valid:r.filed_core_valid,scoring_valid:r.scoring_valid,names:r.names,terminal_ambiguity:r.terminal_ambiguity,arrival_branches:r.arrival.ambiguous_runway_branches},null,2));
+console.log(JSON.stringify({ok:true,route,status:r.status,filed_core_valid:r.filed_core_valid,scoring_valid:r.scoring_valid,names:r.names,geometry:r.geometry,terminal_ambiguity:r.terminal_ambiguity,arrival_branches:r.arrival.ambiguous_runway_branches},null,2));
