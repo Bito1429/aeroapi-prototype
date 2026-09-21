@@ -1,4 +1,5 @@
-// Resolver engine core; fail closed until authoritative navdata is loaded.\nexport const RESOLVER_ENGINE_VERSION="R2_ENGINE_V0_2026-09-21";
+// Resolver engine core; fail closed until authoritative navdata is loaded.
+export const RESOLVER_ENGINE_VERSION="R2_ENGINE_V0_2026-09-21";
 export const RESOLVER_COMPARISON_POLICY=Object.freeze({
   point_tolerance_nm:1.0,
   severe_disagreement_nm:5.0,
