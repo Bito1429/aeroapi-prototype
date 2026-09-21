@@ -6,8 +6,9 @@ export function parseCsv(bytes){
   return parse(strFromU8(bytes),{columns:true,skip_empty_lines:true,relax_column_count:true,bom:true,trim:true});
 }
 
-export function buildNasrIndexes({fixZip,navZip,awyZip}){
-  const fixFiles=unzipSync(fixZip),navFiles=unzipSync(navZip),awyFiles=unzipSync(awyZip);
+export function buildNasrIndexes({aptZip=null,fixZip,navZip,awyZip}){
+  const aptFiles=aptZip?unzipSync(aptZip):null,fixFiles=unzipSync(fixZip),navFiles=unzipSync(navZip),awyFiles=unzipSync(awyZip);
+  const airports=aptFiles?parseCsv(aptFiles["APT_BASE.csv"]):[];
   const fixes=parseCsv(fixFiles["FIX_BASE.csv"]);
   const navs=parseCsv(navFiles["NAV_BASE.csv"]);
   const airways=parseCsv(awyFiles["AWY_BASE.csv"]);
@@ -19,6 +20,11 @@ export function buildNasrIndexes({fixZip,navZip,awyZip}){
     points.get(k).push(p);
   };
 
+  for(const r of airports){
+    const lat=Number(r.LAT_DECIMAL),lon=Number(r.LONG_DECIMAL),icao=String(r.ICAO_ID||"").trim().toUpperCase();
+    if(r.COUNTRY_CODE!=="US"||!icao||!Number.isFinite(lat)||!Number.isFinite(lon))continue;
+    add(icao,{name:icao,type:"AIRPORT",latitude:lat,longitude:lon,country_code:r.COUNTRY_CODE,source:"FAA_NASR_APT",faa_id:r.ARPT_ID||null});
+  }
   for(const r of fixes){
     const lat=Number(r.LAT_DECIMAL),lon=Number(r.LONG_DECIMAL);
     if(r.COUNTRY_CODE!=="US"||!Number.isFinite(lat)||!Number.isFinite(lon))continue;
@@ -38,7 +44,7 @@ export function buildNasrIndexes({fixZip,navZip,awyZip}){
     if(!airwayStrings.has(id))airwayStrings.set(id,[]);
     airwayStrings.get(id).push({sequence:seq,regulatory:r.REGULATORY,location:r.AWY_LOCATION});
   }
-  return{points,airwayStrings,counts:{fixes:fixes.length,navs:navs.length,airways:airways.length}};
+  return{points,airwayStrings,counts:{airports:airports.length,fixes:fixes.length,navs:navs.length,airways:airways.length}};
 }
 
 export function resolvePoint(index,ident){
