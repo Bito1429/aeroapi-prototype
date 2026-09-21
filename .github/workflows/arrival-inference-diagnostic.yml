@@ -7,6 +7,10 @@ on:
       - "scripts/diagnose-arrival-inference-v0.mjs"
       - "scripts/infer-development-arrival-direction-v1.mjs"
       - "scripts/infer-development-arrival-direction-v2.mjs"
+      - "scripts/benchmark-arrival-direction-baselines.mjs"
+      - "fixtures/us-arrival-history-14d-final-segments-v1.json"
+      - "fixtures/aeroapi-actual-runway-on-validation-v1.json"
+      - "docs/arrival-direction-baseline-evaluation-v0.md"
       - "docs/historical-landing-direction-inference-policy-v2.md"
       - "docs/historical-landing-direction-inference-policy-v1.md"
       - ".github/workflows/arrival-inference-diagnostic.yml"
@@ -25,3 +29,4 @@ jobs:
       - run: node scripts/diagnose-arrival-inference-v0.mjs
       - run: node scripts/infer-development-arrival-direction-v1.mjs
       - run: node scripts/infer-development-arrival-direction-v2.mjs
+      - run: node scripts/benchmark-arrival-direction-baselines.mjs
