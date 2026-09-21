@@ -82,6 +82,12 @@ for(const c of dev.cases){
  if(seg){const inf=inferDirection(seg[0],seg[1],byAirport.get(c.destination));if(inf)truths.set(String(c.baseline_capture_id),inf);}
 }
 
+function durationBin(minutes){
+ if(!Number.isFinite(minutes))return"UNKNOWN";
+ if(minutes<=120)return"SHORT_LE120";
+ if(minutes<=240)return"MEDIUM_121_240";
+ return"LONG_GT240";
+}
 function summarize(rows){
  const answered=rows.filter(x=>x.prediction),matched=answered.filter(x=>x.match);
  return{
@@ -118,7 +124,19 @@ for(const c of dev.cases){
 
  const p2=prior.filter(x=>new Date(x.track_captured_at).getTime()>=T-2*3600e3).sort((a,b)=>new Date(b.track_captured_at)-new Date(a.track_captured_at));
  const pp=p2[0]?.direction||null;
- persistRows.push({capture_id:c.baseline_capture_id,ident:c.ident,destination:c.destination,truth,prediction:pp,match:pp?match(pp,truth):null,reason:pp?null:"NO_PRIOR_2H",prior_n:p2.length,age_minutes:pp?(T-new Date(p2[0].track_captured_at).getTime())/60000:null});
+ const raw2=hist.records.filter(x=>x.destination===c.destination&&new Date(x.track_captured_at).getTime()<T&&new Date(x.track_captured_at).getTime()>=T-2*3600e3);
+ const refusalReason=pp?null:(raw2.length?"ARRIVALS_BUT_NO_VALID_DIRECTION":"NO_ARRIVAL_2H");
+ persistRows.push({capture_id:c.baseline_capture_id,ident:c.ident,destination:c.destination,truth,prediction:pp,match:pp?match(pp,truth):null,reason:refusalReason,prior_n:p2.length,raw_prior_n:raw2.length,age_minutes:pp?(T-new Date(p2[0].track_captured_at).getTime())/60000:null,scheduled_minutes:Number(c.scheduled_minutes),duration_bin:durationBin(Number(c.scheduled_minutes))});
+}
+const persistence_by_duration=Object.fromEntries(["SHORT_LE120","MEDIUM_121_240","LONG_GT240","UNKNOWN"].map(bin=>{
+ const r=persistRows.filter(x=>x.duration_bin===bin);
+ return [bin,{n:r.length,...summarize(r)}];
+}));
+const persistence_refusals_by_reason={};
+const persistence_refusals_by_destination={};
+for(const x of persistRows.filter(x=>!x.prediction)){
+ persistence_refusals_by_reason[x.reason]=(persistence_refusals_by_reason[x.reason]||0)+1;
+ persistence_refusals_by_destination[x.destination]=(persistence_refusals_by_destination[x.destination]||0)+1;
 }
 const report={
  population:dev.fixture_id,
@@ -126,7 +144,7 @@ const report={
  historical_labels:histRows.length,
  label_validation:labelValidation,
  modal_14d:{...summarize(modalRows),rows:modalRows},
- persistence_2h:{...summarize(persistRows),rows:persistRows}
+ persistence_2h:{...summarize(persistRows),by_duration:persistence_by_duration,refusals_by_reason:persistence_refusals_by_reason,refusals_by_destination:persistence_refusals_by_destination,rows:persistRows}
 };
 await fs.mkdir("artifacts",{recursive:true});
 await fs.writeFile("artifacts/arrival-direction-baselines-development-v0.json",JSON.stringify(report,null,2));
@@ -136,6 +154,6 @@ console.log(JSON.stringify({
  historical_labels:report.historical_labels,
  label_validation:{n:labelValidation.n,comparable:labelValidation.comparable,agreements:labelValidation.agreements,agreement_rate:labelValidation.agreement_rate,disagreements:valComparable.filter(x=>!x.agrees)},
  modal_14d:summarize(modalRows),
- persistence_2h:summarize(persistRows),
+ persistence_2h:{...summarize(persistRows),by_duration:persistence_by_duration,refusals_by_reason:persistence_refusals_by_reason,top_refusal_destinations:Object.entries(persistence_refusals_by_destination).sort((a,b)=>b[1]-a[1]).slice(0,15)},
  persistence_age_minutes:{median:(()=>{const a=persistRows.filter(x=>x.prediction).map(x=>x.age_minutes).sort((a,b)=>a-b);return a.length?a[Math.floor(a.length/2)]:null;})()}
 },null,2));
