@@ -1,4 +1,12 @@
 // Resolver engine core; fail closed until authoritative navdata is loaded.\nexport const RESOLVER_ENGINE_VERSION="R2_ENGINE_V0_2026-09-21";
+export const RESOLVER_COMPARISON_POLICY=Object.freeze({
+  point_tolerance_nm:1.0,
+  severe_disagreement_nm:5.0,
+  route_agreement_fraction:0.95,
+  procedure_authority:"FAA_CIFP",
+  fix_airway_authority:"FAA_NASR",
+  airac_fallback:"NONE"
+});
 
 const LATLON_PATTERNS=[
   /^\d{2,4}[NS]\/\d{3,5}[EW]$/i,
@@ -24,6 +32,40 @@ export function tokenizeRoute(route){
     normalized_token:raw_token.toUpperCase(),
     token_class:classifyToken(raw_token)
   }));
+}
+
+export function selectEffectiveCycle(instant,cycles=[]){
+  const t=new Date(instant).getTime();
+  if(!Number.isFinite(t))return null;
+  const matches=cycles.filter(c=>{
+    const a=new Date(c.effective_from).getTime(),b=new Date(c.effective_to).getTime();
+    return Number.isFinite(a)&&Number.isFinite(b)&&a<=t&&t<b;
+  });
+  return matches.length===1?matches[0]:null;
+}
+
+export function canResolveTokenToObject(tokenClass,objectType,{routeJurisdiction=null,objectJurisdiction=null,loadedJurisdictions=[]}={}){
+  const tc=String(tokenClass||"").toUpperCase(),ot=String(objectType||"").toUpperCase();
+  if(tc==="AIRWAY"&&["POINT","AIRPORT","VOR","NDB","WAYPOINT","FIX"].includes(ot))return false;
+  if(routeJurisdiction&&objectJurisdiction&&routeJurisdiction!==objectJurisdiction&&!loadedJurisdictions.includes(routeJurisdiction))return false;
+  return true;
+}
+
+export function compareCommonNamedFixes(a=[],b=[]){
+  const byName=new Map(b.filter(x=>x?.name&&Number.isFinite(x.latitude)&&Number.isFinite(x.longitude)).map(x=>[String(x.name).toUpperCase(),x]));
+  const rows=[];
+  for(const x of a){
+    if(!x?.name||!Number.isFinite(x.latitude)||!Number.isFinite(x.longitude))continue;
+    const y=byName.get(String(x.name).toUpperCase());if(!y)continue;
+    const R=3440.065,rad=Math.PI/180,p1=x.latitude*rad,p2=y.latitude*rad,dp=(y.latitude-x.latitude)*rad,dl=(y.longitude-x.longitude)*rad;
+    const h=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
+    const nm=2*R*Math.asin(Math.min(1,Math.sqrt(h)));
+    rows.push({name:String(x.name).toUpperCase(),distance_nm:+nm.toFixed(3)});
+  }
+  const within=rows.filter(r=>r.distance_nm<=RESOLVER_COMPARISON_POLICY.point_tolerance_nm).length;
+  const severe=rows.filter(r=>r.distance_nm>RESOLVER_COMPARISON_POLICY.severe_disagreement_nm).length;
+  const fraction=rows.length?within/rows.length:0;
+  return{common_count:rows.length,within_tolerance:within,severe_count:severe,agreement_fraction:+fraction.toFixed(4),agreement:rows.length>0&&fraction>=RESOLVER_COMPARISON_POLICY.route_agreement_fraction&&severe===0,points:rows};
 }
 
 export function resolverEnvelope({route,origin=null,destination=null,nav_cycle_code=null}={}){
