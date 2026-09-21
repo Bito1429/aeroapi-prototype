@@ -31,8 +31,8 @@ export function buildNasrIndexes({aptZip=null,fixZip,navZip,awyZip}){
     add(r.FIX_ID,{name:r.FIX_ID,type:"FIX",latitude:lat,longitude:lon,country_code:r.COUNTRY_CODE,icao_region_code:r.ICAO_REGION_CODE,source:"FAA_NASR_FIX"});
   }
   for(const r of navs){
-    const lat=Number(r.LAT_DECIMAL),lon=Number(r.LONG_DECIMAL);
-    if(r.COUNTRY_CODE!=="US"||!Number.isFinite(lat)||!Number.isFinite(lon))continue;
+    const lat=Number(r.LAT_DECIMAL),lon=Number(r.LONG_DECIMAL),type=String(r.NAV_TYPE||"NAVAID").trim().toUpperCase();
+    if(r.COUNTRY_CODE!=="US"||type==="VOT"||!Number.isFinite(lat)||!Number.isFinite(lon))continue;
     add(r.NAV_ID,{name:r.NAV_ID,type:r.NAV_TYPE||"NAVAID",latitude:lat,longitude:lon,country_code:r.COUNTRY_CODE,source:"FAA_NASR_NAV"});
   }
 
