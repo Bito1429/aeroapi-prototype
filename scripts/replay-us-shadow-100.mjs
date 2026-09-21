@@ -4,6 +4,16 @@ import{buildNasrIndexes}from"../api/resolver/faa-nasr.js";
 import{resolveFiledRouteUS}from"../api/resolver/faa-route.js";
 
 const fixture=JSON.parse(await fs.readFile("fixtures/us-shadow-100-260903-v1.json","utf8"));
+function havNm(a,b){
+  const R=3440.065,rad=Math.PI/180;
+  const p1=a.latitude*rad,p2=b.latitude*rad,dp=(b.latitude-a.latitude)*rad,dl=(b.longitude-a.longitude)*rad;
+  const h=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
+  return 2*R*Math.asin(Math.min(1,Math.sqrt(h)));
+}
+function polyNm(points){
+  let d=0; for(let i=1;i<points.length;i++) if(Number.isFinite(points[i-1]?.latitude)&&Number.isFinite(points[i-1]?.longitude)&&Number.isFinite(points[i]?.latitude)&&Number.isFinite(points[i]?.longitude)) d+=havNm(points[i-1],points[i]);
+  return d;
+}
 const U={
   APT:"https://nfdc.faa.gov/webContent/28DaySub/extra/03_Sep_2026_APT_CSV.zip",
   FIX:"https://nfdc.faa.gov/webContent/28DaySub/extra/03_Sep_2026_FIX_CSV.zip",
@@ -34,6 +44,21 @@ const results=fixture.cases.map(c=>{
   const bucket=classify(r);
   const oldCount=Number(c.old_canonical_fix_count)||null;
   const detCount=r.geometry?.length||0;
+  const oldFixes=Array.isArray(c.old_canonical_fixes)?c.old_canonical_fixes:[];
+  const oldNames=oldFixes.map(x=>String(x?.name||"").toUpperCase());
+  const detNames=(r.names||[]).map(x=>String(x).toUpperCase());
+  let terminalDistanceNm=null,oldTotalNm=null,terminalDistanceFraction=null;
+  if(oldFixes.length>1&&detNames.length){
+    oldTotalNm=polyNm(oldFixes);
+    const firstIdx=oldNames.indexOf(detNames[0]);
+    const lastIdx=oldNames.lastIndexOf(detNames.at(-1));
+    if(firstIdx>=0&&lastIdx>=firstIdx){
+      const depSeg=oldFixes.slice(0,firstIdx+1);
+      const arrSeg=oldFixes.slice(lastIdx);
+      terminalDistanceNm=polyNm(depSeg)+polyNm(arrSeg);
+      terminalDistanceFraction=oldTotalNm>0?terminalDistanceNm/oldTotalNm:null;
+    }
+  }
   const omittedCount=oldCount?Math.max(0,oldCount-detCount):null;
   const omittedFraction=oldCount?omittedCount/oldCount:null;
   return{
@@ -43,6 +68,9 @@ const results=fixture.cases.map(c=>{
     old_canonical_fix_count:oldCount,
     omitted_terminal_or_unresolved_point_count:omittedCount,
     omitted_fraction_of_old_geometry:omittedFraction,
+    old_total_distance_nm:oldTotalNm,
+    terminal_uncertain_distance_nm:terminalDistanceNm,
+    terminal_uncertain_distance_fraction:terminalDistanceFraction,
     terminal_ambiguity:r.terminal_ambiguity,
     problems:r.problems,
     departure_status:r.departure?.status||null,
@@ -81,12 +109,19 @@ for(const x of results){
 const coreRows=results.filter(x=>x.bucket==="DETERMINISTIC_FILED_CORE_WITH_TERMINAL_AMBIGUITY"&&x.old_canonical_fix_count);
 const omittedFractions=coreRows.map(x=>x.omitted_fraction_of_old_geometry).sort((a,b)=>a-b);
 const median=arr=>arr.length?arr[Math.floor(arr.length/2)]:null;
+const distRows=coreRows.filter(x=>Number.isFinite(x.terminal_uncertain_distance_fraction));
+const distFracs=distRows.map(x=>x.terminal_uncertain_distance_fraction).sort((a,b)=>a-b);
 const terminalCoverage={
   n:coreRows.length,
   mean_omitted_fraction:coreRows.length?coreRows.reduce((s,x)=>s+x.omitted_fraction_of_old_geometry,0)/coreRows.length:null,
   median_omitted_fraction:median(omittedFractions),
   p90_omitted_fraction:omittedFractions.length?omittedFractions[Math.min(omittedFractions.length-1,Math.floor(0.9*omittedFractions.length))]:null,
-  mean_omitted_points:coreRows.length?coreRows.reduce((s,x)=>s+x.omitted_terminal_or_unresolved_point_count,0)/coreRows.length:null
+  mean_omitted_points:coreRows.length?coreRows.reduce((s,x)=>s+x.omitted_terminal_or_unresolved_point_count,0)/coreRows.length:null,
+  distance_n:distRows.length,
+  mean_terminal_distance_fraction:distRows.length?distRows.reduce((s,x)=>s+x.terminal_uncertain_distance_fraction,0)/distRows.length:null,
+  median_terminal_distance_fraction:median(distFracs),
+  p90_terminal_distance_fraction:distFracs.length?distFracs[Math.min(distFracs.length-1,Math.floor(0.9*distFracs.length))]:null,
+  mean_terminal_uncertain_nm:distRows.length?distRows.reduce((s,x)=>s+x.terminal_uncertain_distance_nm,0)/distRows.length:null
 };
 
 const report={
