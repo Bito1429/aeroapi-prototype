@@ -1,4 +1,4 @@
-export const RESOLVER_ENGINE_VERSION="R2_ENGINE_V0_2026-09-21";
+// Resolver engine core; fail closed until authoritative navdata is loaded.\nexport const RESOLVER_ENGINE_VERSION="R2_ENGINE_V0_2026-09-21";
 
 const LATLON_PATTERNS=[
   /^\d{2,4}[NS]\/\d{3,5}[EW]$/i,
