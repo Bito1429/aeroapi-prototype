@@ -56,16 +56,34 @@ for(const x of results){
     problemReasons[k]=(problemReasons[k]||0)+1;
   }
 }
+const ambiguousTokens={},unresolvedDepartures={},unresolvedArrivals={};
+for(const x of results){
+  for(const p of x.problems||[]){
+    if(String(p.status||"").includes("AMBIGUOUS")){
+      const k=String(p.token||p.name||"UNKNOWN"); ambiguousTokens[k]=(ambiguousTokens[k]||0)+1;
+    }
+  }
+  const toks=String(x.route||"").split(/\s+/).filter(Boolean);
+  if(x.departure_status==="UNRESOLVED"){
+    const k=toks[0]||"UNKNOWN"; unresolvedDepartures[k]=(unresolvedDepartures[k]||0)+1;
+  }
+  if(x.arrival_status==="UNRESOLVED"){
+    const k=toks.at(-1)||"UNKNOWN"; unresolvedArrivals[k]=(unresolvedArrivals[k]||0)+1;
+  }
+}
 const report={
   fixture_id:fixture.fixture_id,
   airac_cycle:fixture.airac_cycle,
   n:results.length,
   counts,
   problem_reasons:problemReasons,
+  ambiguous_tokens:ambiguousTokens,
+  unresolved_departures:unresolvedDepartures,
+  unresolved_arrivals:unresolvedArrivals,
   results
 };
 await fs.mkdir("artifacts",{recursive:true});
 await fs.writeFile("artifacts/us-shadow-100-260903-v1-results.json",JSON.stringify(report,null,2));
-console.log(JSON.stringify({fixture_id:report.fixture_id,n:report.n,counts:report.counts,problem_reasons:report.problem_reasons,
+console.log(JSON.stringify({fixture_id:report.fixture_id,n:report.n,counts:report.counts,problem_reasons:report.problem_reasons,ambiguous_tokens:report.ambiguous_tokens,unresolved_departures:report.unresolved_departures,unresolved_arrivals:report.unresolved_arrivals,
   examples:Object.fromEntries(Object.keys(counts).map(k=>[k,results.filter(x=>x.bucket===k).slice(0,5).map(x=>({ident:x.ident,origin:x.origin,destination:x.destination,route:x.route,problems:x.problems,terminal_ambiguity:x.terminal_ambiguity}))]))
 },null,2));
