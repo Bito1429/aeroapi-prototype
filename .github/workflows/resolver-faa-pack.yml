@@ -1,5 +1,7 @@
 name: Resolver FAA pack validation
 on:
+  push:
+    branches: [resolver-engine-v0]
   pull_request:
     branches: [resolver-fail-closed-v1]
     paths:
