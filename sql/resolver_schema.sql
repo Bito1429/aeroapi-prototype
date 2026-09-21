@@ -15,9 +15,11 @@ create table if not exists nav_sources (
   source_code text not null,
   jurisdiction text not null,
   licence_ref text,
+  source_url text not null,
   cycle_id uuid not null references nav_cycles(id),
   imported_at timestamptz not null default now(),
-  checksum text,
+  sha256 text not null,
+  parser_version text not null,
   unique(source_code,jurisdiction,cycle_id)
 );
 
@@ -87,7 +89,8 @@ create table if not exists resolver_runs (
   flight_job_id uuid references flight_jobs(id),
   capture_id uuid references flight_captures(id),
   resolver_rule_version text not null,
-  nav_cycle_code text,
+  nav_cycle_id uuid not null references nav_cycles(id),
+  nav_cycle_code text not null,
   raw_route text not null,
   origin_icao text,
   destination_icao text,
@@ -118,5 +121,5 @@ create table if not exists resolver_token_decisions (
   unique(resolver_run_id,ordinal)
 );
 
-comment on table resolver_runs is 'Versioned resolver outputs. Scoring may only consume status=VALID.';
+comment on table resolver_runs is 'Versioned resolver outputs. Scoring may only consume status=VALID. AIRAC cycle is mandatory and must be effective for the flight instant.';
 comment on table resolver_token_decisions is 'Full audit trail for each token; ambiguity is preserved, never guessed.';
