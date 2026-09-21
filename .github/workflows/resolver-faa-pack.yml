@@ -1,11 +1,17 @@
 name: Resolver FAA pack validation
+
 on:
   push:
-    branches: [resolver-engine-v0]
+    branches:
+      - resolver-engine-v0
   pull_request:
-    branches: [resolver-fail-closed-v1]
+    branches:
+      - resolver-fail-closed-v1
     paths:
-      - "api/resolver-**"\n      - "api/lib.js"
+      - "api/resolver-**"
+      - "api/lib.js"
+      - "scripts/test-resolver-engine.mjs"
+      - "scripts/test-resolver.mjs"
       - "scripts/probe-faa-pack.mjs"
       - "package.json"
       - ".github/workflows/resolver-faa-pack.yml"
