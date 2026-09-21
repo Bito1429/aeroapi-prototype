@@ -46,7 +46,8 @@ export function selectDepartureByNextFix(cifpText,{airport,procedure,nextFix}){
   const exact=candidates.filter(x=>x.transition_id===next);
   const pool=exact.length?exact:candidates;
   if(pool.length!==1){
-    return{status:pool.length?"AMBIGUOUS":"UNRESOLVED",procedure,selector:{next_fix:next},candidates:pool.map(x=>({route_type:x.route_type,transition_id:x.transition_id,fixes:x.fixes}))};
+    if(records.length)return{status:"PARTIAL_AMBIGUOUS_RUNWAY",procedure,selector:{next_fix:next},fixes:[],candidates:pool.map(x=>({route_type:x.route_type,transition_id:x.transition_id,fixes:x.fixes}))};
+    return{status:"UNRESOLVED",procedure,selector:{next_fix:next},candidates:[]};
   }
   const chosen=pool[0],idx=chosen.fixes.indexOf(next);
   return{status:"RESOLVED",procedure,selector:{next_fix:next},route_type:chosen.route_type,transition_id:chosen.transition_id,fixes:chosen.fixes.slice(0,idx+1)};
@@ -82,6 +83,8 @@ export function selectArrivalByEntryFix(cifpText,{airport,procedure,entryFix}){
     }
   }
   if(!transition.length&&common.length&&common[0]===entry)transition=[entry];
+  const directRunwayEntry=all.some(rows=>["3","6"].includes(rows[0]?.route_type)&&rows[0]?.transition_id.startsWith("RW")&&fixesOf(rows)[0]===entry);
+  if(!transition.length&&directRunwayEntry)transition=[entry];
   if(!transition.length)return{status:"UNRESOLVED",procedure,selector:{entry_fix:entry},reason:"ENTRY_TRANSITION_NOT_FOUND"};
 
   const prefix=[...transition];
