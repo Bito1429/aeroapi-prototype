@@ -41,6 +41,7 @@ jobs:
       - run: node scripts/replay-us-resolver-sample.mjs
       - run: node scripts/replay-us-shadow-100.mjs
       - run: node scripts/inspect-unresolved-procedures-260903.mjs
+      - run: node scripts/inspect-sid-groups.mjs
       - uses: actions/upload-artifact@v4
         with:
           name: faa-pack-260903-summary
