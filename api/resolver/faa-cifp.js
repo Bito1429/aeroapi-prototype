@@ -98,3 +98,51 @@ export function selectArrivalByEntryFix(cifpText,{airport,procedure,entryFix}){
     ambiguous_runway_branches:runwayGroups
   };
 }
+
+
+export function selectDepartureByRunwayAndNextFix(cifpText,{airport,procedure,runway,nextFix}){
+  const records=procedureRecords(cifpText,{airport,procedure,subsection:"D"});
+  const groups=groupRecords(records);
+  const rwy=String(runway||"").toUpperCase().replace(/^RW/,"");
+  const next=String(nextFix||"").toUpperCase();
+  const runwayGroups=[...groups.values()].filter(rows=>rows[0]?.route_type==="4"&&rows[0]?.transition_id.startsWith("RW"));
+  const exact=runwayGroups.filter(rows=>rows[0].transition_id===`RW${rwy}`);
+  const num=rwy.match(/^([0-9]{2})/)?.[1]||"";
+  const broad=runwayGroups.filter(rows=>rows[0].transition_id===`RW${num}B`);
+  const chosenRunway=exact.length===1?exact:(exact.length===0&&broad.length===1?broad:[]);
+  if(chosenRunway.length!==1){
+    return{status:chosenRunway.length?"AMBIGUOUS":"UNRESOLVED",reason:"RUNWAY_TRANSITION_NOT_UNIQUE",runway:rwy};
+  }
+  const path=fixesOf(chosenRunway[0]).filter(Boolean);
+
+  const commonGroups=[...groups.values()].filter(rows=>rows[0]?.route_type==="5");
+  if(commonGroups.length){
+    const tail=path.at(-1);
+    const matches=commonGroups.filter(rows=>{
+      const f=fixesOf(rows).filter(Boolean);
+      return !tail||f[0]===tail;
+    });
+    if(matches.length===1){
+      for(const x of fixesOf(matches[0]).filter(Boolean).slice(1))if(path.at(-1)!==x)path.push(x);
+    }else if(matches.length>1){
+      return{status:"AMBIGUOUS",reason:"COMMON_BODY_NOT_UNIQUE",runway:rwy};
+    }
+  }
+
+  const tail=path.at(-1);
+  const enrouteGroups=[...groups.values()].filter(rows=>rows[0]?.route_type==="6").filter(rows=>{
+    const f=fixesOf(rows).filter(Boolean);
+    return f.includes(next)&&(!tail||f[0]===tail||f.includes(tail));
+  });
+  if(enrouteGroups.length!==1){
+    return{status:enrouteGroups.length?"AMBIGUOUS":"UNRESOLVED",reason:"ENROUTE_TRANSITION_NOT_UNIQUE",runway:rwy,next_fix:next};
+  }
+  const ef=fixesOf(enrouteGroups[0]).filter(Boolean);
+  const start=tail?Math.max(0,ef.indexOf(tail)):0;
+  for(const x of ef.slice(start+(tail?1:0))){
+    if(path.at(-1)!==x)path.push(x);
+    if(x===next)break;
+  }
+  if(path.at(-1)!==next)return{status:"UNRESOLVED",reason:"NEXT_FIX_NOT_REACHED",runway:rwy,next_fix:next};
+  return{status:"RESOLVED",runway:rwy,next_fix:next,fixes:path};
+}
