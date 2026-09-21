@@ -13,7 +13,7 @@ function summarizeCsv(bytes){
   const lines=text.split(/\r?\n/).filter(Boolean);
   return{rows:Math.max(0,lines.length-1),header:lines[0]||null,samples:lines.slice(1,3)};
 }
-const report={cycle:"260903",generated_at:new Date().toISOString(),sources:{}};
+const report={cycle:"260903",effective_from:"2026-09-03T00:00:00Z",effective_to:"2026-10-01T00:00:00Z",parser_version:"FAA_PACK_PROBE_V1",generated_at:new Date().toISOString(),sources:{}};
 for(const[kind,url]of Object.entries(SOURCES)){
   const r=await fetch(url);
   if(!r.ok)throw new Error(`${kind} download failed: ${r.status}`);
