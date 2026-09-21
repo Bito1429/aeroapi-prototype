@@ -1,0 +1,28 @@
+name: Resolver FAA pack validation
+on:
+  pull_request:
+    branches: [resolver-fail-closed-v1]
+    paths:
+      - "api/resolver-**"
+      - "scripts/probe-faa-pack.mjs"
+      - "package.json"
+      - ".github/workflows/resolver-faa-pack.yml"
+  workflow_dispatch:
+
+jobs:
+  validate-faa-pack:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm install
+      - run: node scripts/test-resolver-engine.mjs
+      - run: node scripts/test-resolver.mjs
+      - run: node scripts/probe-faa-pack.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: faa-pack-260903-summary
+          path: artifacts/faa-pack-260903-summary.json
