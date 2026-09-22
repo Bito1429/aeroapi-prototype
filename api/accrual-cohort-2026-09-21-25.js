@@ -8,7 +8,14 @@ const DAYS={
  "22":[new Date("2026-09-22T10:00:00Z"),new Date("2026-09-22T22:00:00Z")],
  "23":[new Date("2026-09-23T10:00:00Z"),new Date("2026-09-23T22:00:00Z")],
  "24":[new Date("2026-09-24T10:00:00Z"),new Date("2026-09-24T22:00:00Z")],
- "25":[new Date("2026-09-25T10:00:00Z"),new Date("2026-09-25T22:00:00Z")]
+ "25":[new Date("2026-09-25T10:00:00Z"),new Date("2026-09-25T22:00:00Z")],
+ "26":[new Date("2026-09-26T10:00:00Z"),new Date("2026-09-26T22:00:00Z")],
+ "27":[new Date("2026-09-27T10:00:00Z"),new Date("2026-09-27T22:00:00Z")],
+ "28":[new Date("2026-09-28T10:00:00Z"),new Date("2026-09-28T22:00:00Z")],
+ "29":[new Date("2026-09-29T10:00:00Z"),new Date("2026-09-29T22:00:00Z")],
+ "30":[new Date("2026-09-30T10:00:00Z"),new Date("2026-09-30T22:00:00Z")],
+ "01":[new Date("2026-10-01T10:00:00Z"),new Date("2026-10-01T22:00:00Z")],
+ "02":[new Date("2026-10-02T10:00:00Z"),new Date("2026-10-02T22:00:00Z")]
 };
 const BATCH_AFTER=new Date("2026-09-20T17:00:00Z");
 const TARGET=600;
@@ -54,7 +61,7 @@ function balancedSelect(candidates,existingRows,n,start,end){
 
 export default async function handler(req,res){try{
  const day=String(req.query?.day||"");
- if(!DAYS[day])return json(res,400,{ok:false,error:"day must be 21, 22, 23, 24, or 25"});
+ if(!DAYS[day])return json(res,400,{ok:false,error:"day must be 21-30 (Sep) or 01-02 (Oct)"});
  const[START,END]=DAYS[day];
  const sql=db();
  const cohort=await sql`select fa_flight_id,scheduled_out_initial,ident from flight_jobs where created_at>=${BATCH_AFTER.toISOString()}::timestamptz and scheduled_out_initial>=${START.toISOString()}::timestamptz and scheduled_out_initial<${END.toISOString()}::timestamptz and origin like 'K%' and destination like 'K%'`;
@@ -87,5 +94,5 @@ export default async function handler(req,res){try{
  }
  const after=await sql`select scheduled_out_initial,ident from flight_jobs where created_at>=${BATCH_AFTER.toISOString()}::timestamptz and scheduled_out_initial>=${START.toISOString()}::timestamptz and scheduled_out_initial<${END.toISOString()}::timestamptz and origin like 'K%' and destination like 'K%' order by scheduled_out_initial`;
  const bins={};for(const r of after){const b=binOf(r.scheduled_out_initial);bins[b]=(bins[b]||0)+1;}
- return json(res,200,{ok:true,done:after.length>=TARGET,day,registered_now:done.length,batch_total:after.length,target:TARGET,new_candidates:candidates.length,failed:failed.length,airport_errors,window:[START,END],min_lead_minutes:MIN_LEAD_MIN,selection:"US domestic mainstream scheduled carriers; 15-minute balanced accrual; Cape Air/KAP excluded prospectively",bin_counts:bins});
+ return json(res,200,{ok:true,done:after.length>=TARGET,day,batch_total:after.length,target:TARGET,new_candidates:candidates.length,failed:failed.length,airport_errors,window:[START,END],min_lead_minutes:MIN_LEAD_MIN,selection:"US domestic mainstream scheduled carriers; 15-minute balanced accrual; Cape Air/KAP excluded prospectively",bin_counts:bins});
 }catch(e){json(res,e.status||500,{ok:false,error:e.message,detail:e.body||null})}}
