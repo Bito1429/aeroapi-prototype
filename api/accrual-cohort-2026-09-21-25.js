@@ -18,7 +18,7 @@ const DAYS={
  "02":[new Date("2026-10-02T10:00:00Z"),new Date("2026-10-02T22:00:00Z")]
 };
 const BATCH_AFTER=new Date("2026-09-20T17:00:00Z");
-const TARGET=600;
+const targetForDay=day=>["23","24","25","26","27","28","29","30"].includes(day)?900:600;
 const STEP=50;
 const MIN_LEAD_MIN=90;
 const BIN_MIN=15;
@@ -63,6 +63,7 @@ export default async function handler(req,res){try{
  const day=String(req.query?.day||"");
  if(!DAYS[day])return json(res,400,{ok:false,error:"day must be 21-30 (Sep) or 01-02 (Oct)"});
  const[START,END]=DAYS[day];
+ const TARGET=targetForDay(day);
  const sql=db();
  const cohort=await sql`select fa_flight_id,scheduled_out_initial,ident from flight_jobs where created_at>=${BATCH_AFTER.toISOString()}::timestamptz and scheduled_out_initial>=${START.toISOString()}::timestamptz and scheduled_out_initial<${END.toISOString()}::timestamptz and origin like 'K%' and destination like 'K%'`;
  const binOf=iso=>Math.floor((new Date(iso).getTime()-START.getTime())/(BIN_MIN*60000));
