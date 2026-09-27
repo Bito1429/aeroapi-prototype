@@ -17,8 +17,9 @@ async function processOne(cp){const job=await getJob(cp.flight_job_id);if(!job)r
    if(realized&&frozen&&realized!==frozen){await terminalize(job.id,"DIVERTED",`realized destination ${realized} differs from frozen destination ${frozen}`);return{flight:cp.fa_flight_id,label:"POSTFLIGHT",state:"DIVERTED",frozen_destination:frozen,realized_destination:realized};}
    if(pf.flight.actual_out)await closeoutEligibility(job.id,pf.flight.actual_out);
    const tr=await saveTrack(job.id,pf),base=await latestEligibleBaseline(job.id);let means=null;
+   if(!base){await terminalize(job.id,"POSTFLIGHT_UNAVAILABLE","RESOLVER_INVALID_BASELINE: no eligible baseline passed resolver validation");await checkpointState(cp.id,"COMPLETE",pf.captured_at);return{flight:cp.fa_flight_id,label:"POSTFLIGHT",state:"COMPLETE",terminal_state:"POSTFLIGHT_UNAVAILABLE",reason:"RESOLVER_INVALID_BASELINE"};}
    await markScoreable(job.id);
-   if(base){const raw=base.raw_capture,bpts=(raw.protocol?.fixes||[]).filter(x=>Number.isFinite(x.latitude)&&Number.isFinite(x.longitude)),apts=pf.track.points.filter(x=>Number.isFinite(x.latitude)&&Number.isFinite(x.longitude));if(bpts.length>1&&apts.length>1)means=await saveScores(job.id,base.id,tr.id,methodA(bpts,apts));}
+   const raw=base.raw_capture,bpts=(raw.protocol?.fixes||[]).filter(x=>Number.isFinite(x.latitude)&&Number.isFinite(x.longitude)),apts=pf.track.points.filter(x=>Number.isFinite(x.latitude)&&Number.isFinite(x.longitude));if(bpts.length>1&&apts.length>1)means=await saveScores(job.id,base.id,tr.id,methodA(bpts,apts));
    await finishJob(job.id,pf);await checkpointState(cp.id,"COMPLETE",pf.captured_at);return{flight:cp.fa_flight_id,label:"POSTFLIGHT",state:"COMPLETE",terminal_state:"SCOREABLE",means};
  }
  const got=await apiCall(cp,()=>captureFlight(cp.fa_flight_id));if(!got.ok)return got.event;const c=got.value;
