@@ -1,4 +1,4 @@
-import{captureFlight,postflight,addMin,json,isCancelled,trackLooksTerminated}from"./lib.js";import{claimDueCheckpoints,saveCapture,checkpointState,rescheduleCheckpoint,retryCheckpoint,closeoutEligibility,saveTrack,latestEligibleBaseline,saveScores,finishJob,getJob,terminalize,markScoreable}from"./db.js";import{methodA}from"./score.js";
+import{captureFlight,postflight,addMin,json,isCancelled,trackLooksTerminated}from"./lib.js";import{claimDueCheckpoints,saveCapture,checkpointState,rescheduleCheckpoint,retryCheckpoint,closeoutEligibility,saveTrack,latestEligibleBaseline,saveScores,finishJob,getJob,terminalize,markScoreable,markUnscoreable}from"./db.js";import{methodA}from"./score.js";
 const CONCURRENCY=30,RETRY_DELAY_MS=60000,RETRY_WINDOW_MS=180000,MAX_TRANSIENT_ATTEMPTS=3,RETRY_PREFIX="TRANSIENT_RETRY:";
 function postflightDeadline(job){const base=job.scheduled_on_initial||new Date(new Date(job.scheduled_out_initial).getTime()+180*60000).toISOString();return new Date(new Date(base).getTime()+6*3600000);}
 function retryMeta(cp){const t=String(cp.error_text||"");if(!t.startsWith(RETRY_PREFIX))return null;try{const x=JSON.parse(t.slice(RETRY_PREFIX.length));if(Number.isFinite(x.started)&&Number.isInteger(x.failures)&&x.failures>0)return x;}catch{}return null;}
@@ -16,10 +16,16 @@ async function processOne(cp){const job=await getJob(cp.flight_job_id);if(!job)r
    const realized=String(pf.flight.destination||"").toUpperCase(),frozen=String(job.destination||"").toUpperCase();
    if(realized&&frozen&&realized!==frozen){await terminalize(job.id,"DIVERTED",`realized destination ${realized} differs from frozen destination ${frozen}`);return{flight:cp.fa_flight_id,label:"POSTFLIGHT",state:"DIVERTED",frozen_destination:frozen,realized_destination:realized};}
    if(pf.flight.actual_out)await closeoutEligibility(job.id,pf.flight.actual_out);
-   const tr=await saveTrack(job.id,pf),base=await latestEligibleBaseline(job.id);let means=null;
-   await markScoreable(job.id);
-   if(base){const raw=base.raw_capture,bpts=(raw.protocol?.fixes||[]).filter(x=>Number.isFinite(x.latitude)&&Number.isFinite(x.longitude)),apts=pf.track.points.filter(x=>Number.isFinite(x.latitude)&&Number.isFinite(x.longitude));if(bpts.length>1&&apts.length>1)means=await saveScores(job.id,base.id,tr.id,methodA(bpts,apts));}
-   await finishJob(job.id,pf);await checkpointState(cp.id,"COMPLETE",pf.captured_at);return{flight:cp.fa_flight_id,label:"POSTFLIGHT",state:"COMPLETE",terminal_state:"SCOREABLE",means};
+   const tr=await saveTrack(job.id,pf),base=await latestEligibleBaseline(job.id);let means=null,terminalState="NO_ELIGIBLE_BASELINE";
+   if(base){
+     await markScoreable(job.id);
+     terminalState="SCOREABLE";
+     const raw=base.raw_capture,bpts=(raw.protocol?.fixes||[]).filter(x=>Number.isFinite(x.latitude)&&Number.isFinite(x.longitude)),apts=pf.track.points.filter(x=>Number.isFinite(x.latitude)&&Number.isFinite(x.longitude));
+     if(bpts.length>1&&apts.length>1)means=await saveScores(job.id,base.id,tr.id,methodA(bpts,apts));
+   }else{
+     await markUnscoreable(job.id,"NO_ELIGIBLE_BASELINE","No eligible predeparture baseline capture; excluded from prospective scoring");
+   }
+   await finishJob(job.id,pf);await checkpointState(cp.id,"COMPLETE",pf.captured_at);return{flight:cp.fa_flight_id,label:"POSTFLIGHT",state:"COMPLETE",terminal_state:terminalState,means};
  }
  const got=await apiCall(cp,()=>captureFlight(cp.fa_flight_id));if(!got.ok)return got.event;const c=got.value;
  if(isCancelled(c.flight.status)&&!c.flight.actual_out){await terminalize(job.id,"CANCELLED","AeroAPI cancellation before actual_out","CANCELLED");return{flight:cp.fa_flight_id,label:cp.label,state:"CANCELLED"};}
