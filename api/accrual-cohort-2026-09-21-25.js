@@ -17,13 +17,23 @@ const DAYS={
  "01":[new Date("2026-10-01T10:00:00Z"),new Date("2026-10-01T22:00:00Z")],
  "02":[new Date("2026-10-02T10:00:00Z"),new Date("2026-10-02T22:00:00Z")]
 };
+const DATE_TO_DAY={
+ "2026-09-21":"21","2026-09-22":"22","2026-09-23":"23","2026-09-24":"24",
+ "2026-09-25":"25","2026-09-26":"26","2026-09-27":"27","2026-09-28":"28",
+ "2026-09-29":"29","2026-09-30":"30","2026-10-01":"01","2026-10-02":"02"
+};
 const BATCH_AFTER=new Date("2026-09-20T17:00:00Z");
 const targetForDay=day=>["23","24","25","26","27","28","29","30"].includes(day)?900:600;
-const STEP=50;
 const MIN_LEAD_MIN=90;
 const BIN_MIN=15;
+const REGISTER_CONCURRENCY=25;
 const code=x=>x?.code_icao||x?.code||x||"";
 const carrierOf=f=>String(f.ident||f.ident_icao||"").match(/^([A-Z]{3})/)?.[1]||"";
+
+function autoDay(now=new Date()){
+ const tomorrow=new Date(now.getTime()+24*60*60*1000).toISOString().slice(0,10);
+ return{date:tomorrow,day:DATE_TO_DAY[tomorrow]||null};
+}
 
 async function registerOne(f,now){
  const s=f.scheduled_out,sm=new Date(s).getTime();
@@ -60,14 +70,20 @@ function balancedSelect(candidates,existingRows,n,start,end){
 }
 
 export default async function handler(req,res){try{
- const day=String(req.query?.day||"");
+ const explicit=String(req.query?.day||"");
+ const derived=autoDay();
+ const day=explicit||derived.day||"";
+ if(!day){
+   return json(res,200,{ok:true,done:true,skipped:true,reason:"outside frozen accrual campaign",next_utc_date:derived.date});
+ }
  if(!DAYS[day])return json(res,400,{ok:false,error:"day must be 21-30 (Sep) or 01-02 (Oct)"});
  const[START,END]=DAYS[day];
  const TARGET=targetForDay(day);
  const sql=db();
  const cohort=await sql`select fa_flight_id,scheduled_out_initial,ident from flight_jobs where created_at>=${BATCH_AFTER.toISOString()}::timestamptz and scheduled_out_initial>=${START.toISOString()}::timestamptz and scheduled_out_initial<${END.toISOString()}::timestamptz and origin like 'K%' and destination like 'K%'`;
  const binOf=iso=>Math.floor((new Date(iso).getTime()-START.getTime())/(BIN_MIN*60000));
- if(cohort.length>=TARGET)return json(res,200,{ok:true,done:true,day,batch_total:cohort.length,target:TARGET,window:[START,END],min_lead_minutes:MIN_LEAD_MIN,selection:"US domestic mainstream scheduled carriers; 15-minute balanced accrual; Cape Air/KAP excluded prospectively",bin_counts:Object.entries(cohort.reduce((a,r)=>(a[binOf(r.scheduled_out_initial)]=(a[binOf(r.scheduled_out_initial)]||0)+1,a),{}))});
+ if(cohort.length>TARGET)return json(res,409,{ok:false,done:false,day,batch_total:cohort.length,target:TARGET,error:"cohort exceeds frozen target; manual review required"});
+ if(cohort.length===TARGET)return json(res,200,{ok:true,done:true,day,batch_total:cohort.length,target:TARGET,window:[START,END],min_lead_minutes:MIN_LEAD_MIN,selection:"US domestic mainstream scheduled carriers; 15-minute balanced accrual; Cape Air/KAP excluded prospectively",bin_counts:Object.entries(cohort.reduce((a,r)=>(a[binOf(r.scheduled_out_initial)]=(a[binOf(r.scheduled_out_initial)]||0)+1,a),{}))});
  const now=Date.now();
  const scanStartMs=Math.max(START.getTime(),Math.ceil((now+MIN_LEAD_MIN*60000)/60000)*60000);
  const scanStart=new Date(scanStartMs);
@@ -86,14 +102,18 @@ export default async function handler(req,res){try{
  const existing=await sql`select fa_flight_id from flight_jobs`;
  const have=new Set(existing.map(x=>x.fa_flight_id));
  const candidates=[...seen.values()].filter(f=>!have.has(f.fa_flight_id)).sort((a,b)=>new Date(a.scheduled_out)-new Date(b.scheduled_out));
- const need=Math.min(STEP,TARGET-cohort.length);
- const{selected}=balancedSelect(candidates,cohort,need,START,END);
+ const need=TARGET-cohort.length;
+ const{selected}=balancedSelect(candidates,cohort,candidates.length,START,END);
  const done=[],failed=[];
- for(let i=0;i<selected.length;i+=10){
-  const out=await Promise.all(selected.slice(i,i+10).map(async f=>{try{await registerOne(f,now);return{ok:true,f};}catch(e){return{ok:false,f,error:e.message}}}));
+ let cursor=0;
+ while(done.length<need&&cursor<selected.length){
+  const batchSize=Math.min(REGISTER_CONCURRENCY,need-done.length);
+  const batch=selected.slice(cursor,cursor+batchSize);cursor+=batch.length;
+  const out=await Promise.all(batch.map(async f=>{try{await registerOne(f,now);return{ok:true,f};}catch(e){return{ok:false,f,error:e.message}}}));
   for(const x of out)(x.ok?done:failed).push(x);
  }
  const after=await sql`select scheduled_out_initial,ident from flight_jobs where created_at>=${BATCH_AFTER.toISOString()}::timestamptz and scheduled_out_initial>=${START.toISOString()}::timestamptz and scheduled_out_initial<${END.toISOString()}::timestamptz and origin like 'K%' and destination like 'K%' order by scheduled_out_initial`;
  const bins={};for(const r of after){const b=binOf(r.scheduled_out_initial);bins[b]=(bins[b]||0)+1;}
- return json(res,200,{ok:true,done:after.length>=TARGET,day,batch_total:after.length,target:TARGET,new_candidates:candidates.length,failed:failed.length,airport_errors,window:[START,END],min_lead_minutes:MIN_LEAD_MIN,selection:"US domestic mainstream scheduled carriers; 15-minute balanced accrual; Cape Air/KAP excluded prospectively",bin_counts:bins});
+ const complete=after.length===TARGET;
+ return json(res,complete?200:503,{ok:complete,done:complete,day,batch_total:after.length,target:TARGET,registered_this_invocation:done.length,new_candidates:candidates.length,failed:failed.length,failed_examples:failed.slice(0,10).map(x=>({fa_flight_id:x.f?.fa_flight_id,ident:x.f?.ident,error:x.error})),airport_errors,window:[START,END],min_lead_minutes:MIN_LEAD_MIN,selection:"US domestic mainstream scheduled carriers; 15-minute balanced accrual; Cape Air/KAP excluded prospectively",bin_counts:bins});
 }catch(e){json(res,e.status||500,{ok:false,error:e.message,detail:e.body||null})}}
