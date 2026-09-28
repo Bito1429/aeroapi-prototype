@@ -1,1 +1,11 @@
-{"crons":[{"path":"/api/worker","schedule":"* * * * *"}],"functions":{"api/worker.js":{"maxDuration":60}}}
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [
+    {"path": "/api/worker", "schedule": "* * * * *"},
+    {"path": "/api/accrual-cohort-2026-09-21-25", "schedule": "5 22 * * *"}
+  ],
+  "functions": {
+    "api/worker.js": {"maxDuration": 60},
+    "api/accrual-cohort-2026-09-21-25.js": {"maxDuration": 300}
+  }
+}
