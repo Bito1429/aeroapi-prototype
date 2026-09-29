@@ -1,7 +1,7 @@
 import{aero,json}from"./lib.js";
 
 const OPS=["RYR","EZY","EXS","WZZ"];
-const CUTOFF="2026-09-28T23:59:59Z";
+const CUTOFF="2026-09-28T00:00:00Z";
 const START="2026-09-27T00:00:00Z";
 
 function slim(f){
