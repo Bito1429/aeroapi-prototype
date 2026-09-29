@@ -19,6 +19,12 @@
     },
     "api/europe-feasibility-run.js": {
       "maxDuration": 300
+    },
+    "api/europe-feasibility-batch.js": {
+      "maxDuration": 300
+    },
+    "api/europe-feasibility-driver.js": {
+      "maxDuration": 60
     }
   }
 }
