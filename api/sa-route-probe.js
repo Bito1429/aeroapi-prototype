@@ -53,5 +53,5 @@ export default async function handler(req,res){
       out.operators[op]={error:e.message,status:e.status||null,detail:e.body||null};
     }
   }
-  json(res,200,out);
+  console.log("SA_ROUTE_PROBE_RESULT", JSON.stringify(out));\n  json(res,200,out);
 }
