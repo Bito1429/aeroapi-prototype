@@ -4,6 +4,5 @@
   "private": true,
   "type": "module",
   "engines": {"node": "24.x"},
-  "scripts": {"vercel-build": "node scripts/sa-route-build-probe.mjs"},
   "dependencies": {"@neondatabase/serverless": "^1.0.2"}
 }
