@@ -1,6 +1,6 @@
 # Europe historical-route feasibility — V1 FROZEN
 
-Status: FROZEN 2026-09-29. No sampling, method, metric or threshold changes after data inspection.
+Status: FROZEN 2026-09-29. Geography clarification frozen before sample enumeration. No sampling, method, metric or threshold changes after sample data inspection.
 
 Source protocol: user-supplied "Europe: predicting routes from historical tracks — feasibility protocol".
 
@@ -19,7 +19,8 @@ Public material checked 2026-09-29 indicates AeroAPI Standard publicly permits h
 - Carriers: Ryanair, easyJet, Jet2, Wizz.
 - A route pair is keyed as `carrier|flight_number|origin|destination`.
 - "Direct" means a nonstop service physically operated by the named carrier itself. Exclude codeshare/marketing-only flight numbers and any occurrence whose operating carrier is not the named carrier.
-- Candidate universe: all qualifying direct European route pairs with at least 9 completed occurrences in the 45 days ending at the cutoff.
+- Geography (frozen before sample enumeration): both origin and destination must be in one of the EU-27 member states, the United Kingdom, Norway, Switzerland or Iceland. This rule deliberately excludes Turkey, Azerbaijan, Morocco, Egypt and other non-member states. ECAC is not used because its membership includes Turkey and Azerbaijan.
+- Candidate universe: all qualifying direct route pairs inside that geography with at least 9 completed occurrences in the 45 days ending at the cutoff.
 - Evaluation cutoff: 2026-09-28 23:59:59 UTC.
 - All 9 qualifying occurrences for a selected route must have completed before the cutoff.
 - For each selected route, order the 9 qualifying occurrences chronologically: the earliest 6 are training and the latest 3 are evaluation. No post-cutoff occurrence may enter either set.
