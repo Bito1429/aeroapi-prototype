@@ -23,7 +23,7 @@ const DATE_TO_DAY={
  "2026-09-29":"29","2026-09-30":"30","2026-10-01":"01","2026-10-02":"02"
 };
 const BATCH_AFTER=new Date("2026-09-20T17:00:00Z");
-const targetForDay=day=>["23","24","25","26","27","28","29","30"].includes(day)?900:600;
+const targetForDay=day=>["23","24","25","26","27","28","29","30","01","02"].includes(day)?900:600;
 const MIN_LEAD_MIN=90;
 const BIN_MIN=15;
 const REGISTER_CONCURRENCY=25;
