@@ -2,10 +2,10 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "crons": [
     {"path": "/api/worker", "schedule": "* * * * *"},
-    {"path": "/api/accrual-cohort-2026-09-21-25", "schedule": "5 22 * * *"}
+    {"path": "/api/accrual-continuous-oct-nov-2026", "schedule": "5 22 * * *"}
   ],
   "functions": {
     "api/worker.js": {"maxDuration": 60},
-    "api/accrual-cohort-2026-09-21-25.js": {"maxDuration": 300}
+    "api/accrual-continuous-oct-nov-2026.js": {"maxDuration": 300}
   }
 }
