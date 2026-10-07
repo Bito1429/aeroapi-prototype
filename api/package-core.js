@@ -2,7 +2,8 @@ import crypto from "node:crypto";
 import{db}from"./db.js";
 import{havKm,polyKm}from"./lib.js";
 import{etaPackage}from"./eta-calibration.js";
-import{CORRIDOR_CALIBRATION,corridorMeta}from"./corridor-calibration.js";\nimport{persistEtaAudit}from"./eta-audit.js";
+import{CORRIDOR_CALIBRATION,corridorMeta}from"./corridor-calibration.js";
+import{persistEtaAudit}from"./eta-audit.js";
 
 function round(n,d=6){return Number.isFinite(n)?+n.toFixed(d):null;}
 function stable(value){
@@ -110,7 +111,8 @@ export async function buildDraftPackage(flightId){
  const points=protocol.fixes.filter(p=>Number.isFinite(p?.latitude)&&Number.isFinite(p?.longitude)).map(p=>({name:p.name||null,latitude:p.latitude,longitude:p.longitude}));
  const corridor=corridorMeta();
  const confidenceHalfWidth=CORRIDOR_CALIBRATION.confidence_half_width_km;
- const eta=etaPackage({estimatedOff,filedEteSeconds:durationSeconds});\n const body={
+ const eta=etaPackage({estimatedOff,filedEteSeconds:durationSeconds});
+ const body={
   status:"READY",
   package_version:1,
   source_captured_at:cap?.captured_at||null,
