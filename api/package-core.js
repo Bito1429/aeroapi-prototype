@@ -11,7 +11,9 @@ function stable(value){
  return value;
 }
 export function etagFor(body){
- const raw=JSON.stringify(stable(body));
+ const clone={...body};
+ delete clone.generated_at;
+ const raw=JSON.stringify(stable(clone));
  return '"'+crypto.createHash("sha256").update(raw).digest("hex").slice(0,24)+'"';
 }
 function pointAtFraction(points,f){
@@ -47,12 +49,45 @@ export function denseTimeline(points,{startIso=null,durationSeconds=null,maxMinu
   };
  });
 }
+function projectLocal(p,lat0){
+ const kLat=111.195,kLon=111.195*Math.cos(lat0*Math.PI/180);
+ return{x:p.longitude*kLon,y:p.latitude*kLat,kLat,kLon};
+}
+function unprojectLocal(x,y,kLat,kLon){return{latitude:y/kLat,longitude:x/kLon};}
+function vertexNormal(points,i,lat0){
+ const prev=points[Math.max(0,i-1)],next=points[Math.min(points.length-1,i+1)];
+ const a=projectLocal(prev,lat0),b=projectLocal(next,lat0);
+ const dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy)||1;
+ return{x:-dy/len,y:dx/len,kLat:a.kLat,kLon:a.kLon};
+}
+export function corridorPolygon(points,halfWidthKm){
+ const clean=(points||[]).filter(p=>Number.isFinite(p?.latitude)&&Number.isFinite(p?.longitude));
+ if(clean.length<2||!Number.isFinite(halfWidthKm)||halfWidthKm<=0)return null;
+ const lat0=clean.reduce((a,p)=>a+p.latitude,0)/clean.length;
+ const left=[],right=[];
+ for(let i=0;i<clean.length;i++){
+  const base=projectLocal(clean[i],lat0),n=vertexNormal(clean,i,lat0);
+  const l=unprojectLocal(base.x+n.x*halfWidthKm,base.y+n.y*halfWidthKm,n.kLat,n.kLon);
+  const r=unprojectLocal(base.x-n.x*halfWidthKm,base.y-n.y*halfWidthKm,n.kLat,n.kLon);
+  left.push({latitude:round(l.latitude),longitude:round(l.longitude)});
+  right.push({latitude:round(r.latitude),longitude:round(r.longitude)});
+ }
+ const ring=[...left,...right.reverse(),left[0]];
+ return{type:"Polygon",coordinates:[ring.map(p=>[p.longitude,p.latitude])]};
+}
 function sanity(protocol){
  if(!protocol)return{ok:false,reason:"NO_ROUTE_PROTOCOL"};
  if(protocol.baseline_valid===false)return{ok:false,reason:"MISSING_FIX_COORDINATES"};
  if(!Array.isArray(protocol.fixes)||protocol.fixes.filter(p=>Number.isFinite(p?.latitude)&&Number.isFinite(p?.longitude)).length<2)return{ok:false,reason:"INSUFFICIENT_ROUTE_POINTS"};
  if(!Number.isFinite(protocol.computed_km)||protocol.computed_km<=0)return{ok:false,reason:"INVALID_ROUTE_DISTANCE"};
  return{ok:true,reason:"OK"};
+}
+function saleState(job,flight,hasRoute){
+ if(/cancel/i.test(String(flight?.status||"")))return{state:"CANCELLED",sellable:false};
+ if(flight?.actual_out||job?.final_actual_out)return{state:"DEPARTED",sellable:false};
+ if(!String(job?.origin||"").startsWith("K")||!String(job?.destination||"").startsWith("K"))return{state:"UNSUPPORTED_MARKET",sellable:false};
+ if(!hasRoute)return{state:"PENDING_ROUTE",sellable:false};
+ return{state:"SELLABLE",sellable:true};
 }
 export async function buildDraftPackage(flightId){
  const sql=db();
@@ -61,8 +96,10 @@ export async function buildDraftPackage(flightId){
  const caps=await sql`select * from flight_captures where flight_job_id=${job.id}::uuid order by captured_at desc limit 1`;
  const cap=caps[0]||null;
  const raw=cap?.raw_capture||null,protocol=raw?.protocol||null,flight=raw?.flight||null;
- if(!protocol?.canonical_route||!Array.isArray(protocol?.fixes)||protocol.fixes.length<2){
-  return{status:202,body:{status:"PENDING_ROUTE",flight_id:flightId,package_version:1,retryable:true}};
+ const hasRoute=!!(protocol?.canonical_route&&Array.isArray(protocol?.fixes)&&protocol.fixes.length>=2);
+ const state=saleState(job,flight,hasRoute);
+ if(!hasRoute){
+  return{status:state.state==="PENDING_ROUTE"?202:200,body:{status:state.state,flight_id:flightId,package_version:1,retryable:state.state==="PENDING_ROUTE",sellable:false}};
  }
  const s=sanity(protocol);
  const startIso=flight?.estimated_off||flight?.scheduled_off||job.scheduled_out_initial||null;
@@ -71,13 +108,15 @@ export async function buildDraftPackage(flightId){
  const body={
   status:"READY",
   package_version:1,
+  source_captured_at:cap?.captured_at||null,
+  sale_state:state,
   flight:{
    id:flightId,
    ident:job.ident,
    origin:job.origin,
    destination:job.destination,
    scheduled_out:job.scheduled_out_initial,
-   estimated_off:flight?.estimated_off||null
+   estimated_off:flight?.estimated_off||cap?.estimated_off||null
   },
   route:{
    canonical_hash:protocol.canonical_hash||cap?.canonical_hash||null,
@@ -90,7 +129,8 @@ export async function buildDraftPackage(flightId){
   eta:{
    baseline_source:"FILED_ETE",
    duration_seconds:durationSeconds,
-   windows:null
+   windows:null,
+   status:"PENDING_CALIBRATION"
   },
   corridor:{
    half_width_km:null,
