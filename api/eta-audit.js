@@ -11,18 +11,19 @@ export async function persistEtaAudit({
  baselineSource=ETA_CALIBRATION.baseline_source,
  baselineAtCutoff=null,
  finalActualOn=null,
- predictionVersion=ETA_CALIBRATION.version
+ predictionVersion=ETA_CALIBRATION.version,
+ sourceEnvironment=process.env.VERCEL_ENV||"unknown"
 }){
  const sql=db();
  const rows=await sql`
    insert into eta_prediction_audit(
      flight_job_id,cutoff_at,prediction_version,predicted_at,predicted_on,
-     window_early,window_late,baseline_source,baseline_at_cutoff,final_actual_on
+     window_early,window_late,baseline_source,baseline_at_cutoff,final_actual_on,source_environment
    ) values(
      ${flightJobId}::uuid,${cutoffAt}::timestamptz,${predictionVersion},
      ${predictedAt}::timestamptz,${predictedOn}::timestamptz,
      ${windowEarly}::timestamptz,${windowLate}::timestamptz,${baselineSource},
-     ${baselineAtCutoff}::timestamptz,${finalActualOn}::timestamptz
+     ${baselineAtCutoff}::timestamptz,${finalActualOn}::timestamptz,${sourceEnvironment}
    )
    on conflict(flight_job_id,prediction_version,cutoff_at)
    do update set
@@ -32,7 +33,8 @@ export async function persistEtaAudit({
      window_late=excluded.window_late,
      baseline_source=excluded.baseline_source,
      baseline_at_cutoff=excluded.baseline_at_cutoff,
-     final_actual_on=coalesce(excluded.final_actual_on,eta_prediction_audit.final_actual_on)
+     final_actual_on=coalesce(excluded.final_actual_on,eta_prediction_audit.final_actual_on),
+     source_environment=excluded.source_environment
    returning *
  `;
  return rows[0];
