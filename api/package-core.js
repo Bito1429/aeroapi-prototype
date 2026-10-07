@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import{db}from"./db.js";
 import{havKm,polyKm}from"./lib.js";
+import{etaPackage}from"./eta-calibration.js";
 
 function round(n,d=6){return Number.isFinite(n)?+n.toFixed(d):null;}
 function stable(value){
@@ -102,7 +103,8 @@ export async function buildDraftPackage(flightId){
   return{status:state.state==="PENDING_ROUTE"?202:200,body:{status:state.state,flight_id:flightId,package_version:1,retryable:state.state==="PENDING_ROUTE",sellable:false}};
  }
  const s=sanity(protocol);
- const startIso=flight?.estimated_off||flight?.scheduled_off||job.scheduled_out_initial||null;
+ const estimatedOff=flight?.estimated_off||cap?.estimated_off||null;
+ const startIso=estimatedOff||flight?.scheduled_off||job.scheduled_out_initial||null;
  const durationSeconds=Number(cap?.filed_ete_seconds||flight?.filed_ete||0)||null;
  const points=protocol.fixes.filter(p=>Number.isFinite(p?.latitude)&&Number.isFinite(p?.longitude)).map(p=>({name:p.name||null,latitude:p.latitude,longitude:p.longitude}));
  const body={
@@ -116,7 +118,7 @@ export async function buildDraftPackage(flightId){
    origin:job.origin,
    destination:job.destination,
    scheduled_out:job.scheduled_out_initial,
-   estimated_off:flight?.estimated_off||cap?.estimated_off||null
+   estimated_off:estimatedOff
   },
   route:{
    canonical_hash:protocol.canonical_hash||cap?.canonical_hash||null,
@@ -126,12 +128,7 @@ export async function buildDraftPackage(flightId){
    resolver_sanity:s,
    timeline:denseTimeline(points,{startIso,durationSeconds,maxMinutes:2,maxKm:25})
   },
-  eta:{
-   baseline_source:"FILED_ETE",
-   duration_seconds:durationSeconds,
-   windows:null,
-   status:"PENDING_CALIBRATION"
-  },
+  eta:etaPackage({estimatedOff,filedEteSeconds:durationSeconds}),
   corridor:{
    half_width_km:null,
    polygon:null,
