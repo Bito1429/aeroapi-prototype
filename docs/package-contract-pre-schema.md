@@ -18,8 +18,8 @@ Implemented package content:
 - canonical route/fixes/hash
 - resolver sanity flag and reason
 - timeline resampled to satisfy both <=2 minutes and <=25 km spacing
-- ETA v1 calibration metadata and predeparture ~80% window
-- airborne ETA rule/width ready for takeoff event input
+- ETA v1 calibration metadata and predeparture ~80% landing window
+- airborne landing-window rule/width ready for on-device detected-takeoff input
 - statistically calibrated route-confidence corridor: +/-18 km half-width and polygon
 - package version and source capture timestamp
 
@@ -31,6 +31,9 @@ Deliberately separate:
 Still pending:
 - exact Chester schema names/types/nesting
 - schema conformance tests
-- ETA audit migration application and runtime persistence
+- ETA audit table is live in Neon; runtime persistence wiring is on this branch and must be retained through schema mapping
 - takeoff event ingestion feeding the airborne ETA centre
 - final authentication/internal-access policy
+
+Passenger-facing terminology rule:
+- use "landing" or "touchdown", never "arrival", for takeoff + filed-ETE timing windows; gate arrival is a different event.
