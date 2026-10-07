@@ -28,6 +28,16 @@ export function windowAround(centerIso,halfWidthMinutes){
  const d=halfWidthMinutes*60000;
  return{early:new Date(t-d).toISOString(),late:new Date(t+d).toISOString()};
 }
+export function airborneOffsets(filedEteSeconds){
+ const duration=Number(filedEteSeconds);
+ if(!Number.isFinite(duration))return null;
+ const half=ETA_CALIBRATION.airborne.half_width_minutes*60;
+ return{
+  center_offset_seconds:duration,
+  early_offset_seconds:duration-half,
+  late_offset_seconds:duration+half
+ };
+}
 export function etaPackage({estimatedOff=null,filedEteSeconds=null}={}){
  const duration=Number(filedEteSeconds);
  const preCenter=estimatedOff&&Number.isFinite(duration)?addSeconds(estimatedOff,duration):null;
@@ -43,11 +53,10 @@ export function etaPackage({estimatedOff=null,filedEteSeconds=null}={}){
    validated_coverage:ETA_CALIBRATION.predeparture.validation_coverage
   },
   airborne:{
-   center:null,
-   window:null,
-   half_width_minutes:ETA_CALIBRATION.airborne.half_width_minutes,
    center_rule:ETA_CALIBRATION.airborne.center_rule,
-   validated_coverage:ETA_CALIBRATION.airborne.validation_coverage
+   half_width_minutes:ETA_CALIBRATION.airborne.half_width_minutes,
+   validated_coverage:ETA_CALIBRATION.airborne.validation_coverage,
+   relative_to_detected_takeoff:airborneOffsets(duration)
   }
  };
 }
