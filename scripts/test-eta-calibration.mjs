@@ -9,5 +9,8 @@ assert.equal(x.predeparture.center,"2026-10-07T14:00:00.000Z");
 assert.equal(x.predeparture.window.early,"2026-10-07T13:43:00.000Z");
 assert.equal(x.predeparture.window.late,"2026-10-07T14:17:00.000Z");
 assert.equal(x.airborne.center_rule,"detected_takeoff_plus_filed_ete");
+assert.equal(x.airborne.relative_to_detected_takeoff.center_offset_seconds,7200);
+assert.equal(x.airborne.relative_to_detected_takeoff.early_offset_seconds,6660);
+assert.equal(x.airborne.relative_to_detected_takeoff.late_offset_seconds,7740);
 
 console.log(JSON.stringify({ok:true,version:ETA_CALIBRATION.version,pre:x.predeparture,airborne:x.airborne}));
