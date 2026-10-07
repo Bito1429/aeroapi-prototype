@@ -12,8 +12,9 @@ export async function persistEtaAudit({
  baselineAtCutoff=null,
  finalActualOn=null,
  predictionVersion=ETA_CALIBRATION.version,
- sourceEnvironment=process.env.VERCEL_ENV||"unknown"
+ sourceEnvironment=process.env.VERCEL_ENV
 }){
+ if(!["production","preview","development"].includes(sourceEnvironment)) throw new Error("ETA_AUDIT_SOURCE_ENVIRONMENT_REQUIRED");
  const sql=db();
  const rows=await sql`
    insert into eta_prediction_audit(
