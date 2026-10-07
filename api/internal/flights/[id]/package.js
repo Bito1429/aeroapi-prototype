@@ -1,5 +1,5 @@
-import{json}from"../../../../lib.js";
-import{buildDraftPackage,etagFor}from"../../../../package-core.js";
+import{json}from"../../../lib.js";
+import{buildDraftPackage,etagFor}from"../../../package-core.js";
 
 export default async function handler(req,res){try{
  const id=String(req.query?.id||"").trim();
