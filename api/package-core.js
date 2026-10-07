@@ -138,5 +138,16 @@ export async function buildDraftPackage(flightId){
   },
   generated_at:new Date().toISOString()
  };
+ const landing=eta.predeparture;
+ if(cap?.captured_at&&landing?.landing_time_center&&landing?.landing_window){
+  await persistEtaAudit({
+   flightJobId:job.id,
+   cutoffAt:cap.captured_at,
+   predictedOn:landing.landing_time_center,
+   windowEarly:landing.landing_window.early,
+   windowLate:landing.landing_window.late,
+   baselineAtCutoff:estimatedOff
+  });
+ }
  return{status:200,body};
 }
