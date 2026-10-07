@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 import{db}from"./db.js";
 import{havKm,polyKm}from"./lib.js";
 import{etaPackage}from"./eta-calibration.js";
+import{CORRIDOR_CALIBRATION,corridorMeta}from"./corridor-calibration.js";
 
 function round(n,d=6){return Number.isFinite(n)?+n.toFixed(d):null;}
 function stable(value){
@@ -107,6 +108,8 @@ export async function buildDraftPackage(flightId){
  const startIso=estimatedOff||flight?.scheduled_off||job.scheduled_out_initial||null;
  const durationSeconds=Number(cap?.filed_ete_seconds||flight?.filed_ete||0)||null;
  const points=protocol.fixes.filter(p=>Number.isFinite(p?.latitude)&&Number.isFinite(p?.longitude)).map(p=>({name:p.name||null,latitude:p.latitude,longitude:p.longitude}));
+ const corridor=corridorMeta();
+ const confidenceHalfWidth=CORRIDOR_CALIBRATION.confidence_half_width_km;
  const body={
   status:"READY",
   package_version:1,
@@ -130,9 +133,8 @@ export async function buildDraftPackage(flightId){
   },
   eta:etaPackage({estimatedOff,filedEteSeconds:durationSeconds}),
   corridor:{
-   half_width_km:null,
-   polygon:null,
-   status:"PENDING_CALIBRATION"
+   ...corridor,
+   confidence_polygon:corridorPolygon(points,confidenceHalfWidth)
   },
   generated_at:new Date().toISOString()
  };
