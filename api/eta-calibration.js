@@ -33,9 +33,9 @@ export function airborneOffsets(filedEteSeconds){
  if(!Number.isFinite(duration))return null;
  const half=ETA_CALIBRATION.airborne.half_width_minutes*60;
  return{
-  center_offset_seconds:duration,
-  early_offset_seconds:duration-half,
-  late_offset_seconds:duration+half
+  landing_center_offset_seconds:duration,
+  landing_early_offset_seconds:duration-half,
+  landing_late_offset_seconds:duration+half
  };
 }
 export function etaPackage({estimatedOff=null,filedEteSeconds=null}={}){
@@ -45,9 +45,10 @@ export function etaPackage({estimatedOff=null,filedEteSeconds=null}={}){
   calibration_version:ETA_CALIBRATION.version,
   baseline_source:ETA_CALIBRATION.baseline_source,
   duration_seconds:Number.isFinite(duration)?duration:null,
+  semantics:"LANDING_NOT_GATE_ARRIVAL",
   predeparture:{
-   center:preCenter,
-   window:preCenter?windowAround(preCenter,ETA_CALIBRATION.predeparture.half_width_minutes):null,
+   landing_time_center:preCenter,
+   landing_window:preCenter?windowAround(preCenter,ETA_CALIBRATION.predeparture.half_width_minutes):null,
    half_width_minutes:ETA_CALIBRATION.predeparture.half_width_minutes,
    center_rule:ETA_CALIBRATION.predeparture.center_rule,
    validated_coverage:ETA_CALIBRATION.predeparture.validation_coverage
