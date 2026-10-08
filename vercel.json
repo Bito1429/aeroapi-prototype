@@ -1,11 +1,28 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "crons": [
-    {"path": "/api/worker", "schedule": "* * * * *"},
-    {"path": "/api/accrual-continuous-oct-nov-2026", "schedule": "5 22 * * *"}
+    {
+      "path": "/api/worker",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/accrual-continuous-oct-nov-2026",
+      "schedule": "5 22 * * *"
+    },
+    {
+      "path": "/api/route-filing-study",
+      "schedule": "17 * * * *"
+    }
   ],
   "functions": {
-    "api/worker.js": {"maxDuration": 60},
-    "api/accrual-continuous-oct-nov-2026.js": {"maxDuration": 300}
+    "api/worker.js": {
+      "maxDuration": 60
+    },
+    "api/accrual-continuous-oct-nov-2026.js": {
+      "maxDuration": 300
+    },
+    "api/route-filing-study.js": {
+      "maxDuration": 300
+    }
   }
 }
