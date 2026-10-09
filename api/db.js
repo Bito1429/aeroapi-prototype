@@ -19,3 +19,43 @@ export async function latestEligibleBaseline(jobId){const s=db(),r=await s`selec
 export async function saveScores(jobId,baselineId,trackId,rows){const s=db();for(const x of rows)await s`insert into method_a_scores(flight_job_id,baseline_capture_id,track_id,checkpoint_pct,total_error_km,xtd_km,atd_km) values(${jobId}::uuid,${baselineId},${trackId},${x.pct},${x.total},${x.xtd},${x.atd}) on conflict(flight_job_id,checkpoint_pct) do update set scored_at=now(),baseline_capture_id=excluded.baseline_capture_id,track_id=excluded.track_id,total_error_km=excluded.total_error_km,xtd_km=excluded.xtd_km,atd_km=excluded.atd`;const mt=rows.reduce((a,x)=>a+x.total,0)/rows.length,mx=rows.reduce((a,x)=>a+x.xtd,0)/rows.length,ma=rows.reduce((a,x)=>a+x.atd,0)/rows.length;await s`update flight_jobs set method_a_mean_total_km=${mt},method_a_mean_xtd_km=${mx},method_a_mean_atd_km=${ma},postflight_track_source='AEROAPI',postflight_track_count=(select point_count from postflight_tracks where id=${trackId}),postflight_track_km=(select computed_km from postflight_tracks where id=${trackId}) where id=${jobId}::uuid`;return{mean_total_km:mt,mean_xtd_km:mx,mean_atd_km:ma};}
 export async function finishJob(jobId,pf){const s=db(),f=pf.flight,runwayOn=f.actual_runway_on??null,branchValidity=runwayOn?"AUTHORITATIVE_RUNWAY":"CAVEATED_RUNWAY_UNKNOWN";await s`update flight_jobs set status='CLOSED',closed_at=now(),final_actual_out=coalesce(${f.actual_out||null}::timestamptz,final_actual_out),final_actual_off=${f.actual_off||null}::timestamptz,final_actual_on=${f.actual_on||null}::timestamptz,final_actual_in=${f.actual_in||null}::timestamptz,actual_runway_on=${runwayOn},branch_validity=${branchValidity} where id=${jobId}::uuid`;}
 export async function jobSummary(jobId){const s=db(),j=(await s`select * from flight_jobs where id=${jobId}::uuid`)[0],c=await s`select label,ordinal,nominal_at,due_after,state,captured_at,eligibility,attempt_count from flight_checkpoints where flight_job_id=${jobId}::uuid order by nominal_at nulls first,ordinal`,sc=await s`select checkpoint_pct,total_error_km,xtd_km,atd_km from method_a_scores where flight_job_id=${jobId}::uuid order by checkpoint_pct`;return{job:j,checkpoints:c,scores:sc};}
+
+
+export async function closeStaleJobs48h(){
+ const s=db();
+ return await s`with stale as(
+   select j.id,
+     exists(select 1 from method_a_scores ms where ms.flight_job_id=j.id) as has_scores,
+     exists(select 1 from postflight_tracks pt where pt.flight_job_id=j.id) as has_track,
+     exists(select 1 from flight_captures fc where fc.flight_job_id=j.id and coalesce(fc.status_seen,'') ~* 'cancel') as cancelled_seen
+   from flight_jobs j
+   where j.status='ACTIVE'
+     and j.scheduled_on_initial is not null
+     and j.scheduled_on_initial < now()-interval '48 hours'
+ ), updated as(
+   update flight_jobs j set
+     status=case when st.has_scores then 'CLOSED' when st.cancelled_seen then 'CANCELLED' else 'CLOSED' end,
+     closed_at=now(),
+     terminal_state=case when st.has_scores then j.terminal_state when st.cancelled_seen then 'CANCELLED' when not st.has_track then 'POSTFLIGHT_UNAVAILABLE' else 'IRREGULAR_NONCOMPLETION' end,
+     terminal_reason=case
+       when st.has_scores then concat_ws('; ',nullif(j.terminal_reason,''),'STALE_48H:CLOSED_AFTER_LINGERING_ACTIVE')
+       when st.cancelled_seen then 'STALE_48H:CANCELLED_SEEN'
+       when not st.has_track then 'STALE_48H:NO_TRACK_RECEIVED'
+       else 'STALE_48H:UNKNOWN'
+     end,
+     scoreable=case when st.has_scores then true else false end,
+     updated_at=now()
+   from stale st where j.id=st.id
+   returning j.id,st.has_scores,st.cancelled_seen,st.has_track,j.terminal_state
+ ), stopped as(
+   update flight_checkpoints cp set state='STOPPED',claimed_at=null
+   where cp.flight_job_id in(select id from updated) and cp.state in('PENDING','PROCESSING')
+   returning cp.id
+ )
+ select count(*)::int as closed_total,
+   count(*) filter(where has_scores)::int as closed_already_scored,
+   count(*) filter(where not has_scores and cancelled_seen)::int as closed_cancelled,
+   count(*) filter(where not has_scores and not cancelled_seen and not has_track)::int as closed_no_track_received,
+   count(*) filter(where not has_scores and not cancelled_seen and has_track)::int as closed_unknown
+ from updated`;
+}
