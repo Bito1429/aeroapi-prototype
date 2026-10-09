@@ -68,7 +68,7 @@ async function observeOne(sql,row){
     }
     const firstCheck=!row.first_checked_at;
     const firstRoute=String(row.first_route_text||"").trim();
-    const changed=routePresent&&firstRoute&&route!==firstRoute;
+    const changed=Boolean(routePresent&&firstRoute&&route!==firstRoute);
     const cancelled=/cancel/i.test(String(f.status||""));
     await sql`insert into route_filing_study_observations(study_flight_id,checked_at,route_present,route_text,route_decodable,actual_off,status_seen)
       values(${row.id},${checkedAt.toISOString()}::timestamptz,${routePresent},${route||null},${decodable},${f.actual_off||null}::timestamptz,${f.status||null})`;
