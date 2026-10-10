@@ -10,6 +10,8 @@ const MIN_LEAD_MIN=90;
 const BIN_MIN=15;
 const REGISTER_CONCURRENCY=25;
 const BATCH_AFTER=new Date("2026-10-06T00:00:00Z");
+const HOURLY_MIX_START="2026-10-12";
+const ORIGINAL_HOURLY_QUOTAS={10:35,11:41,12:43,13:40,14:37,15:29,16:11,17:4,18:1,19:1,20:3,21:5};
 const code=x=>x?.code_icao||x?.code||x||"";
 const carrierOf=f=>String(f.ident||f.ident_icao||"").match(/^([A-Z]{3})/)?.[1]||"";
 
@@ -55,6 +57,24 @@ function balancedSelect(candidates,existingRows,n,start,end){
  return{selected,counts,binOf};
 }
 
+function originalMixSelect(candidates,existingRows,start){
+ const selected=[],hourCounts={};
+ for(const r of existingRows){
+  const h=new Date(r.scheduled_out_initial).getUTCHours();
+  hourCounts[h]=(hourCounts[h]||0)+1;
+ }
+ for(const h of Object.keys(ORIGINAL_HOURLY_QUOTAS).map(Number).sort((a,b)=>a-b)){
+  const need=Math.max(0,ORIGINAL_HOURLY_QUOTAS[h]-(hourCounts[h]||0));
+  if(!need)continue;
+  const hs=new Date(start);hs.setUTCHours(h,0,0,0);
+  const he=new Date(hs.getTime()+3600000);
+  const within=candidates.filter(f=>{const t=new Date(f.scheduled_out).getTime();return t>=hs.getTime()&&t<he.getTime();});
+  const picked=balancedSelect(within,[],need,hs,he).selected.slice(0,need);
+  selected.push(...picked);hourCounts[h]=(hourCounts[h]||0)+picked.length;
+ }
+ return{selected,hourCounts};
+}
+
 export default async function handler(req,res){try{
  const explicit=String(req.query?.date||"");
  const date=explicit||autoDate();
@@ -72,7 +92,7 @@ export default async function handler(req,res){try{
  if(scanStart>=END)return json(res,409,{ok:false,done:false,date,batch_total:cohort.length,target:TARGET,error:"90-minute window closed",scan_start:scanStart});
  let raw=[],airport_errors=[];
  for(const ap of AIRPORTS){
-  try{const b=await aero(`/airports/${ap}/flights/scheduled_departures`,{start:scanStart.toISOString(),end:END.toISOString(),max_pages:6});raw.push(...(b.scheduled_departures||b.flights||[]));}
+  try{const b=await aero(`/airports/${ap}/flights/scheduled_departures`,{start:scanStart.toISOString(),end:END.toISOString(),max_pages:date>=HOURLY_MIX_START?12:6});raw.push(...(b.scheduled_departures||b.flights||[]));}
   catch(e){airport_errors.push({airport:ap,error:e.message,detail:e.body||null});}
  }
  const seen=new Map();
@@ -85,7 +105,9 @@ export default async function handler(req,res){try{
  const have=new Set(existing.map(x=>x.fa_flight_id));
  const candidates=[...seen.values()].filter(f=>!have.has(f.fa_flight_id)).sort((a,b)=>new Date(a.scheduled_out)-new Date(b.scheduled_out));
  const need=TARGET-cohort.length;
- const{selected}=balancedSelect(candidates,cohort,candidates.length,START,END);
+ const mixMode=date>=HOURLY_MIX_START;
+ const pick=mixMode?originalMixSelect(candidates,cohort,START):balancedSelect(candidates,cohort,candidates.length,START,END);
+ const selected=pick.selected;
  const done=[],failed=[];
  let cursor=0;
  while(done.length<need&&cursor<selected.length){
@@ -97,5 +119,5 @@ export default async function handler(req,res){try{
  const after=await sql`select scheduled_out_initial,ident from flight_jobs where created_at>=${BATCH_AFTER.toISOString()}::timestamptz and scheduled_out_initial>=${START.toISOString()}::timestamptz and scheduled_out_initial<${END.toISOString()}::timestamptz and origin like 'K%' and destination like 'K%' order by scheduled_out_initial`;
  const bins={};for(const r of after){const b=binOf(r.scheduled_out_initial);bins[b]=(bins[b]||0)+1;}
  const complete=after.length===TARGET;
- return json(res,complete?200:503,{ok:complete,done:complete,date,batch_total:after.length,target:TARGET,registered_this_invocation:done.length,new_candidates:candidates.length,failed:failed.length,failed_examples:failed.slice(0,10).map(x=>({fa_flight_id:x.f?.fa_flight_id,ident:x.f?.ident,error:x.error})),airport_errors,window:[START,END],min_lead_minutes:MIN_LEAD_MIN,selection:"US domestic mainstream scheduled carriers; 15-minute balanced accrual; Cape Air/KAP excluded",campaign:[CAMPAIGN_START,CAMPAIGN_END],bin_counts:bins});
+ return json(res,complete?200:503,{ok:complete,done:complete,date,batch_total:after.length,target:TARGET,registered_this_invocation:done.length,new_candidates:candidates.length,failed:failed.length,failed_examples:failed.slice(0,10).map(x=>({fa_flight_id:x.f?.fa_flight_id,ident:x.f?.ident,error:x.error})),airport_errors,window:[START,END],min_lead_minutes:MIN_LEAD_MIN,selection:mixMode?"US domestic mainstream scheduled carriers; hourly quotas matched to original 10,001-flight campaign distribution within 10:00-22:00 UTC; 15-minute balancing within each hour; Cape Air/KAP excluded":"US domestic mainstream scheduled carriers; 15-minute balanced accrual; Cape Air/KAP excluded",hourly_quotas:mixMode?ORIGINAL_HOURLY_QUOTAS:null,campaign:[CAMPAIGN_START,CAMPAIGN_END],bin_counts:bins});
 }catch(e){json(res,e.status||500,{ok:false,error:e.message,detail:e.body||null})}}
