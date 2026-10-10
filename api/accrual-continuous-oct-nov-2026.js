@@ -81,11 +81,12 @@ export default async function handler(req,res){try{
  if(!/^2026-(10|11)-\d{2}$/.test(date))return json(res,400,{ok:false,error:"date must be YYYY-MM-DD in Oct/Nov 2026"});
  if(!inCampaign(date))return json(res,200,{ok:true,done:true,skipped:true,reason:"outside continuous Oct-Nov campaign",date,campaign:[CAMPAIGN_START,CAMPAIGN_END],target:TARGET});
  const[START,END]=dayWindow(date);
+ const mixMode=date>=HOURLY_MIX_START;
  const sql=db();
  const cohort=await sql`select fa_flight_id,scheduled_out_initial,ident from flight_jobs where created_at>=${BATCH_AFTER.toISOString()}::timestamptz and scheduled_out_initial>=${START.toISOString()}::timestamptz and scheduled_out_initial<${END.toISOString()}::timestamptz and origin like 'K%' and destination like 'K%'`;
  const binOf=iso=>Math.floor((new Date(iso).getTime()-START.getTime())/(BIN_MIN*60000));
  if(cohort.length>TARGET)return json(res,409,{ok:false,done:false,date,batch_total:cohort.length,target:TARGET,error:"cohort exceeds continuous target; manual review required"});
- if(cohort.length===TARGET)return json(res,200,{ok:true,done:true,date,batch_total:cohort.length,target:TARGET,window:[START,END],min_lead_minutes:MIN_LEAD_MIN,selection:"US domestic mainstream scheduled carriers; 15-minute balanced accrual; Cape Air/KAP excluded",bin_counts:Object.entries(cohort.reduce((a,r)=>(a[binOf(r.scheduled_out_initial)]=(a[binOf(r.scheduled_out_initial)]||0)+1,a),{}))});
+ if(cohort.length===TARGET)return json(res,200,{ok:true,done:true,date,batch_total:cohort.length,target:TARGET,window:[START,END],min_lead_minutes:MIN_LEAD_MIN,selection:mixMode?"US domestic mainstream scheduled carriers; hourly quotas matched to original 10,001-flight campaign distribution within 10:00-22:00 UTC; 15-minute balancing within each hour; Cape Air/KAP excluded":"US domestic mainstream scheduled carriers; 15-minute balanced accrual; Cape Air/KAP excluded",hourly_quotas:mixMode?ORIGINAL_HOURLY_QUOTAS:null,bin_counts:Object.entries(cohort.reduce((a,r)=>(a[binOf(r.scheduled_out_initial)]=(a[binOf(r.scheduled_out_initial)]||0)+1,a),{}))});
  const now=Date.now();
  const scanStartMs=Math.max(START.getTime(),Math.ceil((now+MIN_LEAD_MIN*60000)/60000)*60000);
  const scanStart=new Date(scanStartMs);
@@ -105,7 +106,6 @@ export default async function handler(req,res){try{
  const have=new Set(existing.map(x=>x.fa_flight_id));
  const candidates=[...seen.values()].filter(f=>!have.has(f.fa_flight_id)).sort((a,b)=>new Date(a.scheduled_out)-new Date(b.scheduled_out));
  const need=TARGET-cohort.length;
- const mixMode=date>=HOURLY_MIX_START;
  const pick=mixMode?originalMixSelect(candidates,cohort,START):balancedSelect(candidates,cohort,candidates.length,START,END);
  const selected=pick.selected;
  const done=[],failed=[];
