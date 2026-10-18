@@ -122,6 +122,8 @@ export async function buildDraftPackage(flightId){
    ident:job.ident,
    origin:job.origin,
    destination:job.destination,
+   origin_airport:flight?.origin_airport||null,
+   destination_airport:flight?.destination_airport||null,
    scheduled_out:job.scheduled_out_initial,
    estimated_off:estimatedOff
   },
