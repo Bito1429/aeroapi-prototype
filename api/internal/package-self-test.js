@@ -2,6 +2,7 @@ import{json}from"../lib.js";
 import{denseTimeline,corridorPolygon,etagFor}from"../package-core.js";
 import{ETA_CALIBRATION,etaPackage}from"../eta-calibration.js";
 import{CORRIDOR_CALIBRATION}from"../corridor-calibration.js";
+import{normalizeAirportName}from"../airport-reference.js";
 
 export default async function handler(req,res){
  try{
@@ -19,6 +20,7 @@ export default async function handler(req,res){
   if(etagFor(a)!==etagFor(b))throw new Error("generated_at invalidates ETag");
   const eta=etaPackage({estimatedOff:"2026-10-07T12:00:00Z",filedEteSeconds:7200});
   if(eta.predeparture.landing_window?.early!=="2026-10-07T13:43:00.000Z")throw new Error("landing window failed");
+  if(normalizeAirportName("McCarran International Airport","LAS")!=="Harry Reid International Airport")throw new Error("airport-name normalization failed");
   return json(res,200,{ok:true,timeline_points:tl.length,corridor_half_width_km:CORRIDOR_CALIBRATION.confidence_half_width_km,eta_pre_half_width_min:ETA_CALIBRATION.predeparture.half_width_minutes,eta_airborne_half_width_min:ETA_CALIBRATION.airborne.half_width_minutes,semantics:eta.semantics});
  }catch(e){return json(res,500,{ok:false,error:e.message});}
 }
