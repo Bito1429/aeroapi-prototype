@@ -12,6 +12,8 @@ const REGISTER_CONCURRENCY=25;
 const BATCH_AFTER=new Date("2026-10-06T00:00:00Z");
 const HOURLY_MIX_START="2026-10-12";
 const ORIGINAL_HOURLY_QUOTAS={10:35,11:41,12:43,13:40,14:37,15:29,16:11,17:4,18:1,19:1,20:3,21:5};
+const EVENING_SPLIT_HOUR=20;
+const EVENING_MAX_PAGES=4;
 const code=x=>x?.code_icao||x?.code||x||"";
 const carrierOf=f=>String(f.ident||f.ident_icao||"").match(/^([A-Z]{3})/)?.[1]||"";
 
@@ -92,9 +94,19 @@ export default async function handler(req,res){try{
  const scanStart=new Date(scanStartMs);
  if(scanStart>=END)return json(res,409,{ok:false,done:false,date,batch_total:cohort.length,target:TARGET,error:"90-minute window closed",scan_start:scanStart});
  let raw=[],airport_errors=[];
+ const eveningStart=new Date(START);eveningStart.setUTCHours(EVENING_SPLIT_HOUR,0,0,0);
  for(const ap of AIRPORTS){
-  try{const b=await aero(`/airports/${ap}/flights/scheduled_departures`,{start:scanStart.toISOString(),end:END.toISOString(),max_pages:date>=HOURLY_MIX_START?12:6});raw.push(...(b.scheduled_departures||b.flights||[]));}
-  catch(e){airport_errors.push({airport:ap,error:e.message,detail:e.body||null});}
+  const windows=mixMode
+   ?[
+     {label:"day",start:scanStart,end:new Date(Math.min(END.getTime(),eveningStart.getTime())),max_pages:12},
+     {label:"evening",start:new Date(Math.max(scanStart.getTime(),eveningStart.getTime())),end:END,max_pages:EVENING_MAX_PAGES}
+    ]
+   :[{label:"full",start:scanStart,end:END,max_pages:6}];
+  for(const w of windows){
+   if(w.start>=w.end)continue;
+   try{const b=await aero(`/airports/${ap}/flights/scheduled_departures`,{start:w.start.toISOString(),end:w.end.toISOString(),max_pages:w.max_pages});raw.push(...(b.scheduled_departures||b.flights||[]));}
+   catch(e){airport_errors.push({airport:ap,window:w.label,error:e.message,detail:e.body||null});}
+  }
  }
  const seen=new Map();
  for(const f of raw){
