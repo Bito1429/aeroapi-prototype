@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import{denseTimeline,corridorPolygon,etagFor}from"../api/package-core.js";
+import{normalizeAirportName,airportView}from"../api/airport-reference.js";
 
 const route=[
  {latitude:40.6413,longitude:-73.7781},
@@ -23,5 +24,12 @@ const b={status:"READY",generated_at:"2026-10-07T12:01:00Z",route:{hash:"abc"}};
 const c={status:"READY",generated_at:"2026-10-07T12:01:00Z",route:{hash:"def"}};
 assert.equal(etagFor(a),etagFor(b),"generated_at must not invalidate ETag");
 assert.notEqual(etagFor(a),etagFor(c),"content change must invalidate ETag");
+
+assert.equal(normalizeAirportName("McCarran International Airport","LAS"),"Harry Reid International Airport");
+assert.equal(normalizeAirportName("Anything stale","LAS"),"Harry Reid International Airport","LAS code must force current passenger-facing name");
+assert.deepEqual(
+ airportView({code_iata:"LAS",code_icao:"KLAS",name:"McCarran International Airport",timezone:"America/Los_Angeles",latitude:36.0801,longitude:-115.1522}),
+ {code_iata:"LAS",code_icao:"KLAS",name:"Harry Reid International Airport",timezone:"America/Los_Angeles",latitude:36.0801,longitude:-115.1522}
+);
 
 console.log(JSON.stringify({ok:true,timeline_points:tl.length,corridor_vertices:poly.coordinates[0].length,etag:etagFor(a)}));
