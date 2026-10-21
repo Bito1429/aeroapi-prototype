@@ -10,6 +10,8 @@ const ALLOWED=new Set(["LO","EB","LB","LD","LC","LK","EK","EE","EF","LF","ED","L
 const ROUTE_PCTS=[20,40,60,80,95],ETA_PCTS=[20,40,60,80],N=101;
 const PAGE_DELAY_MS=230;
 const RUN_MS=235000;
+const MAX_TRACK_REQUESTS=270;
+const SEALED_OD=new Set(["LEBL|LIRF","LIRF|LEBL","EGCC|LEPA","LEPA|EGCC"]);
 
 const code=x=>x?.code_icao||x?.code||x||"";
 const ms=x=>{const n=typeof x==="number"?x:new Date(x).getTime();return Number.isFinite(n)?n:null};
@@ -20,6 +22,7 @@ function median(a){if(!a.length)return null;const s=[...a].sort((x,y)=>x-y),m=Ma
 function pctile(a,p){if(!a.length)return null;const s=[...a].sort((x,y)=>x-y);return s[Math.max(0,Math.min(s.length-1,Math.ceil(p*s.length)-1))]}
 function r3(x){return x==null?null:+x.toFixed(3)}
 function inside(x){return x&&ALLOWED.has(String(x).slice(0,2).toUpperCase())}
+function sealedHoldout(origin,destination){return SEALED_OD.has(String(origin)+"|"+String(destination))}
 function keyOf(op,f){return[op,String(f.ident_icao||f.ident||""),code(f.origin),code(f.destination)].join("|")}
 function hash(k){return crypto.createHash("sha256").update(k).digest("hex")}
 function validFlight(op,f){
@@ -72,13 +75,19 @@ async function buildCandidates(sql){
    percentile_cont(0.5) within group(order by extract(epoch from(scheduled_in-scheduled_out))/60.0) as med_block
    from europe_feasibility_flights group by 1,2,3,4 having count(*)>=9`;
  for(const x of rows){
-  const block=Number(x.med_block),sector=block<120?"short":block<=240?"medium":null;if(!sector)continue;
+  const block=Number(x.med_block),sector=block<120?"short":block<=240?"medium":null;if(!sector||sealedHoldout(x.origin,x.destination))continue;
   const k=[x.operator_icao,x.ident,x.origin,x.destination].join("|"),ids=(x.ids||[]).slice(0,9).reverse();
   await sql`insert into europe_feasibility_routes(route_key,route_hash,sector,median_scheduled_block_min,qualifying_occurrence_count,flight_ids)
     values(${k},${hash(k)},${sector},${block},${x.n},${JSON.stringify(ids)}::jsonb) on conflict(route_key) do nothing`;
  }
 }
 function cleanTrack(b){const p=[];for(const x of(b.positions||b.track||[])){const latitude=Number(x.latitude),longitude=Number(x.longitude),t=pms(x.timestamp);if(Number.isFinite(latitude)&&Number.isFinite(longitude)&&t!=null)p.push({latitude,longitude,t})}p.sort((a,b)=>a.t-b.t);return p}
+async function reserveTrackRequest(sql){
+ await sql`insert into europe_feasibility_progress(task_key,status,detail) values('budget:track_requests','IN_PROGRESS',${JSON.stringify({cap_usd:450,max_track_requests:MAX_TRACK_REQUESTS,basis:"~$400 prior estimate for 270-track paid run; stop before any replacement track request"})}::jsonb) on conflict(task_key) do nothing`;
+ const r=await sql`update europe_feasibility_progress set flight_count=flight_count+1,updated_at=now() where task_key='budget:track_requests' and flight_count<${MAX_TRACK_REQUESTS} returning flight_count`;
+ if(!r.length)throw new Error("BUDGET_GUARD: 270 historical track requests reached; stop before any additional paid track retrieval");
+ return r[0].flight_count;
+}
 async function fillTracks(sql,deadline){
  await buildCandidates(sql);
  for(const sector of["short","medium"]){
@@ -98,6 +107,7 @@ async function fillTracks(sql,deadline){
     const exists=await sql`select 1 from europe_feasibility_tracks where fa_flight_id=${id}`;
     if(exists.length)continue;
     try{
+     await reserveTrackRequest(sql);
      const b=await aero("/history/flights/"+encodeURIComponent(id)+"/track"),pts=cleanTrack(b);
      if(pts.length<2){bad="missing_or_short_track";break}
      await sql`insert into europe_feasibility_tracks(fa_flight_id,route_key,role,point_count,actual_distance,points)
