@@ -9,7 +9,7 @@ const CUTOFF_MS=new Date("2026-09-28T23:59:59Z").getTime();
 const ALLOWED=new Set(["LO","EB","LB","LD","LC","LK","EK","EE","EF","LF","ED","LG","LH","EI","LI","EV","EY","EL","LM","EH","EP","LP","LR","LZ","LJ","LE","GC","ES","EG","EN","LS","BI"]);
 const ROUTE_PCTS=[20,40,60,80,95],ETA_PCTS=[20,40,60,80],N=101;
 const PAGE_DELAY_MS=230;
-const RUN_MS=235000;
+const RUN_MS=45000;
 const MAX_TRACK_REQUESTS=270;
 const SEALED_OD=new Set(["LEBL|LIRF","LIRF|LEBL","EGCC|LEPA","LEPA|EGCC"]);
 
