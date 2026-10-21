@@ -43,28 +43,34 @@ async function enumStatus(sql){
 }
 async function enumerate(sql,deadline){
  await seed(sql);
+ const CONCURRENCY=8;
  while(Date.now()<deadline){
-  const [task]=await sql`select * from europe_feasibility_progress where task_key like 'enum:%' and status<>'DONE' order by task_key limit 1`;
-  if(!task)break;
-  const day=task.detail.day,op=task.detail.op,start=day+"T00:00:00Z",end=new Date(new Date(start).getTime()+86400000).toISOString();
-  let path=task.cursor||"/history/operators/"+op+"/flights",params=task.cursor?{}:{start,end,max_pages:1};
-  try{
-   const b=await aero(path,params),flights=b.flights||[];
-   for(const f of flights){
-    if(!validFlight(op,f))continue;
-    await sql`insert into europe_feasibility_flights(fa_flight_id,operator_icao,ident,origin,destination,scheduled_out,scheduled_in,actual_off,actual_on,status,source_day,raw)
-      values(${f.fa_flight_id},${op},${String(f.ident_icao||f.ident||"")},${code(f.origin)},${code(f.destination)},${f.scheduled_out}::timestamptz,${f.scheduled_in}::timestamptz,${f.actual_off||null}::timestamptz,${f.actual_on||null}::timestamptz,${f.status||null},${day}::date,${JSON.stringify(f)}::jsonb)
-      on conflict(fa_flight_id) do nothing`;
+  const tasks=await sql`select * from europe_feasibility_progress where task_key like 'enum:%' and status<>'DONE' order by task_key limit ${CONCURRENCY}`;
+  if(!tasks.length)break;
+  await Promise.all(tasks.map(async task=>{
+   const day=task.detail.day,op=task.detail.op,start=day+"T00:00:00Z",end=new Date(new Date(start).getTime()+86400000).toISOString();
+   let path=task.cursor||"/history/operators/"+op+"/flights",params=task.cursor?{}:{start,end,max_pages:1};
+   try{
+    const b=await aero(path,params),flights=b.flights||[];
+    for(const f of flights){
+     if(!validFlight(op,f))continue;
+     await sql`insert into europe_feasibility_flights(fa_flight_id,operator_icao,ident,origin,destination,scheduled_out,scheduled_in,actual_off,actual_on,status,source_day,raw)
+       values(${f.fa_flight_id},${op},${String(f.ident_icao||f.ident||"")},${code(f.origin)},${code(f.destination)},${f.scheduled_out}::timestamptz,${f.scheduled_in}::timestamptz,${f.actual_off||null}::timestamptz,${f.actual_on||null}::timestamptz,${f.status||null},${day}::date,${JSON.stringify(f)}::jsonb)
+       on conflict(fa_flight_id) do nothing`;
+    }
+    const next=b.links?.next||null,status=next?"IN_PROGRESS":"DONE";
+    await sql`update europe_feasibility_progress set status=${status},cursor=${next},page_count=page_count+1,flight_count=flight_count+${flights.length},updated_at=now() where task_key=${task.task_key}`;
+   }catch(e){
+    const st=Number(e.status);
+    if(st===429||st===408||st>=500){
+     await sql`update europe_feasibility_progress set status='IN_PROGRESS',detail=detail||${JSON.stringify({last_transient_error:e.message})}::jsonb,updated_at=now() where task_key=${task.task_key}`;
+     return;
+    }
+    await sql`update europe_feasibility_progress set status='ERROR',detail=detail||${JSON.stringify({error:e.message,body:e.body||null})}::jsonb,updated_at=now() where task_key=${task.task_key}`;
+    throw e;
    }
-   const next=b.links?.next||null,status=next?"IN_PROGRESS":"DONE";
-   await sql`update europe_feasibility_progress set status=${status},cursor=${next},page_count=page_count+1,flight_count=flight_count+${flights.length},updated_at=now() where task_key=${task.task_key}`;
-   await sleep(PAGE_DELAY_MS);
-  }catch(e){
-   const st=Number(e.status);
-   if(st===429||st===408||st>=500){await sql`update europe_feasibility_progress set status='IN_PROGRESS',detail=detail||${JSON.stringify({last_transient_error:e.message})}::jsonb,updated_at=now() where task_key=${task.task_key}`;await sleep(st===429?2000:3000);continue}
-   await sql`update europe_feasibility_progress set status='ERROR',detail=detail||${JSON.stringify({error:e.message,body:e.body||null})}::jsonb,updated_at=now() where task_key=${task.task_key}`;
-   throw e;
-  }
+  }));
+  await sleep(PAGE_DELAY_MS*2);
  }
  return enumStatus(sql);
 }
