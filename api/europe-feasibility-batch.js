@@ -48,7 +48,7 @@ async function enumerate(sql,deadline){
  const touched=new Set();
  let completed=0;
  while(Date.now()<deadline){
-  const candidates=await sql`select task_key from europe_feasibility_progress where task_key like 'enum:%' and status='PENDING' order by updated_at asc, task_key asc limit 200`;
+  const candidates=await sql`select task_key from europe_feasibility_progress where task_key like 'enum:%' and status='PENDING' order by coalesce((detail->>'window_index')::int,0) desc,updated_at asc,task_key asc limit 200`;
   const choice=candidates.find(x=>!touched.has(x.task_key));
   if(!choice)break;
   touched.add(choice.task_key);
