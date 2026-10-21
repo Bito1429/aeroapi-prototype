@@ -7,12 +7,16 @@ export default async function handler(req,res){
  if(!process.env.EUROPE_DATABASE_URL)return json(res,503,{ok:false,error:'Europe database not configured'});
 
  const sql=neon(process.env.EUROPE_DATABASE_URL),owner=randomUUID();
- const usage=await aero('/account/usage',{start:'2026-10-20',end:new Date().toISOString().slice(0,10),all_keys:false}).catch(e=>({error:e.message}));
- // Never run paid jobs while supplier cost is unavailable or cannot be interpreted.
- const reported=Number(usage?.total_cost_usd??usage?.total_cost??usage?.total_amount_usd);
- if(!Number.isFinite(reported))return json(res,503,{ok:false,blocked:'FlightAware billing figure unavailable/unparsed'});
- if(reported>=450)return json(res,503,{ok:false,blocked:'Account usage >= $450 conservative ceiling',account_cost_usd:reported});
- const [lease]=await sql`insert into europe_feasibility_progress(task_key,status,detail) values('ops:europe_cron','RUNNING',${JSON.stringify({owner,account_cost_usd:reported})}::jsonb) on conflict(task_key) do update set status='RUNNING',detail=${JSON.stringify({owner,account_cost_usd:reported})}::jsonb,updated_at=now() where europe_feasibility_progress.status<>'RUNNING' or europe_feasibility_progress.updated_at<now()-interval '3 minutes' returning task_key`;
+ // FlightAware's screenshot reports $13.40 of Europe enumeration on 21 Oct.
+ // Provider account totals also contain US spend, so never use account-wide totals as Europe spend.
+ const [{enum_pages,track_requests}]=await sql`
+ select
+ (select coalesce(sum(page_count),0)::int from europe_feasibility_progress where task_key like 'enum:%') as enum_pages,
+ (select coalesce(max(flight_count),0)::int from europe_feasibility_progress where task_key='budget:track_requests') as track_requests`;
+ const estimatedUsd=0.02*Number(enum_pages)+1.60*Number(track_requests);
+ // Conservative estimates (not supplier invoices); retain a $25 safety buffer.
+ if(estimatedUsd>=425)return json(res,503,{ok:false,blocked:'Europe estimated spend reached $425 reserve threshold',estimated_spend_usd:estimatedUsd});
+  const [lease]=await sql`insert into europe_feasibility_progress(task_key,status,detail) values('ops:europe_cron','RUNNING',${JSON.stringify({owner,estimated_spend_usd:estimatedUsd})}::jsonb) on conflict(task_key) do update set status='RUNNING',detail=${JSON.stringify({owner,estimated_spend_usd:estimatedUsd})}::jsonb,updated_at=now() where europe_feasibility_progress.status<>'RUNNING' or europe_feasibility_progress.updated_at<now()-interval '3 minutes' returning task_key`;
  if(!lease)return json(res,200,{ok:true,skipped:'prior invocation still holds lease'});
  try{return await batch(req,res)}finally{await sql`update europe_feasibility_progress set status='IDLE',updated_at=now() where task_key='ops:europe_cron' and detail->>'owner'=${owner}`;}
 
