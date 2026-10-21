@@ -60,7 +60,8 @@ async function enumerate(sql,deadline){
    await sql`update europe_feasibility_progress set status=${status},cursor=${next},page_count=page_count+1,flight_count=flight_count+${flights.length},updated_at=now() where task_key=${task.task_key}`;
    await sleep(PAGE_DELAY_MS);
   }catch(e){
-   if(Number(e.status)===429){await sleep(2000);continue}
+   const st=Number(e.status);
+   if(st===429||st===408||st>=500){await sql`update europe_feasibility_progress set status='IN_PROGRESS',detail=detail||${JSON.stringify({last_transient_error:e.message})}::jsonb,updated_at=now() where task_key=${task.task_key}`;await sleep(st===429?2000:3000);continue}
    await sql`update europe_feasibility_progress set status='ERROR',detail=detail||${JSON.stringify({error:e.message,body:e.body||null})}::jsonb,updated_at=now() where task_key=${task.task_key}`;
    throw e;
   }
