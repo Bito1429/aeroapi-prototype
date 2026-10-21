@@ -43,40 +43,58 @@ async function enumStatus(sql){
 }
 async function enumerate(sql,deadline){
  await seed(sql);
- await sql`update europe_feasibility_progress set status='PENDING',cursor=null,updated_at=now() where task_key like 'enum:%' and status='RUNNING' and updated_at<now()-interval '10 minutes'`;
+ // A task is one airline/day; the durable window_index makes it resumable.
+ await sql`update europe_feasibility_progress set status='PENDING',cursor=null,updated_at=now() where task_key like 'enum:%' and status in ('RUNNING','IN_PROGRESS') and updated_at<now()-interval '10 minutes'`;
+ const touched=new Set();
+ let completed=0;
  while(Date.now()<deadline){
-  const [task]=await sql`update europe_feasibility_progress set status='RUNNING',cursor=null,updated_at=now()
-    where task_key=(select task_key from europe_feasibility_progress where task_key like 'enum:%' and status<>'DONE' and status<>'RUNNING' order by updated_at asc, task_key asc for update skip locked limit 1)
-    returning *`;
-  if(!task)break;
-  const day=task.detail.day,op=task.detail.op,start=day+"T00:00:00Z",end=new Date(new Date(start).getTime()+86400000).toISOString();
-  let path="/history/operators/"+op+"/flights",params={start,end,max_pages:1},pages=0,flightsSeen=0;
+  const candidates=await sql`select task_key from europe_feasibility_progress where task_key like 'enum:%' and status='PENDING' order by updated_at asc, task_key asc limit 200`;
+  const choice=candidates.find(x=>!touched.has(x.task_key));
+  if(!choice)break;
+  touched.add(choice.task_key);
+  const [task]=await sql`update europe_feasibility_progress set status='RUNNING',updated_at=now() where task_key=${choice.task_key} and status='PENDING' returning *`;
+  if(!task)continue;
+  const day=task.detail.day,op=task.detail.op,windowHours=op==='RYR'?1:2,totalWindows=24/windowHours;
+  let wi=Math.max(0,Math.min(totalWindows,Number(task.detail.window_index)||0));
+  let pages=task.page_count||0,flightsSeen=task.flight_count||0;
   try{
-   while(path){
-    const body=await aero(path,params),flights=body.flights||[];
-    pages++;flightsSeen+=flights.length;
-    for(const f of flights){
-     if(!validFlight(op,f))continue;
-     await sql`insert into europe_feasibility_flights(fa_flight_id,operator_icao,ident,origin,destination,scheduled_out,scheduled_in,actual_off,actual_on,status,source_day,raw)
+   while(wi<totalWindows && Date.now()<deadline-4000){
+    const start=new Date(Date.parse(day+'T00:00:00Z')+wi*windowHours*3600000).toISOString();
+    const end=new Date(Date.parse(start)+windowHours*3600000).toISOString();
+    let path='/history/operators/'+op+'/flights',params={start,end,max_pages:1};
+    let windowPages=0,windowFlights=0;
+    while(path){
+     if(Date.now()>=deadline-3000)break;
+     const body=await aero(path,params),flights=body.flights||[];
+     windowPages++;windowFlights+=flights.length;
+     for(const f of flights){
+      if(!validFlight(op,f))continue;
+      await sql`insert into europe_feasibility_flights(fa_flight_id,operator_icao,ident,origin,destination,scheduled_out,scheduled_in,actual_off,actual_on,status,source_day,raw)
        values(${f.fa_flight_id},${op},${String(f.ident_icao||f.ident||"")},${code(f.origin)},${code(f.destination)},${f.scheduled_out}::timestamptz,${f.scheduled_in}::timestamptz,${f.actual_off||null}::timestamptz,${f.actual_on||null}::timestamptz,${f.status||null},${day}::date,${JSON.stringify(f)}::jsonb)
        on conflict(fa_flight_id) do nothing`;
+     }
+     path=body.links?.next||null;params={};
+     await sleep(PAGE_DELAY_MS);
     }
-    path=body.links?.next||null;params={};
-    await sleep(PAGE_DELAY_MS);
+    // Never advance the window marker after a partial cursor chain.
+    if(path)break;
+    wi++;pages+=windowPages;flightsSeen+=windowFlights;
+    await sql`update europe_feasibility_progress set detail=detail||${JSON.stringify({window_index:wi,window_hours:windowHours})}::jsonb,page_count=${pages},flight_count=${flightsSeen},updated_at=now() where task_key=${task.task_key} and status='RUNNING'`;
    }
-   await sql`update europe_feasibility_progress set status='DONE',cursor=null,page_count=${pages},flight_count=${flightsSeen},updated_at=now() where task_key=${task.task_key}`;
+   if(wi===totalWindows){
+    await sql`update europe_feasibility_progress set status='DONE',cursor=null,updated_at=now() where task_key=${task.task_key} and status='RUNNING'`;
+    completed++;
+   }else{
+    await sql`update europe_feasibility_progress set status='PENDING',cursor=null,updated_at=now() where task_key=${task.task_key} and status='RUNNING'`;
+   }
   }catch(e){
    const st=Number(e.status);
-   if(st===429||st===408||st>=500){
-    await sql`update europe_feasibility_progress set status='PENDING',cursor=null,detail=detail||${JSON.stringify({last_transient_error:e.message})}::jsonb,updated_at=now() where task_key=${task.task_key}`;
-    await sleep(st===429?3000:5000);
-    continue;
-   }
-   await sql`update europe_feasibility_progress set status='ERROR',cursor=null,detail=detail||${JSON.stringify({error:e.message,body:e.body||null})}::jsonb,updated_at=now() where task_key=${task.task_key}`;
-   throw e;
+   const transient=st===429||st===408||st>=500;
+   await sql`update europe_feasibility_progress set status=${transient?'PENDING':'ERROR'},cursor=null,detail=detail||${JSON.stringify({last_error:e.message,body:e.body||null})}::jsonb,updated_at=now() where task_key=${task.task_key} and status='RUNNING'`;
+   if(st===429)await sleep(2500);
   }
  }
- return enumStatus(sql);
+ return {status:await enumStatus(sql),completed};
 }
 async function buildCandidates(sql){
  const n=await sql`select count(*)::int n from europe_feasibility_routes`;
@@ -173,8 +191,8 @@ export default async function handler(req,res){
  try{
   const est=await enumStatus(sql);const total=Object.values(est).reduce((a,b)=>a+b,0);
   if(total===0||((est.DONE||0)<180)){
-   const status=await enumerate(sql,deadline);
-   return json(res,200,{ok:true,phase:"ENUMERATE",status,continue:(status.DONE||0)<180});
+   const outcome=await enumerate(sql,deadline);
+   return json(res,outcome.completed>0?200:409,{ok:outcome.completed>0,phase:"ENUMERATE",status:outcome.status,completed_this_batch:outcome.completed,continue:(outcome.status.DONE||0)<180});
   }
   const sel=await fillTracks(sql,deadline);
   if((sel.short||0)<15||(sel.medium||0)<15)return json(res,200,{ok:true,phase:"TRACKS",selected:sel,continue:true});
