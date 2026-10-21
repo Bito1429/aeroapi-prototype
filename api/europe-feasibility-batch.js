@@ -46,7 +46,7 @@ async function enumerate(sql,deadline){
  await sql`update europe_feasibility_progress set status='PENDING',cursor=null,updated_at=now() where task_key like 'enum:%' and status='RUNNING' and updated_at<now()-interval '10 minutes'`;
  while(Date.now()<deadline){
   const [task]=await sql`update europe_feasibility_progress set status='RUNNING',cursor=null,updated_at=now()
-    where task_key=(select task_key from europe_feasibility_progress where task_key like 'enum:%' and status<>'DONE' and status<>'RUNNING' order by task_key for update skip locked limit 1)
+    where task_key=(select task_key from europe_feasibility_progress where task_key like 'enum:%' and status<>'DONE' and status<>'RUNNING' order by updated_at asc, task_key asc for update skip locked limit 1)
     returning *`;
   if(!task)break;
   const day=task.detail.day,op=task.detail.op,start=day+"T00:00:00Z",end=new Date(new Date(start).getTime()+86400000).toISOString();
