@@ -2,29 +2,16 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "crons": [
     {
-      "path": "/api/worker",
-      "schedule": "* * * * *"
-    },
-    {
-      "path": "/api/accrual-cohort-2026-09-21-25",
-      "schedule": "5 22 * * *"
+      "path": "/api/europe-feasibility-cron",
+      "schedule": "0 * * * *"
     }
   ],
   "functions": {
-    "api/worker.js": {
-      "maxDuration": 60
-    },
-    "api/accrual-cohort-2026-09-21-25.js": {
-      "maxDuration": 300
-    },
-    "api/europe-feasibility-run.js": {
-      "maxDuration": 300
+    "api/europe-feasibility-cron.js": {
+      "maxDuration": 120
     },
     "api/europe-feasibility-batch.js": {
-      "maxDuration": 300
-    },
-    "api/europe-feasibility-driver.js": {
-      "maxDuration": 60
+      "maxDuration": 120
     }
   }
 }
