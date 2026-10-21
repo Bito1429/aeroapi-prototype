@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import{aero,json,havKm,polyKm}from"./lib.js";
-import{db}from"./db.js";
+import{neon}from"@neondatabase/serverless";
+const db=()=>{if(!process.env.EUROPE_DATABASE_URL)throw Error("EUROPE_DATABASE_URL missing");return neon(process.env.EUROPE_DATABASE_URL)};
 
 const OPS=["RYR","EZY","EXS","WZZ"];
 const START_DAY=new Date("2026-08-15T00:00:00Z");
