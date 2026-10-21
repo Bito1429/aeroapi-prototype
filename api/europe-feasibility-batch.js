@@ -9,7 +9,7 @@ const CUTOFF_MS=new Date("2026-09-28T23:59:59Z").getTime();
 const ALLOWED=new Set(["LO","EB","LB","LD","LC","LK","EK","EE","EF","LF","ED","LG","LH","EI","LI","EV","EY","EL","LM","EH","EP","LP","LR","LZ","LJ","LE","GC","ES","EG","EN","LS","BI"]);
 const ROUTE_PCTS=[20,40,60,80,95],ETA_PCTS=[20,40,60,80],N=101;
 const PAGE_DELAY_MS=230;
-const RUN_MS=235000;
+const RUN_MS=45000;
 const MAX_TRACK_REQUESTS=270;
 const SEALED_OD=new Set(["LEBL|LIRF","LIRF|LEBL","EGCC|LEPA","LEPA|EGCC"]);
 
@@ -43,8 +43,11 @@ async function enumStatus(sql){
 }
 async function enumerate(sql,deadline){
  await seed(sql);
+ await sql`update europe_feasibility_progress set status='PENDING',cursor=null,updated_at=now() where task_key like 'enum:%' and status='RUNNING' and updated_at<now()-interval '10 minutes'`;
  while(Date.now()<deadline){
-  const [task]=await sql`select * from europe_feasibility_progress where task_key like 'enum:%' and status<>'DONE' order by task_key limit 1`;
+  const [task]=await sql`update europe_feasibility_progress set status='RUNNING',cursor=null,updated_at=now()
+    where task_key=(select task_key from europe_feasibility_progress where task_key like 'enum:%' and status<>'DONE' and status<>'RUNNING' order by task_key for update skip locked limit 1)
+    returning *`;
   if(!task)break;
   const day=task.detail.day,op=task.detail.op,start=day+"T00:00:00Z",end=new Date(new Date(start).getTime()+86400000).toISOString();
   let path="/history/operators/"+op+"/flights",params={start,end,max_pages:1},pages=0,flightsSeen=0;
