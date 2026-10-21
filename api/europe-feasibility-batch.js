@@ -114,7 +114,9 @@ async function buildCandidates(sql){
 function cleanTrack(b){const p=[];for(const x of(b.positions||b.track||[])){const latitude=Number(x.latitude),longitude=Number(x.longitude),t=pms(x.timestamp);if(Number.isFinite(latitude)&&Number.isFinite(longitude)&&t!=null)p.push({latitude,longitude,t})}p.sort((a,b)=>a.t-b.t);return p}
 async function reserveTrackRequest(sql){
  await sql`insert into europe_feasibility_progress(task_key,status,detail) values('budget:track_requests','IN_PROGRESS',${JSON.stringify({cap_usd:450,max_track_requests:MAX_TRACK_REQUESTS,basis:"~$400 prior estimate for 270-track paid run; stop before any replacement track request"})}::jsonb) on conflict(task_key) do nothing`;
- const r=await sql`update europe_feasibility_progress set flight_count=flight_count+1,updated_at=now() where task_key='budget:track_requests' and flight_count<${MAX_TRACK_REQUESTS} returning flight_count`;
+ const pages=await sql`select coalesce(sum(page_count),0)::int n from europe_feasibility_progress where task_key like 'enum:%'`;
+ const budgetMax=Math.max(0,Math.min(MAX_TRACK_REQUESTS,Math.floor((425-Number(pages[0].n)*0.02)/1.60)));
+ const r=await sql`update europe_feasibility_progress set flight_count=flight_count+1,updated_at=now() where task_key='budget:track_requests' and flight_count<${budgetMax} returning flight_count`;
  if(!r.length)throw new Error("BUDGET_GUARD: 270 historical track requests reached; stop before any additional paid track retrieval");
  return r[0].flight_count;
 }
@@ -188,6 +190,7 @@ async function score(sql){
 }
 
 export default async function handler(req,res){
+ if(!process.env.CRON_SECRET || req.headers.authorization !== "Bearer "+process.env.CRON_SECRET)return json(res,401,{ok:false,error:"unauthorized"});
  const sql=db(),deadline=Date.now()+RUN_MS;
  try{
   const est=await enumStatus(sql);const total=Object.values(est).reduce((a,b)=>a+b,0);
