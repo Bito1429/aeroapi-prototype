@@ -3,7 +3,7 @@
   "crons": [
     {
       "path": "/api/europe-feasibility-cron",
-      "schedule": "0 * * * *"
+      "schedule": "*/10 * * * *"
     }
   ],
   "functions": {
