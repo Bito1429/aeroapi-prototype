@@ -190,8 +190,8 @@ function minLine(p,line){const lat0=p.latitude*Math.PI/180,kLa=111.195,kLo=111.1
 function fm(pred,act){return mean(ROUTE_PCTS.map(x=>minLine(atFrac(act,x/100),pred)))}
 function summary(v){return{n:v.length,median:r3(median(v)),mean:r3(mean(v)),p90:r3(pctile(v,.9)),within_15_pct:r3(100*v.filter(x=>x<=15).length/v.length),within_50_pct:r3(100*v.filter(x=>x<=50).length/v.length)}}
 function esum(v){const a=v.map(Math.abs);return{n:v.length,median_abs_min:r3(median(a)),mean_abs_min:r3(mean(a)),p90_abs_min:r3(pctile(a,.9)),mean_signed_min:r3(mean(v)),within_5_pct:r3(100*a.filter(x=>x<=5).length/v.length),within_10_pct:r3(100*a.filter(x=>x<=10).length/v.length),within_15_pct:r3(100*a.filter(x=>x<=15).length/v.length)}}
-async function score(sql){
- const existing=await sql`select id,route_summary,eta_summary,metadata from europe_feasibility_results order by id desc limit 1`;if(existing.length)return existing[0];
+export async function score(sql,force=false){
+ const existing=await sql`select id,route_summary,eta_summary,metadata from europe_feasibility_results order by id desc limit 1`;if(existing.length&&!force)return existing[0];
  const routes=await sql`select * from europe_feasibility_routes where selected=true order by sector,selection_rank`;
  const evals=[];
  for(const r of routes){
@@ -206,7 +206,7 @@ async function score(sql){
  const routeSummary={median_path:summary(evals.map(x=>x.route_mean_xtd_km.median_path)),most_recent_track:summary(evals.map(x=>x.route_mean_xtd_km.most_recent)),great_circle:summary(evals.map(x=>x.route_mean_xtd_km.great_circle))},eta={};
  for(const k of["takeoff","20","40","60","80"])eta[k]=esum(evals.map(x=>x.eta_signed_error_min[k]));
  const usable=routeSummary.median_path.median<=15&&routeSummary.median_path.within_50_pct>=70,noGc=routeSummary.median_path.median>=routeSummary.great_circle.median,conclusion=noGc||routeSummary.median_path.median>30?"not_usable":usable?"usable":"marginal";
- const meta={evaluated_flights:evals.length,route_predeclared_conclusion:conclusion,protocol_commit:"30796efb80815c74d31a69ea235214cc58a9add9"};
+ const meta={evaluated_flights:evals.length,route_predeclared_conclusion:conclusion,protocol_commit:"30796efb80815c74d31a69ea235214cc58a9add9",correction:force?"Transient 502 retried; RYR336 restored by predeclared hash order; original scoring row retained":null};
  const r=await sql`insert into europe_feasibility_results(protocol_commit,route_summary,eta_summary,evaluations,metadata) values('30796efb80815c74d31a69ea235214cc58a9add9',${JSON.stringify(routeSummary)}::jsonb,${JSON.stringify(eta)}::jsonb,${JSON.stringify(evals)}::jsonb,${JSON.stringify(meta)}::jsonb) returning id,route_summary,eta_summary,metadata`;
  return r[0];
 }
