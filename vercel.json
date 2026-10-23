@@ -1,11 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "crons": [
-    {
-      "path": "/api/europe-extension2-run",
-      "schedule": "*/2 * * * *"
-    }
-  ],
+  "crons": [],
   "functions": {
     "api/europe-feasibility-cron.js": {
       "maxDuration": 120
