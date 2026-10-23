@@ -211,6 +211,28 @@ export async function score(sql,force=false){
  return r[0];
 }
 
+export async function scoreExtension(sql){
+ const existing=await sql`select id,route_summary,eta_summary,metadata from europe_feasibility_extension_results order by id desc limit 1`;if(existing.length)return existing[0];
+ const routes=await sql`select * from europe_feasibility_extension_routes where status='SELECTED' order by sector,selection_rank`;
+ const evals=[];
+ for(const r of routes){
+  const ids=r.flight_ids||[];
+  const fs=await sql`select f.fa_flight_id,f.actual_off,f.actual_on,t.points from europe_feasibility_flights f join europe_feasibility_tracks t using(fa_flight_id) where f.fa_flight_id=any(${ids}::text[])`;
+  const m=new Map(fs.map(x=>[x.fa_flight_id,x])),ordered=ids.map(id=>m.get(id)),tr=ordered.slice(0,6),ev=ordered.slice(6);
+  const mp=medPath(tr.map(x=>x.points)),recent=tr[5].points,great=gc(medPt(tr.map(x=>x.points[0])),medPt(tr.map(x=>x.points.at(-1))));
+  const dur=median(tr.map(x=>(ms(x.actual_on)-ms(x.actual_off))/60000)),rem={};
+  for(const p of ETA_PCTS)rem[p]=median(tr.map(x=>(ms(x.actual_on)-atFrac(x.points,p/100).t)/60000));
+  for(const x of ev){const on=ms(x.actual_on),off=ms(x.actual_off),eta={takeoff:(off+dur*60000-on)/60000};for(const p of ETA_PCTS){const cp=atFrac(x.points,p/100);eta[p]=(cp.t+rem[p]*60000-on)/60000}evals.push({route_key:r.route_key,sector:r.sector,fa_flight_id:x.fa_flight_id,route_mean_xtd_km:{median_path:r3(fm(mp,x.points)),most_recent:r3(fm(recent,x.points)),great_circle:r3(fm(great,x.points))},eta_signed_error_min:Object.fromEntries(Object.entries(eta).map(([k,v])=>[k,r3(v)]))})}
+ }
+ const routeSummary={median_path:summary(evals.map(x=>x.route_mean_xtd_km.median_path)),most_recent_track:summary(evals.map(x=>x.route_mean_xtd_km.most_recent)),great_circle:summary(evals.map(x=>x.route_mean_xtd_km.great_circle))},eta={};
+ for(const k of["takeoff","20","40","60","80"])eta[k]=esum(evals.map(x=>x.eta_signed_error_min[k]));
+ const usable=routeSummary.median_path.median<=15&&routeSummary.median_path.within_50_pct>=70,noGc=routeSummary.median_path.median>=routeSummary.great_circle.median,conclusion=noGc||routeSummary.median_path.median>30?"not_usable":usable?"usable":"marginal";
+ const meta={evaluated_flights:evals.length,route_predeclared_conclusion:conclusion,protocol_commit:"30796efb80815c74d31a69ea235214cc58a9add9",cohort:'extension 100 pairs preregistered entry 771'};
+ const r=await sql`insert into europe_feasibility_extension_results(route_summary,eta_summary,evaluations,metadata) values(${JSON.stringify(routeSummary)}::jsonb,${JSON.stringify(eta)}::jsonb,${JSON.stringify(evals)}::jsonb,${JSON.stringify(meta)}::jsonb) returning id,route_summary,eta_summary,metadata`;
+ return r[0];
+}
+
+
 export default async function handler(req,res){
  if(!process.env.CRON_SECRET || req.headers.authorization !== "Bearer "+process.env.CRON_SECRET)return json(res,401,{ok:false,error:"unauthorized"});
  const sql=db(),deadline=Date.now()+RUN_MS;
