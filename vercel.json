@@ -1,11 +1,19 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "crons": [],
+  "crons": [
+    {
+      "path": "/api/europe-track-pilot",
+      "schedule": "* * * * *"
+    }
+  ],
   "functions": {
     "api/europe-feasibility-cron.js": {
       "maxDuration": 120
     },
     "api/europe-feasibility-batch.js": {
+      "maxDuration": 120
+    },
+    "api/europe-track-pilot.js": {
       "maxDuration": 120
     }
   }
