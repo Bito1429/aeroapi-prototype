@@ -3,7 +3,7 @@
   "crons": [
     {
       "path": "/api/europe-extension-run",
-      "schedule": "*/2 * * * *"
+      "schedule": "* * * * *"
     }
   ],
   "functions": {
