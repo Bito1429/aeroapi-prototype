@@ -1,11 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "crons": [
-    {
-      "path": "/api/europe-retry-transient",
-      "schedule": "* * * * *"
-    }
-  ],
+  "crons": [],
   "functions": {
     "api/europe-feasibility-cron.js": {
       "maxDuration": 120
