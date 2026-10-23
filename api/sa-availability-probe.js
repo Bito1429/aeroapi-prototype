@@ -22,7 +22,7 @@ export default async function handler(req,res){
    for(const hour of [0,6,12,18]){
     if(cost+0.02>9.0)break;
     const start='2026-09-20T'+String(hour).padStart(2,'0')+':00:00Z';
-    const end='2026-09-20T'+String(hour+6).padStart(2,'0')+':00:00Z';
+    const end=hour===18?'2026-09-21T00:00:00Z':'2026-09-20T'+String(hour+6).padStart(2,'0')+':00:00Z';
     try{
      const b=await aero('/history/operators/'+op+'/flights',{start,end,max_pages:1});
      pages++;cost+=.02; listing.push({start,total:(b.flights||[]).length});
