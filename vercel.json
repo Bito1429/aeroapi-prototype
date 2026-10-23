@@ -2,8 +2,8 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "crons": [
     {
-      "path": "/api/europe-extension2-pilot",
-      "schedule": "* * * * *"
+      "path": "/api/europe-extension2-run",
+      "schedule": "*/2 * * * *"
     }
   ],
   "functions": {
