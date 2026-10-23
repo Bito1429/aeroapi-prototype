@@ -101,24 +101,43 @@ async function enumerate(sql,deadline){
  return {status:await enumStatus(sql),completed};
 }
 async function buildCandidates(sql){
- const n=await sql`select count(*)::int n from europe_feasibility_routes`;
- if(n[0].n)return;
- const rows=await sql`select operator_icao,ident,origin,destination,count(*)::int n,
-   jsonb_agg(fa_flight_id order by scheduled_out desc) as ids,
-   percentile_cont(0.5) within group(order by extract(epoch from(scheduled_in-scheduled_out))/60.0) as med_block
-   from europe_feasibility_flights group by 1,2,3,4 having count(*)>=9`;
+ const existing=await sql`select count(*)::int n from europe_feasibility_routes`;
+ if(existing[0].n)return;
+ // Amended sample frame: ONLY fully enumerated airline-days, never partial days.
+ // Rank eligible pairs by frozen SHA-256, select first 9 latest occurrences by time,
+ // and retain backup candidates for strictly ordered missing-track replacement.
+ const rows=await sql`
+ with eligible as (
+   select f.*,row_number() over(partition by f.operator_icao,f.ident,f.origin,f.destination order by f.scheduled_out desc,f.fa_flight_id desc) rn
+   from europe_feasibility_flights f join europe_feasibility_progress p
+    on p.task_key='enum:'||to_char(f.source_day,'YYYY-MM-DD')||':'||f.operator_icao and p.status='DONE'
+   where not ((f.origin='LEBL' and f.destination='LIRF') or(f.origin='LIRF' and f.destination='LEBL')
+       or (f.origin='EGCC' and f.destination='LEPA') or(f.origin='LEPA' and f.destination='EGCC'))
+ ), groups as (
+   select operator_icao,ident,origin,destination,count(*)::int n,
+    percentile_cont(0.5) within group(order by extract(epoch from(scheduled_in-scheduled_out))/60) med_block,
+    count(*) filter(where actual_off is null or actual_on is null or actual_on<=actual_off) bad_times,
+    jsonb_agg(fa_flight_id order by scheduled_out asc,fa_flight_id asc) ids
+   from eligible where rn<=9 group by 1,2,3,4 having count(*)=9
+ ), ranked as (
+   select *,case when med_block<120 then 'short' when med_block<=240 then 'medium' end sector,
+    encode(digest(operator_icao||'|'||ident||'|'||origin||'|'||destination,'sha256'),'hex') h
+   from groups where bad_times=0
+ ), chosen as (
+   select *,row_number() over(partition by sector order by h) rank
+   from ranked where sector is not null
+ ) select * from chosen where rank<=80 order by sector,rank`;
  for(const x of rows){
-  const block=Number(x.med_block),sector=block<120?"short":block<=240?"medium":null;if(!sector||sealedHoldout(x.origin,x.destination))continue;
-  const k=[x.operator_icao,x.ident,x.origin,x.destination].join("|"),ids=(x.ids||[]).slice(0,9).reverse();
+  const key=[x.operator_icao,x.ident,x.origin,x.destination].join('|');
   await sql`insert into europe_feasibility_routes(route_key,route_hash,sector,median_scheduled_block_min,qualifying_occurrence_count,flight_ids)
-    values(${k},${hash(k)},${sector},${block},${x.n},${JSON.stringify(ids)}::jsonb) on conflict(route_key) do nothing`;
+  values(${key},${x.h},${x.sector},${Number(x.med_block)},${x.n},${JSON.stringify(x.ids)}::jsonb) on conflict(route_key) do nothing`;
  }
 }
 function cleanTrack(b){const p=[];for(const x of(b.positions||b.track||[])){const latitude=Number(x.latitude),longitude=Number(x.longitude),t=pms(x.timestamp);if(Number.isFinite(latitude)&&Number.isFinite(longitude)&&t!=null)p.push({latitude,longitude,t})}p.sort((a,b)=>a.t-b.t);return p}
 async function reserveTrackRequest(sql){
  await sql`insert into europe_feasibility_progress(task_key,status,detail) values('budget:track_requests','IN_PROGRESS',${JSON.stringify({cap_usd:450,max_track_requests:MAX_TRACK_REQUESTS,basis:"~$400 prior estimate for 270-track paid run; stop before any replacement track request"})}::jsonb) on conflict(task_key) do nothing`;
  const pages=await sql`select coalesce(sum(page_count),0)::int n from europe_feasibility_progress where task_key like 'enum:%'`;
- const budgetMax=Math.max(0,Math.min(MAX_TRACK_REQUESTS,Math.floor((425-Number(pages[0].n)*0.02)/1.60)));
+ const budgetMax=Math.max(0,Math.min(MAX_TRACK_REQUESTS,Math.floor((425-Number(pages[0].n)*0.02)/0.06)));
  const r=await sql`update europe_feasibility_progress set flight_count=flight_count+1,updated_at=now() where task_key='budget:track_requests' and flight_count<${budgetMax} returning flight_count`;
  if(!r.length)throw new Error("BUDGET_GUARD: 270 historical track requests reached; stop before any additional paid track retrieval");
  return r[0].flight_count;
@@ -197,7 +216,7 @@ export default async function handler(req,res){
  const sql=db(),deadline=Date.now()+RUN_MS;
  try{
   const est=await enumStatus(sql);const total=Object.values(est).reduce((a,b)=>a+b,0);
-  if(total===0||((est.DONE||0)<180)){
+  if(false && (total===0||((est.DONE||0)<180))){
    const outcome=await enumerate(sql,deadline);
    return json(res,outcome.completed>0?200:409,{ok:outcome.completed>0,phase:"ENUMERATE",status:outcome.status,completed_this_batch:outcome.completed,continue:(outcome.status.DONE||0)<180});
   }
