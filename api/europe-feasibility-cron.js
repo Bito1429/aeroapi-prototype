@@ -13,7 +13,7 @@ export default async function handler(req,res){
  select
  (select coalesce(sum(page_count),0)::int from europe_feasibility_progress where task_key like 'enum:%') as enum_pages,
  (select coalesce(max(flight_count),0)::int from europe_feasibility_progress where task_key='budget:track_requests') as track_requests`;
- const estimatedUsd=0.02*Number(enum_pages)+1.60*Number(track_requests);
+ const estimatedUsd=0.02*Number(enum_pages)+0.06*(Number(track_requests)+10);
  // Conservative estimates (not supplier invoices); retain a $25 safety buffer.
  if(estimatedUsd>=425)return json(res,503,{ok:false,blocked:'Europe estimated spend reached $425 reserve threshold',estimated_spend_usd:estimatedUsd});
   const [lease]=await sql`insert into europe_feasibility_progress(task_key,status,detail) values('ops:europe_cron','RUNNING',${JSON.stringify({owner,estimated_spend_usd:estimatedUsd})}::jsonb) on conflict(task_key) do update set status='RUNNING',detail=${JSON.stringify({owner,estimated_spend_usd:estimatedUsd})}::jsonb,updated_at=now() where europe_feasibility_progress.status<>'RUNNING' or europe_feasibility_progress.updated_at<now()-interval '3 minutes' returning task_key`;
