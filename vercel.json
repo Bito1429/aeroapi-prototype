@@ -2,8 +2,8 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "crons": [
     {
-      "path": "/api/europe-track-pilot",
-      "schedule": "* * * * *"
+      "path": "/api/europe-feasibility-cron",
+      "schedule": "*/2 * * * *"
     }
   ],
   "functions": {
