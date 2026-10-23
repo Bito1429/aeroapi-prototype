@@ -11,7 +11,7 @@ const ALLOWED=new Set(["LO","EB","LB","LD","LC","LK","EK","EE","EF","LF","ED","L
 const ROUTE_PCTS=[20,40,60,80,95],ETA_PCTS=[20,40,60,80],N=101;
 const PAGE_DELAY_MS=230;
 const RUN_MS=90000;
-const MAX_TRACK_REQUESTS=270;
+const MAX_TRACK_REQUESTS=4000;
 const SEALED_OD=new Set(["LEBL|LIRF","LIRF|LEBL","EGCC|LEPA","LEPA|EGCC"]);
 
 const code=x=>x?.code_icao||x?.code||x||"";
@@ -139,7 +139,7 @@ async function reserveTrackRequest(sql){
  const pages=await sql`select coalesce(sum(page_count),0)::int n from europe_feasibility_progress where task_key like 'enum:%'`;
  const budgetMax=Math.max(0,Math.min(MAX_TRACK_REQUESTS,Math.floor((425-Number(pages[0].n)*0.02)/0.06)));
  const r=await sql`update europe_feasibility_progress set flight_count=flight_count+1,updated_at=now() where task_key='budget:track_requests' and flight_count<${budgetMax} returning flight_count`;
- if(!r.length)throw new Error("BUDGET_GUARD: 270 historical track requests reached; stop before any additional paid track retrieval");
+ if(!r.length)throw new Error("BUDGET_GUARD: Europe study estimated spend reached $425; stop before additional paid track retrieval");
  return r[0].flight_count;
 }
 async function fillTracks(sql,deadline){
