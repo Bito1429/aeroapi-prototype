@@ -128,6 +128,11 @@ export async function buildDraftPackage(flightId){
   flight:{
    id:flightId,
    ident:job.ident,
+   ident_icao:flight?.ident_icao||null,
+   airline:flight?.airline||null,
+   aircraft_type:flight?.aircraft_type||null,
+   scheduled_arrival:flight?.scheduled_on||null,
+   actual_off:actualTakeoff,
    origin:job.origin,
    destination:job.destination,
    origin_airport:flight?.origin_airport||null,
