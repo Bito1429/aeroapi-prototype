@@ -13,7 +13,6 @@ export function toChesterV1(draft,{airports,airline,aircraftType,expiresAt,pois=
  if(!airline?.code||!airline?.name)fail("airline");
  if(!aircraftType)fail("aircraft_type");
  if(!expiresAt||!Number.isFinite(Date.parse(expiresAt)))fail("expires_at");
- const toPoint=p=>[p.latitude,p.longitude];
  const pts=r.fixes.map(p=>({name:p.name||null,lat:p.latitude,lon:p.longitude}));
  if(pts.some(p=>!Number.isFinite(p.lat)||!Number.isFinite(p.lon)))fail("route.coordinates");
  const timeline=r.timeline||[];
@@ -23,6 +22,9 @@ export function toChesterV1(draft,{airports,airline,aircraftType,expiresAt,pois=
  const generatedAt=draft.generated_at;
  if(!generatedAt||!Number.isFinite(Date.parse(generatedAt)))fail("generated_at");
  const airborneMinutes=duration/60;
+ // Never invent ground speeds or climb/descent phases to satisfy the checker.
+ // A calibrated timeline with measured or explicitly modelled speeds and phases is required.
+ if(timeline.some(p=>!Number.isFinite(p.gs_kmh)||!["takeoff","climb","cruise","descent","landing"].includes(p.phase)))fail("timeline.phase_or_groundspeed");
  const out={
   schema:"aevpath.package.v1",schema_minor:0,
   package_version:"system-"+generatedAt.replace(/[^0-9]/g,""),
@@ -53,8 +55,8 @@ export function toChesterV1(draft,{airports,airline,aircraftType,expiresAt,pois=
    t_min:Number((p.fraction*airborneMinutes).toFixed(3)),
    lat:p.latitude,lon:p.longitude,
    dist_km:Number((p.fraction*r.distance_km).toFixed(3)),
-   phase:i===0?"takeoff":i===timeline.length-1?"landing":"cruise",
-   gs_kmh:null
+   phase:p.phase,
+   gs_kmh:p.gs_kmh
   })),
   pois,
   eta:{
