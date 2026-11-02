@@ -106,6 +106,8 @@ export async function buildDraftPackage(flightId){
  }
  const s=sanity(protocol);
  const estimatedOff=flight?.estimated_off||cap?.estimated_off||null;
+ // Gate departure is distinct from takeoff; never fall back to estimated_off.
+ const estimatedOut=flight?.estimated_out||cap?.estimated_out||null;
  const startIso=estimatedOff||flight?.scheduled_off||job.scheduled_out_initial||null;
  const durationSeconds=Number(cap?.filed_ete_seconds||flight?.filed_ete||0)||null;
  const points=protocol.fixes.filter(p=>Number.isFinite(p?.latitude)&&Number.isFinite(p?.longitude)).map(p=>({name:p.name||null,latitude:p.latitude,longitude:p.longitude}));
@@ -125,7 +127,8 @@ export async function buildDraftPackage(flightId){
    origin_airport:flight?.origin_airport||null,
    destination_airport:flight?.destination_airport||null,
    scheduled_out:job.scheduled_out_initial,
-   estimated_off:estimatedOff
+   estimated_off:estimatedOff,
+   estimated_out:estimatedOut
   },
   route:{
    canonical_hash:protocol.canonical_hash||cap?.canonical_hash||null,
