@@ -112,7 +112,8 @@ export async function buildDraftPackage(flightId){
  const gateMs=estimatedOut?Date.parse(estimatedOut):NaN;
  const checkAgainAfter=!actualTakeoff&&Number.isFinite(gateMs)?new Date(gateMs-30*60000).toISOString():null;
  const startIso=estimatedOff||flight?.scheduled_off||job.scheduled_out_initial||null;
- const durationSeconds=Number(cap?.filed_ete_seconds||flight?.filed_ete||0)||null;
+ const rawDuration=cap?.filed_ete_seconds??flight?.filed_ete;
+ const durationSeconds=rawDuration==null||rawDuration===""?null:Number(rawDuration);
  const points=protocol.fixes.filter(p=>Number.isFinite(p?.latitude)&&Number.isFinite(p?.longitude)).map(p=>({name:p.name||null,latitude:p.latitude,longitude:p.longitude}));
  const corridor=corridorMeta();
  const confidenceHalfWidth=CORRIDOR_CALIBRATION.confidence_half_width_km;
