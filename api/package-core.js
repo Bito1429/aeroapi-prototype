@@ -108,6 +108,9 @@ export async function buildDraftPackage(flightId){
  const estimatedOff=flight?.estimated_off||cap?.estimated_off||null;
  // Gate departure is distinct from takeoff; never fall back to estimated_off.
  const estimatedOut=flight?.estimated_out||cap?.estimated_out||null;
+ const actualTakeoff=flight?.actual_off||cap?.actual_off||null;
+ const gateMs=estimatedOut?Date.parse(estimatedOut):NaN;
+ const checkAgainAfter=!actualTakeoff&&Number.isFinite(gateMs)?new Date(gateMs-30*60000).toISOString():null;
  const startIso=estimatedOff||flight?.scheduled_off||job.scheduled_out_initial||null;
  const durationSeconds=Number(cap?.filed_ete_seconds||flight?.filed_ete||0)||null;
  const points=protocol.fixes.filter(p=>Number.isFinite(p?.latitude)&&Number.isFinite(p?.longitude)).map(p=>({name:p.name||null,latitude:p.latitude,longitude:p.longitude}));
@@ -118,6 +121,7 @@ export async function buildDraftPackage(flightId){
   status:"READY",
   package_version:1,
   source_captured_at:cap?.captured_at||null,
+  ...(checkAgainAfter?{check_again_after:checkAgainAfter}:{}),
   sale_state:state,
   flight:{
    id:flightId,
