@@ -29,8 +29,8 @@ export function windowAround(centerIso,halfWidthMinutes){
  return{early:new Date(t-d).toISOString(),late:new Date(t+d).toISOString()};
 }
 export function airborneOffsets(filedEteSeconds){
- const duration=Number(filedEteSeconds);
- if(!Number.isFinite(duration))return null;
+ const duration=filedEteSeconds==null||filedEteSeconds===""?NaN:Number(filedEteSeconds);
+ if(!Number.isFinite(duration)||duration<=0)return null;
  const half=ETA_CALIBRATION.airborne.half_width_minutes*60;
  return{
   landing_center_offset_seconds:duration,
@@ -39,7 +39,7 @@ export function airborneOffsets(filedEteSeconds){
  };
 }
 export function etaPackage({estimatedOff=null,filedEteSeconds=null}={}){
- const duration=Number(filedEteSeconds);
+ const duration=filedEteSeconds==null||filedEteSeconds===""?NaN:Number(filedEteSeconds);
  const preCenter=estimatedOff&&Number.isFinite(duration)?addSeconds(estimatedOff,duration):null;
  return{
   calibration_version:ETA_CALIBRATION.version,
