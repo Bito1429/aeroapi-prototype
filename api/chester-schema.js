@@ -52,9 +52,9 @@ export function toChesterV1(draft,{airports,airline,aircraftType,expiresAt,pois=
    statistical:{half_width_km:18,coverage:0.8}
   },
   timeline:timeline.map((p,i)=>({
-   t_min:Number((p.fraction*airborneMinutes).toFixed(3)),
+   t_min:p.t_min,
    lat:p.latitude,lon:p.longitude,
-   dist_km:Number((p.fraction*r.distance_km).toFixed(3)),
+   dist_km:p.dist_km,
    phase:p.phase,
    gs_kmh:p.gs_kmh
   })),
@@ -68,5 +68,6 @@ export function toChesterV1(draft,{airports,airline,aircraftType,expiresAt,pois=
   ...(draft.check_again_after?{check_again_after:draft.check_again_after}:{})
  };
  if(!out.flight.scheduled_departure)fail("scheduled_departure");
+ if(!f.estimated_out&&!f.actual_off)fail("estimated_out");
  return out;
 }
