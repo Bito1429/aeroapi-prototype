@@ -19,3 +19,6 @@ Evidence:
 
 ### Reporting
 Daily one-line evidence-based update scheduled 3–6 Nov around 19:00 UK; separate risk alert Wed 4 Nov around 18:00 UK. These automations report state; they do not themselves constitute a checker run.
+
+## 2026-11-02 — Deadline accelerated by owner
+**New required target: Tue 3 Nov, no later than Wed 4 Nov 2026** for system-generated Chester checker v1.1 PASS and deliverable endpoint. Friday 6 Nov is no longer an acceptable completion target. Prioritize live endpoint integration, genuine permitted source data, checker evidence, deployment smoke test. Escalate immediately on any blocker; do not infer PASS. As of this entry, no verified checker PASS exists and accelerated deadline is at risk.
