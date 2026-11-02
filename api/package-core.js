@@ -4,6 +4,7 @@ import{havKm,polyKm}from"./lib.js";
 import{etaPackage}from"./eta-calibration.js";
 import{CORRIDOR_CALIBRATION,corridorMeta}from"./corridor-calibration.js";
 import{persistEtaAudit}from"./eta-audit.js";
+import{modelFiledTimeline}from"./filed-timeline.js";
 
 function round(n,d=6){return Number.isFinite(n)?+n.toFixed(d):null;}
 function stable(value){
@@ -141,7 +142,7 @@ export async function buildDraftPackage(flightId){
    distance_km:protocol.computed_km??cap?.baseline_km??null,
    fixes:points,
    resolver_sanity:s,
-   timeline:denseTimeline(points,{startIso,durationSeconds,maxMinutes:2,maxKm:25})
+   timeline:Number.isFinite(durationSeconds)&&durationSeconds>0?modelFiledTimeline(points,{durationSeconds,distanceKm:protocol.computed_km??cap?.baseline_km??null}):[]
   },
   eta,
   corridor:{
