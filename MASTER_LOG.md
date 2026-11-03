@@ -22,3 +22,17 @@ Daily one-line evidence-based update scheduled 3–6 Nov around 19:00 UK; separa
 
 ## 2026-11-02 — Deadline accelerated by owner
 **New required target: Tue 3 Nov, no later than Wed 4 Nov 2026** for system-generated Chester checker v1.1 PASS and deliverable endpoint. Friday 6 Nov is no longer an acceptable completion target. Prioritize live endpoint integration, genuine permitted source data, checker evidence, deployment smoke test. Escalate immediately on any blocker; do not infer PASS. As of this entry, no verified checker PASS exists and accelerated deadline is at risk.
+
+## 2026-11-03 07:43 UK — daily engineering gate review
+**RED / immediate risk escalation.** Monday 2 Nov first genuine system-generated Chester package gate is **not evidenced**. No actual checker v1.1 PASS output or generated package fixture was found in accessible GitHub PR #4, deployments, or relevant email. The accepted handmade v3 GOOD remains separate evidence and cannot satisfy the system-generated gate.
+
+Verified:
+- PR #4 is **open, draft, unmerged** at reviewed head `2c06999e7fa708d8bc4be966b716c9d14956c36e`; changed paths: `MASTER_LOG.md`, `api/chester-schema.js`, `api/eta-calibration.js`, `api/filed-timeline.js`, `api/package-core.js`. No endpoint handler changed in this PR; endpoint integration is **not evidenced**.
+- Vercel preview for `2c06999` is READY (`dpl_3cvxiUdZeDR8MLk5hbNzvzmnEaGt`); this is **build status only**, not endpoint or checker PASS. Latest retrieved production deployment remains `main` SHA `775aa3206d581af2244f5f5031b0b24747918845`, not this fix branch.
+- Austen's 1 Nov email says checker v1.1 supersedes previous version and explicitly validates `estimated_out` and check-back at latest estimated gate departure minus 30 minutes; it reports handmade 23 Oct v3 still GOOD with nonblocking notes. His forwarded message says the original ZIP bounced and was removed from the resend. **Checker v1.1 binary / execution output is not available in reviewed evidence**.
+- Source review: `check_again_after` derives from captured `estimated_out` minus 30 minutes and is omitted after actual takeoff; `estimated_off` is separately retained. Frozen `±18 km`, `±9 min` airborne and `±17 min` predeparture remain unchanged. Derived speed/phase model exists, but actual checker compatibility remains unverified.
+- Additional fail-closed ETA correction committed today: `415f44e811046139c34bc714652e7d7688e694af` rejects zero/negative filed ETE for ETA output. Not a checker PASS.
+
+**Milestones:** 2 Nov system-made package: MISSED/NO EVIDENCE; 3–4 Nov accelerated owner deadline: **AT RISK**; 4 Nov internal package gate: unverified; 6 Nov Chester delivery: unverified (owner now requires 4 Nov latest); 9 Nov live search/details/package E2E: not yet evidenced; 10 Nov Chester final deadline: future/unverified.
+
+**Immediate critical path:** obtain actual checker v1.1 executable (Austen resend/link), integrate `toChesterV1` into live package endpoint with real permitted captured flight metadata, produce a system-generated JSON fixture, execute checker and preserve exact stdout/stderr + SHA, smoke-test search/details/package endpoints. Do not merge/deploy on preview READY alone; do not delete raw data or call unlicensed FlightAware trial endpoints.
