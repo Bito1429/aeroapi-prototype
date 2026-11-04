@@ -1,0 +1,648 @@
+{
+  "schema": "aevpath.package.v1",
+  "schema_minor": 0,
+  "package_version": "system-20261104112246599",
+  "flight_id": "ENY6450-1791181975-airline-781p",
+  "market": "US",
+  "generated_at": "2026-11-04T11:22:46.599Z",
+  "expires_at": "2026-10-08T00:00:00.000Z",
+  "frozen_after": "takeoff",
+  "attribution": "Contains AeroAPI data (c) FlightAware LLC 2026 · (c) OpenMapTiles (c) OpenStreetMap contributors",
+  "flight": {
+    "ident": "ENY6450",
+    "ident_icao": "ENY6450",
+    "airline": {
+      "code": "MQ",
+      "name": "Envoy Air"
+    },
+    "origin": {
+      "iata": "ORD",
+      "icao": "KORD",
+      "name": "O'Hare International Airport",
+      "lat": 41.9769403,
+      "lon": -87.9081497,
+      "tz": "America/Chicago"
+    },
+    "destination": {
+      "iata": "CLE",
+      "icao": "KCLE",
+      "name": "Cleveland Hopkins International Airport",
+      "lat": 41.4094069,
+      "lon": -81.8546911,
+      "tz": "America/New_York"
+    },
+    "scheduled_departure": "2026-10-07T12:15:00.000Z",
+    "scheduled_arrival": "2026-10-07T13:41:00Z",
+    "aircraft_type": "E75L",
+    "estimated_out": "2026-10-07T12:15:00Z"
+  },
+  "route": {
+    "total_distance_km": 605.146,
+    "line": [
+      [
+        41.9769403,
+        -87.9081497
+      ],
+      [
+        42.1124722,
+        -87.0633333
+      ],
+      [
+        42.144325,
+        -86.1115056
+      ],
+      [
+        42.1190278,
+        -85.0941667
+      ],
+      [
+        42.0787222,
+        -84.4059167
+      ],
+      [
+        42.00775,
+        -83.3364444
+      ],
+      [
+        41.9905833,
+        -83.1085833
+      ],
+      [
+        41.9770278,
+        -82.935
+      ],
+      [
+        41.9645278,
+        -82.7793056
+      ],
+      [
+        41.9240833,
+        -82.5748889
+      ],
+      [
+        41.8929722,
+        -82.41775
+      ],
+      [
+        41.8525,
+        -82.2133056
+      ],
+      [
+        41.1746667,
+        -81.5410278
+      ],
+      [
+        41.4094069,
+        -81.8546911
+      ]
+    ],
+    "waypoints": [
+      {
+        "name": "KORD",
+        "lat": 41.9769403,
+        "lon": -87.9081497,
+        "type": "Waypoint"
+      },
+      {
+        "name": "DUFEE",
+        "lat": 42.1124722,
+        "lon": -87.0633333,
+        "type": "Waypoint"
+      },
+      {
+        "name": "LOGGR",
+        "lat": 42.144325,
+        "lon": -86.1115056,
+        "type": "Waypoint"
+      },
+      {
+        "name": "DETMR",
+        "lat": 42.1190278,
+        "lon": -85.0941667,
+        "type": "Waypoint"
+      },
+      {
+        "name": "CHUUB",
+        "lat": 42.0787222,
+        "lon": -84.4059167,
+        "type": "Waypoint"
+      },
+      {
+        "name": "FRYYE",
+        "lat": 42.00775,
+        "lon": -83.3364444,
+        "type": "Waypoint"
+      },
+      {
+        "name": "MCKOY",
+        "lat": 41.9905833,
+        "lon": -83.1085833,
+        "type": "Waypoint"
+      },
+      {
+        "name": "WEEDN",
+        "lat": 41.9770278,
+        "lon": -82.935,
+        "type": "Waypoint"
+      },
+      {
+        "name": "RDZON",
+        "lat": 41.9645278,
+        "lon": -82.7793056,
+        "type": "Waypoint"
+      },
+      {
+        "name": "WINNZ",
+        "lat": 41.9240833,
+        "lon": -82.5748889,
+        "type": "Waypoint"
+      },
+      {
+        "name": "GOLIC",
+        "lat": 41.8929722,
+        "lon": -82.41775,
+        "type": "Waypoint"
+      },
+      {
+        "name": "BRWNZ",
+        "lat": 41.8525,
+        "lon": -82.2133056,
+        "type": "Waypoint"
+      },
+      {
+        "name": "USASN",
+        "lat": 41.1746667,
+        "lon": -81.5410278,
+        "type": "Waypoint"
+      },
+      {
+        "name": "KCLE",
+        "lat": 41.4094069,
+        "lon": -81.8546911,
+        "type": "Waypoint"
+      }
+    ],
+    "sanity": {
+      "status": "OK",
+      "reason": null
+    }
+  },
+  "corridor": {
+    "polygon": [
+      [
+        42.029688,
+        -87.923425
+      ],
+      [
+        42.166014,
+        -87.072338
+      ],
+      [
+        42.198284,
+        -86.11183
+      ],
+      [
+        42.172915,
+        -85.090425
+      ],
+      [
+        42.132487,
+        -84.399772
+      ],
+      [
+        42.061486,
+        -83.329854
+      ],
+      [
+        42.04426,
+        -83.101168
+      ],
+      [
+        42.030685,
+        -82.927336
+      ],
+      [
+        42.017464,
+        -82.765256
+      ],
+      [
+        41.976231,
+        -82.556259
+      ],
+      [
+        41.945118,
+        -82.399115
+      ],
+      [
+        41.888783,
+        -82.159644
+      ],
+      [
+        41.20251,
+        -81.478927
+      ],
+      [
+        41.371357,
+        -81.906095
+      ],
+      [
+        41.447457,
+        -81.803287
+      ],
+      [
+        41.146824,
+        -81.603128
+      ],
+      [
+        41.816217,
+        -82.266967
+      ],
+      [
+        41.840826,
+        -82.436385
+      ],
+      [
+        41.871936,
+        -82.593519
+      ],
+      [
+        41.911591,
+        -82.793355
+      ],
+      [
+        41.923371,
+        -82.942664
+      ],
+      [
+        41.936907,
+        -83.115999
+      ],
+      [
+        41.954014,
+        -83.343035
+      ],
+      [
+        42.024957,
+        -84.412061
+      ],
+      [
+        42.06514,
+        -85.097908
+      ],
+      [
+        42.090366,
+        -86.111181
+      ],
+      [
+        42.058931,
+        -87.054329
+      ],
+      [
+        41.924192,
+        -87.892874
+      ],
+      [
+        42.029688,
+        -87.923425
+      ]
+    ],
+    "display_half_width_km": 6,
+    "statistical": {
+      "half_width_km": 18,
+      "coverage": 0.8
+    }
+  },
+  "timeline": [
+    {
+      "t_min": 0,
+      "lat": 41.97694,
+      "lon": -87.90815,
+      "dist_km": 0,
+      "phase": "takeoff",
+      "gs_kmh": 174.462
+    },
+    {
+      "t_min": 2,
+      "lat": 41.994076,
+      "lon": -87.80134,
+      "dist_km": 9.023,
+      "phase": "climb",
+      "gs_kmh": 366.94
+    },
+    {
+      "t_min": 4,
+      "lat": 42.02129,
+      "lon": -87.631704,
+      "dist_km": 23.354,
+      "phase": "climb",
+      "gs_kmh": 492.916
+    },
+    {
+      "t_min": 6,
+      "lat": 42.053259,
+      "lon": -87.432429,
+      "dist_km": 40.189,
+      "phase": "cruise",
+      "gs_kmh": 517.171
+    },
+    {
+      "t_min": 8,
+      "lat": 42.085971,
+      "lon": -87.228522,
+      "dist_km": 57.415,
+      "phase": "cruise",
+      "gs_kmh": 516.402
+    },
+    {
+      "t_min": 10,
+      "lat": 42.113788,
+      "lon": -87.024019,
+      "dist_km": 74.616,
+      "phase": "cruise",
+      "gs_kmh": 515.633
+    },
+    {
+      "t_min": 12,
+      "lat": 42.12075,
+      "lon": -86.815966,
+      "dist_km": 91.791,
+      "phase": "cruise",
+      "gs_kmh": 514.863
+    },
+    {
+      "t_min": 14,
+      "lat": 42.127702,
+      "lon": -86.608224,
+      "dist_km": 108.94,
+      "phase": "cruise",
+      "gs_kmh": 514.094
+    },
+    {
+      "t_min": 16,
+      "lat": 42.134644,
+      "lon": -86.400792,
+      "dist_km": 126.064,
+      "phase": "cruise",
+      "gs_kmh": 513.324
+    },
+    {
+      "t_min": 18,
+      "lat": 42.141575,
+      "lon": -86.193671,
+      "dist_km": 143.162,
+      "phase": "cruise",
+      "gs_kmh": 512.555
+    },
+    {
+      "t_min": 20,
+      "lat": 42.141224,
+      "lon": -85.986797,
+      "dist_km": 160.234,
+      "phase": "cruise",
+      "gs_kmh": 511.785
+    },
+    {
+      "t_min": 22,
+      "lat": 42.136087,
+      "lon": -85.780192,
+      "dist_km": 177.281,
+      "phase": "cruise",
+      "gs_kmh": 511.016
+    },
+    {
+      "t_min": 24,
+      "lat": 42.130957,
+      "lon": -85.573898,
+      "dist_km": 194.302,
+      "phase": "cruise",
+      "gs_kmh": 510.246
+    },
+    {
+      "t_min": 26,
+      "lat": 42.125835,
+      "lon": -85.367916,
+      "dist_km": 211.297,
+      "phase": "cruise",
+      "gs_kmh": 509.477
+    },
+    {
+      "t_min": 28,
+      "lat": 42.120721,
+      "lon": -85.162244,
+      "dist_km": 228.267,
+      "phase": "cruise",
+      "gs_kmh": 508.707
+    },
+    {
+      "t_min": 30,
+      "lat": 42.111013,
+      "lon": -84.957302,
+      "dist_km": 245.211,
+      "phase": "cruise",
+      "gs_kmh": 507.938
+    },
+    {
+      "t_min": 32,
+      "lat": 42.099041,
+      "lon": -84.752879,
+      "dist_km": 262.129,
+      "phase": "cruise",
+      "gs_kmh": 507.168
+    },
+    {
+      "t_min": 34,
+      "lat": 42.087088,
+      "lon": -84.548766,
+      "dist_km": 279.022,
+      "phase": "cruise",
+      "gs_kmh": 506.399
+    },
+    {
+      "t_min": 36,
+      "lat": 42.074684,
+      "lon": -84.345069,
+      "dist_km": 295.889,
+      "phase": "cruise",
+      "gs_kmh": 505.629
+    },
+    {
+      "t_min": 38,
+      "lat": 42.061204,
+      "lon": -84.141931,
+      "dist_km": 312.731,
+      "phase": "cruise",
+      "gs_kmh": 504.86
+    },
+    {
+      "t_min": 40,
+      "lat": 42.047743,
+      "lon": -83.939102,
+      "dist_km": 329.547,
+      "phase": "cruise",
+      "gs_kmh": 504.09
+    },
+    {
+      "t_min": 42,
+      "lat": 42.034304,
+      "lon": -83.736582,
+      "dist_km": 346.337,
+      "phase": "cruise",
+      "gs_kmh": 503.321
+    },
+    {
+      "t_min": 44,
+      "lat": 42.020885,
+      "lon": -83.534371,
+      "dist_km": 363.101,
+      "phase": "cruise",
+      "gs_kmh": 502.552
+    },
+    {
+      "t_min": 46,
+      "lat": 42.007451,
+      "lon": -83.332477,
+      "dist_km": 379.84,
+      "phase": "cruise",
+      "gs_kmh": 501.782
+    },
+    {
+      "t_min": 48,
+      "lat": 41.992291,
+      "lon": -83.131255,
+      "dist_km": 396.554,
+      "phase": "cruise",
+      "gs_kmh": 501.013
+    },
+    {
+      "t_min": 50,
+      "lat": 41.976663,
+      "lon": -82.930454,
+      "dist_km": 413.241,
+      "phase": "cruise",
+      "gs_kmh": 500.243
+    },
+    {
+      "t_min": 52,
+      "lat": 41.955064,
+      "lon": -82.731474,
+      "dist_km": 429.903,
+      "phase": "cruise",
+      "gs_kmh": 499.474
+    },
+    {
+      "t_min": 54,
+      "lat": 41.916603,
+      "lon": -82.537106,
+      "dist_km": 446.539,
+      "phase": "cruise",
+      "gs_kmh": 498.704
+    },
+    {
+      "t_min": 56,
+      "lat": 41.878207,
+      "lon": -82.343166,
+      "dist_km": 463.15,
+      "phase": "cruise",
+      "gs_kmh": 497.935
+    },
+    {
+      "t_min": 58,
+      "lat": 41.813085,
+      "lon": -82.174213,
+      "dist_km": 479.735,
+      "phase": "cruise",
+      "gs_kmh": 497.165
+    },
+    {
+      "t_min": 60,
+      "lat": 41.693527,
+      "lon": -82.055635,
+      "dist_km": 496.294,
+      "phase": "cruise",
+      "gs_kmh": 496.396
+    },
+    {
+      "t_min": 62,
+      "lat": 41.574154,
+      "lon": -81.937241,
+      "dist_km": 512.828,
+      "phase": "cruise",
+      "gs_kmh": 495.626
+    },
+    {
+      "t_min": 64,
+      "lat": 41.454966,
+      "lon": -81.81903,
+      "dist_km": 529.336,
+      "phase": "cruise",
+      "gs_kmh": 494.857
+    },
+    {
+      "t_min": 66,
+      "lat": 41.335964,
+      "lon": -81.701003,
+      "dist_km": 545.819,
+      "phase": "cruise",
+      "gs_kmh": 494.087
+    },
+    {
+      "t_min": 68,
+      "lat": 41.217146,
+      "lon": -81.583159,
+      "dist_km": 562.275,
+      "phase": "cruise",
+      "gs_kmh": 493.318
+    },
+    {
+      "t_min": 70,
+      "lat": 41.238384,
+      "lon": -81.626168,
+      "dist_km": 578.199,
+      "phase": "descent",
+      "gs_kmh": 462.081
+    },
+    {
+      "t_min": 72,
+      "lat": 41.320143,
+      "lon": -81.735415,
+      "dist_km": 591.081,
+      "phase": "descent",
+      "gs_kmh": 310.865
+    },
+    {
+      "t_min": 74,
+      "lat": 41.373262,
+      "lon": -81.806393,
+      "dist_km": 599.451,
+      "phase": "descent",
+      "gs_kmh": 191.318
+    },
+    {
+      "t_min": 76,
+      "lat": 41.409407,
+      "lon": -81.854691,
+      "dist_km": 605.146,
+      "phase": "landing",
+      "gs_kmh": 150.398
+    }
+  ],
+  "pois": [],
+  "eta": {
+    "expected_airborne_min": 76,
+    "airborne_window_min": {
+      "earliest": 67,
+      "latest": 85,
+      "coverage": 0.8
+    },
+    "departure": {
+      "estimated_off": "2026-10-07T12:25:00Z",
+      "window_min": {
+        "earliest": -17,
+        "latest": 17,
+        "coverage": 0.8
+      }
+    },
+    "display_label": "Landing window"
+  },
+  "check_again_after": "2026-10-07T11:45:00.000Z"
+}
