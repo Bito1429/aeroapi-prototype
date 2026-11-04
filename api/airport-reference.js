@@ -28,3 +28,22 @@ export function airportView(a){
   longitude
  };
 }
+
+// Static airport identity metadata for persisted captures which predate airportView.
+// Coordinates are taken from captured route fixes, never guessed.
+const KNOWN_AIRPORTS=Object.freeze({
+ KEWR:["EWR","Newark Liberty International Airport","America/New_York"],
+ KSAV:["SAV","Savannah/Hilton Head International Airport","America/New_York"],
+ KJFK:["JFK","John F. Kennedy International Airport","America/New_York"],
+ KLAX:["LAX","Los Angeles International Airport","America/Los_Angeles"],
+ KATL:["ATL","Hartsfield-Jackson Atlanta International Airport","America/New_York"],
+ KORD:["ORD","O'Hare International Airport","America/Chicago"],
+ KSFO:["SFO","San Francisco International Airport","America/Los_Angeles"],
+ KDEN:["DEN","Denver International Airport","America/Denver"],
+ KDFW:["DFW","Dallas Fort Worth International Airport","America/Chicago"]
+});
+export function airportFromFiledFix(icao,fix){
+ const code=String(icao||"").toUpperCase(),meta=KNOWN_AIRPORTS[code];
+ if(!meta||!fix||!Number.isFinite(fix.latitude)||!Number.isFinite(fix.longitude))return null;
+ return {code_iata:meta[0],code_icao:code,name:meta[1],timezone:meta[2],latitude:fix.latitude,longitude:fix.longitude};
+}
