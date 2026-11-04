@@ -14,9 +14,12 @@ export default async function handler(req,res){
   const draft=result.body,flight=draft.flight;
   // The gate, takeoff and airport fields come only from persisted AeroAPI capture.
   const origin=flight.origin_airport,destination=flight.destination_airport;
-  const airline=flight.airline; // operator mapping to be integrated
+  const airline=flight.airline;
   const aircraftType=flight.aircraft_type;
-  // Policy: expire at the first UTC midnight after scheduled landing, as in accepted v3.\n  // This is a derived expiry policy, not a provider-observed field.\n  const arrivalMs=flight.scheduled_arrival?Date.parse(flight.scheduled_arrival):NaN;\n  const expiry=Number.isFinite(arrivalMs)?new Date(Math.floor(arrivalMs/86400000)*86400000+86400000).toISOString():null;
+  // Policy: expire at the first UTC midnight after scheduled landing, as in accepted v3.
+  // This is a derived expiry policy, not a provider-observed field.
+  const arrivalMs=flight.scheduled_arrival?Date.parse(flight.scheduled_arrival):NaN;
+  const expiry=Number.isFinite(arrivalMs)?new Date(Math.floor(arrivalMs/86400000)*86400000+86400000).toISOString():null;
   const packageBody=toChesterV1(draft,{
    airports:{origin,destination},airline,aircraftType,expiresAt:expiry
   });
