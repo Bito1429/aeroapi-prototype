@@ -45,3 +45,6 @@ Verified:
 
 ## 2026-11-04 — urgent endpoint implementation
 Commit `4303738e4c5d3a7f954212ebc360d293c8440dd0` adds `api/chester-package.js` endpoint, consuming persisted flight captures and returning Chester schema only when required metadata exists; missing source data returns HTTP 422 rather than invented values. **Not yet a working deliverable**: captured metadata may lack airline and expiry; checker v1.1 still unavailable and no successful generated response or PASS exists. Do not merge or deliver on this commit alone. Immediate requirement: authoritative source of expiry/airline and actual checker v1.1, then smoke test.
+
+## 2026-11-04 — urgent implementation follow-through
+Commits: `479bc3a` derive expiry policy as next UTC midnight after scheduled arrival (matches accepted v3 sample; policy requires product confirmation); `116903e` add Node regression tests (committed, **not executed**); `8508fa8` capture provider operator IATA/name only if both present; `1065cd7` separate display polygon ±6 km from statistical confidence polygon ±18 km; `391a0e0` map captured airport metadata to accepted v3 shape. These are code changes, **not checker PASS**. Git clone in sandbox failed DNS; no live test or checker v1.1 run. Missing provider airline/ICAO metadata remains a possible HTTP 422; do not invent. Do not merge as verified.
