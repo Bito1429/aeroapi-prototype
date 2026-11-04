@@ -13,6 +13,8 @@ export function toChesterV1(draft,{airports,airline,aircraftType,expiresAt,pois=
  if(!airline?.code||!airline?.name)fail("airline");
  if(!aircraftType)fail("aircraft_type");
  if(!expiresAt||!Number.isFinite(Date.parse(expiresAt)))fail("expires_at");
+ // Chester v1.0 refuses packages already expired at generation; do not publish stale captures.
+ if(draft.generated_at&&Date.parse(expiresAt)<=Date.parse(draft.generated_at))fail("expires_at_stale");
  const pts=r.fixes.map(p=>({name:p.name||null,lat:p.latitude,lon:p.longitude}));
  if(pts.some(p=>!Number.isFinite(p.lat)||!Number.isFinite(p.lon)))fail("route.coordinates");
  const timeline=r.timeline||[];
