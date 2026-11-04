@@ -32,6 +32,7 @@ export function airportView(a){
 // Static airport identity metadata for persisted captures which predate airportView.
 // Coordinates are taken from captured route fixes, never guessed.
 const KNOWN_AIRPORTS=Object.freeze({
+ KCLE:["CLE","Cleveland Hopkins International Airport","America/New_York"],
  KEWR:["EWR","Newark Liberty International Airport","America/New_York"],
  KSAV:["SAV","Savannah/Hilton Head International Airport","America/New_York"],
  KJFK:["JFK","John F. Kennedy International Airport","America/New_York"],
