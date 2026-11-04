@@ -29,8 +29,8 @@ export function windowAround(centerIso,halfWidthMinutes){
  return{early:new Date(t-d).toISOString(),late:new Date(t+d).toISOString()};
 }
 export function airborneOffsets(filedEteSeconds){
- const duration=Number(filedEteSeconds);
- if(!Number.isFinite(duration))return null;
+ const duration=filedEteSeconds==null||filedEteSeconds===""?NaN:Number(filedEteSeconds);
+ if(!Number.isFinite(duration)||duration<=0)return null;
  const half=ETA_CALIBRATION.airborne.half_width_minutes*60;
  return{
   landing_center_offset_seconds:duration,
@@ -39,12 +39,13 @@ export function airborneOffsets(filedEteSeconds){
  };
 }
 export function etaPackage({estimatedOff=null,filedEteSeconds=null}={}){
- const duration=Number(filedEteSeconds);
- const preCenter=estimatedOff&&Number.isFinite(duration)?addSeconds(estimatedOff,duration):null;
+ const duration=filedEteSeconds==null||filedEteSeconds===""?NaN:Number(filedEteSeconds);
+ const validDuration=Number.isFinite(duration)&&duration>0;
+ const preCenter=estimatedOff&&validDuration?addSeconds(estimatedOff,duration):null;
  return{
   calibration_version:ETA_CALIBRATION.version,
   baseline_source:ETA_CALIBRATION.baseline_source,
-  duration_seconds:Number.isFinite(duration)?duration:null,
+  duration_seconds:validDuration?duration:null,
   semantics:"LANDING_NOT_GATE_ARRIVAL",
   predeparture:{
    landing_time_center:preCenter,
@@ -57,7 +58,7 @@ export function etaPackage({estimatedOff=null,filedEteSeconds=null}={}){
    center_rule:ETA_CALIBRATION.airborne.center_rule,
    half_width_minutes:ETA_CALIBRATION.airborne.half_width_minutes,
    validated_coverage:ETA_CALIBRATION.airborne.validation_coverage,
-   relative_to_detected_takeoff:airborneOffsets(duration)
+   relative_to_detected_takeoff:validDuration?airborneOffsets(duration):null
   }
  };
 }

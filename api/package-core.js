@@ -4,6 +4,7 @@ import{havKm,polyKm}from"./lib.js";
 import{etaPackage}from"./eta-calibration.js";
 import{CORRIDOR_CALIBRATION,corridorMeta}from"./corridor-calibration.js";
 import{persistEtaAudit}from"./eta-audit.js";
+import{modelFiledTimeline}from"./filed-timeline.js";
 
 function round(n,d=6){return Number.isFinite(n)?+n.toFixed(d):null;}
 function stable(value){
@@ -106,8 +107,14 @@ export async function buildDraftPackage(flightId){
  }
  const s=sanity(protocol);
  const estimatedOff=flight?.estimated_off||cap?.estimated_off||null;
+ // Gate departure is distinct from takeoff; never fall back to estimated_off.
+ const estimatedOut=flight?.estimated_out||cap?.estimated_out||null;
+ const actualTakeoff=flight?.actual_off||cap?.actual_off||null;
+ const gateMs=estimatedOut?Date.parse(estimatedOut):NaN;
+ const checkAgainAfter=!actualTakeoff&&Number.isFinite(gateMs)?new Date(gateMs-30*60000).toISOString():null;
  const startIso=estimatedOff||flight?.scheduled_off||job.scheduled_out_initial||null;
- const durationSeconds=Number(cap?.filed_ete_seconds||flight?.filed_ete||0)||null;
+ const rawDuration=cap?.filed_ete_seconds??flight?.filed_ete;
+ const durationSeconds=rawDuration==null||rawDuration===""?null:Number(rawDuration);
  const points=protocol.fixes.filter(p=>Number.isFinite(p?.latitude)&&Number.isFinite(p?.longitude)).map(p=>({name:p.name||null,latitude:p.latitude,longitude:p.longitude}));
  const corridor=corridorMeta();
  const confidenceHalfWidth=CORRIDOR_CALIBRATION.confidence_half_width_km;
@@ -116,16 +123,23 @@ export async function buildDraftPackage(flightId){
   status:"READY",
   package_version:1,
   source_captured_at:cap?.captured_at||null,
+  ...(checkAgainAfter?{check_again_after:checkAgainAfter}:{}),
   sale_state:state,
   flight:{
    id:flightId,
    ident:job.ident,
+   ident_icao:flight?.ident_icao||null,
+   airline:flight?.airline||null,
+   aircraft_type:flight?.aircraft_type||null,
+   scheduled_arrival:flight?.scheduled_on||null,
+   actual_off:actualTakeoff,
    origin:job.origin,
    destination:job.destination,
    origin_airport:flight?.origin_airport||null,
    destination_airport:flight?.destination_airport||null,
    scheduled_out:job.scheduled_out_initial,
-   estimated_off:estimatedOff
+   estimated_off:estimatedOff,
+   estimated_out:estimatedOut
   },
   route:{
    canonical_hash:protocol.canonical_hash||cap?.canonical_hash||null,
@@ -133,12 +147,13 @@ export async function buildDraftPackage(flightId){
    distance_km:protocol.computed_km??cap?.baseline_km??null,
    fixes:points,
    resolver_sanity:s,
-   timeline:denseTimeline(points,{startIso,durationSeconds,maxMinutes:2,maxKm:25})
+   timeline:Number.isFinite(durationSeconds)&&durationSeconds>0?modelFiledTimeline(points,{durationSeconds,distanceKm:protocol.computed_km??cap?.baseline_km??null}):[]
   },
   eta,
   corridor:{
    ...corridor,
-   confidence_polygon:corridorPolygon(points,confidenceHalfWidth)
+   confidence_polygon:corridorPolygon(points,confidenceHalfWidth),
+   display_polygon:corridorPolygon(points,6)
   },
   generated_at:new Date().toISOString()
  };
