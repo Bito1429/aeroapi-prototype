@@ -18,10 +18,12 @@ export function toChesterV1(draft,{airports,airline,aircraftType,expiresAt,pois=
  const timeline=r.timeline||[];
  if(timeline.length<2||timeline.some(p=>!Number.isFinite(p.fraction)||!Number.isFinite(p.latitude)||!Number.isFinite(p.longitude)))fail("route.timeline");
  const corridor=r.corridor||draft.corridor||{};
- if(!corridor.confidence_polygon?.coordinates?.[0])fail("corridor.polygon");
+ if(!corridor.display_polygon?.coordinates?.[0])fail("corridor.display_polygon");
  const generatedAt=draft.generated_at;
  if(!generatedAt||!Number.isFinite(Date.parse(generatedAt)))fail("generated_at");
  const airborneMinutes=duration/60;
+ const airport=a=>({iata:a.code_iata,icao:a.code_icao,name:a.name,lat:a.latitude,lon:a.longitude,tz:a.timezone});
+ for(const a of [airports.origin,airports.destination])if(!a?.code_iata||!a?.code_icao||!a?.name||!Number.isFinite(a?.latitude)||!Number.isFinite(a?.longitude)||!a?.timezone)fail("airport.metadata");
  // Never invent ground speeds or climb/descent phases to satisfy the checker.
  // A calibrated timeline with measured or explicitly modelled speeds and phases is required.
  if(timeline.some(p=>!Number.isFinite(p.gs_kmh)||!["takeoff","climb","cruise","descent","landing"].includes(p.phase)))fail("timeline.phase_or_groundspeed");
@@ -34,7 +36,7 @@ export function toChesterV1(draft,{airports,airline,aircraftType,expiresAt,pois=
   flight:{
    ident:f.ident,ident_icao:f.ident_icao||f.ident,
    airline,
-   origin:airports.origin,destination:airports.destination,
+   origin:airport(airports.origin),destination:airport(airports.destination),
    scheduled_departure:f.scheduled_out,
    scheduled_arrival:f.scheduled_arrival||null,
    aircraft_type:aircraftType,
@@ -47,7 +49,7 @@ export function toChesterV1(draft,{airports,airline,aircraftType,expiresAt,pois=
    sanity:{status:r.resolver_sanity?.ok?"OK":"FAIL",reason:r.resolver_sanity?.ok?null:r.resolver_sanity?.reason||"UNKNOWN"}
   },
   corridor:{
-   polygon:corridor.confidence_polygon.coordinates[0].map(([lon,lat])=>[lat,lon]),
+   polygon:corridor.display_polygon.coordinates[0].map(([lon,lat])=>[lat,lon]),
    display_half_width_km:6,
    statistical:{half_width_km:18,coverage:0.8}
   },
@@ -69,5 +71,6 @@ export function toChesterV1(draft,{airports,airline,aircraftType,expiresAt,pois=
  };
  if(!out.flight.scheduled_departure)fail("scheduled_departure");
  if(!f.estimated_out&&!f.actual_off)fail("estimated_out");
+ if(!f.ident_icao)fail("ident_icao");
  return out;
 }
