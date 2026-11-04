@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {modelFiledTimeline} from "../api/filed-timeline.js";
 import {toChesterV1} from "../api/chester-schema.js";
+import {airlineFromOperator} from "../api/airline-reference.js";
 const pts=[{name:"KJFK",latitude:40.63993,longitude:-73.77869},{name:"KLAX",latitude:33.9425,longitude:-118.40805}];
 test("filed model is finite, monotonic and conserves filed distance/time",()=>{
  const t=modelFiledTimeline(pts,{durationSeconds:318*60,distanceKm:4072.154});
@@ -14,4 +15,11 @@ test("filed model fails closed on missing duration",()=>assert.deepEqual(modelFi
 test("Chester adapter rejects missing captured airline instead of guessing",()=>{
  const d={status:"READY",flight:{id:"test",estimated_off:"2026-11-04T12:00:00Z"},route:{fixes:pts,distance_km:4072},eta:{duration_seconds:19080}};
  assert.throws(()=>toChesterV1(d,{airports:{origin:{},destination:{}},aircraftType:"A321",expiresAt:"2026-11-05T00:00:00Z"}),/CHESTER_REQUIRED_FIELD:airline/);
+});
+
+test("airline mapping resolves UAL/DAL and rejects unknown operators",()=>{
+ assert.deepEqual(airlineFromOperator("UAL"),{code:"UA",name:"United Airlines"});
+ assert.deepEqual(airlineFromOperator("DAL"),{code:"DL",name:"Delta Air Lines"});
+ assert.deepEqual(airlineFromOperator(null,"AAL123"),{code:"AA",name:"American Airlines"});
+ assert.equal(airlineFromOperator("ZZZ"),null);
 });
