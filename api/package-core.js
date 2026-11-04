@@ -6,6 +6,7 @@ import{CORRIDOR_CALIBRATION,corridorMeta}from"./corridor-calibration.js";
 import{persistEtaAudit}from"./eta-audit.js";
 import{modelFiledTimeline}from"./filed-timeline.js";
 import{airlineFromOperator}from"./airline-reference.js";
+import{airportFromFiledFix}from"./airport-reference.js";
 
 function round(n,d=6){return Number.isFinite(n)?+n.toFixed(d):null;}
 function stable(value){
@@ -136,8 +137,8 @@ export async function buildDraftPackage(flightId){
    actual_off:actualTakeoff,
    origin:job.origin,
    destination:job.destination,
-   origin_airport:flight?.origin_airport||null,
-   destination_airport:flight?.destination_airport||null,
+   origin_airport:flight?.origin_airport||airportFromFiledFix(job.origin,points[0]),
+   destination_airport:flight?.destination_airport||airportFromFiledFix(job.destination,points.at(-1)),
    scheduled_out:job.scheduled_out_initial,
    estimated_off:estimatedOff,
    estimated_out:estimatedOut
