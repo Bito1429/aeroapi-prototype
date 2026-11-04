@@ -5,6 +5,7 @@ import{etaPackage}from"./eta-calibration.js";
 import{CORRIDOR_CALIBRATION,corridorMeta}from"./corridor-calibration.js";
 import{persistEtaAudit}from"./eta-audit.js";
 import{modelFiledTimeline}from"./filed-timeline.js";
+import{airlineFromOperator}from"./airline-reference.js";
 
 function round(n,d=6){return Number.isFinite(n)?+n.toFixed(d):null;}
 function stable(value){
@@ -128,8 +129,8 @@ export async function buildDraftPackage(flightId){
   flight:{
    id:flightId,
    ident:job.ident,
-   ident_icao:flight?.ident_icao||null,
-   airline:flight?.airline||null,
+   ident_icao:flight?.ident_icao||(/^([A-Z]{3})\d/.test(job.ident||"")?job.ident:null),
+   airline:flight?.airline||airlineFromOperator(flight?.operator_icao,flight?.ident_icao||job.ident),
    aircraft_type:flight?.aircraft_type||null,
    scheduled_arrival:flight?.scheduled_on||null,
    actual_off:actualTakeoff,
