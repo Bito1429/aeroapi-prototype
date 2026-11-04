@@ -1,0 +1,46 @@
+name: Europe trial preview
+on:
+  schedule:
+    - cron: '0,15,30,45 * * * *'
+  workflow_dispatch:
+    inputs:
+      phase:
+        description: 'seed, predict, or score'
+        required: true
+        default: 'seed'
+        type: choice
+        options: [seed, predict, score]
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: europe-trial-preview-collector
+  cancel-in-progress: false
+jobs:
+  europe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Call protected Europe preview with GitHub OIDC
+        env:
+          ENDPOINT: https://aeroapi-prototype-git-trial-europe-opti-b2167a-benitogaldo-5827.vercel.app
+          MANUAL_PHASE: ${{ inputs.phase }}
+        run: |
+          set -euo pipefail
+          if [ -n "$MANUAL_PHASE" ]; then
+            PHASE="$MANUAL_PHASE"
+          else
+            case "$(date -u +%M)" in
+              00) PHASE=seed ;;
+              15) PHASE=predict ;;
+              30) PHASE=score ;;
+              *) PHASE=predict ;;
+            esac
+          fi
+          OIDC="$(curl --fail --silent --show-error --max-time 10 \
+            -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=aevpath-europe-option-b-20261104" | jq -r .value)"
+          test -n "$OIDC" && test "$OIDC" != null
+          curl --fail-with-body --silent --show-error --max-time 170 \
+            -X POST -H "Authorization: Bearer $OIDC" \
+            "$ENDPOINT/api/europe-option-b?phase=$PHASE"
