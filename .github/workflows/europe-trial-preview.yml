@@ -1,0 +1,27 @@
+name: Europe trial collector (manual preview)
+on:
+  workflow_dispatch:
+    inputs:
+      phase:
+        description: 'seed, predict, or score'
+        required: true
+        default: 'seed'
+        type: choice
+        options: [seed, predict, score]
+permissions:
+  contents: read
+jobs:
+  europe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Call protected Europe preview endpoint
+        env:
+          TOKEN: ${{ secrets.EUROPE_RUNNER_TOKEN }}
+          ENDPOINT: https://aeroapi-prototype-git-trial-europe-opti-b2167a-benitogaldo-5827.vercel.app
+          PHASE: ${{ inputs.phase }}
+        run: |
+          test -n "$TOKEN" || { echo 'EUROPE_RUNNER_TOKEN secret missing'; exit 1; }
+          curl --fail-with-body --silent --show-error --max-time 150 \
+            -X POST -H "Authorization: Bearer $TOKEN" \
+            "$ENDPOINT/api/europe-option-b?phase=$PHASE"
