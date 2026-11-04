@@ -152,7 +152,8 @@ export async function buildDraftPackage(flightId){
   eta,
   corridor:{
    ...corridor,
-   confidence_polygon:corridorPolygon(points,confidenceHalfWidth)
+   confidence_polygon:corridorPolygon(points,confidenceHalfWidth),
+   display_polygon:corridorPolygon(points,6)
   },
   generated_at:new Date().toISOString()
  };
