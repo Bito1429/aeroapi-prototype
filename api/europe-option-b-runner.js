@@ -25,8 +25,18 @@ async function request(db,path){assertTrialWindow();const key=assertTrialKey();i
 const flightDate=f=>iso(f.scheduled_out||f.scheduled_off||f.estimated_out);
 const landed=f=>Boolean(f.actual_on||f.actual_in);
 export async function runEurope(phase){
- assertTrialWindow();assertTrialKey();if(!["seed","predict","score"].includes(phase))throw Error("PHASE_NOT_ALLOWED");
+ assertTrialWindow();assertTrialKey();if(!["probe","seed","predict","score"].includes(phase))throw Error("PHASE_NOT_ALLOWED");
  const db=sql();const [st]=await db`select halted from europe_option_b.trial_state where id=1`;if(st?.halted)throw Error("EUROPE_HALTED");
+ if(phase==="probe"){
+  let result="UNKNOWN",calls=0,status="FAILED";
+  try{
+   // One history track request using UK-linked flight metadata only; no pretrial track reuse.
+   const track=await request(db,"/flights/WZZ1006-1790410938-airline-1672p/track");calls=1;
+   const p=points(track.positions||track.track);result=p.length>=2?"TRACK_AVAILABLE":"TRACK_EMPTY";status="OK";
+  }catch(e){result=String(e.message).slice(0,100);if(/PROVIDER_HTTP_|EUROPE_USAGE_STOP|FORBIDDEN_PROVIDER_FIELDS/.test(result))calls=1}
+  await db`insert into europe_option_b.run_audit(phase,request_count,predicted_count,scored_count,details) values('probe',${calls},0,0,${JSON.stringify({result,status})}::jsonb)`;
+  return {phase,requests:calls,result,status};
+ }
  const routes=await db`select route_key from europe_option_b.route_manifest order by uk_priority desc,route_key`;
  let calls=0,locked=0,scored=0,seeded=0,failures=0;
  const budget=phase==="seed"?Math.min(24,MAX_REQUESTS):Math.min(32,MAX_REQUESTS);
