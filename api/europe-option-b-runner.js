@@ -23,7 +23,7 @@ async function request(db,path){assertTrialWindow();const key=assertTrialKey();i
   const raw=(await r.text()).slice(0,1200);let detail="";
   try{const j=JSON.parse(raw);detail=String(j.error?.message||j.error||j.message||j.detail||"")}catch{detail=""}
   // Error message only: never retain response objects, tracks, coordinates, or credentials.
-  detail=detail.replace(/[A-Za-z0-9_-]{25,}/g,"[redacted]").replace(/https?:\\/\\/\\S+/g,"[url]").replace(/[\\r\\n]/g," ").slice(0,160);
+  detail=detail.replace(/[A-Za-z0-9_-]{25,}/g,"[redacted]").replace(/https?:[^ ]+/g,"[url]").replace(/[\r\n]/g," ").slice(0,160);
   throw Error("PROVIDER_HTTP_"+r.status+(detail?" "+detail:""));
  }
  const b=await r.json();if(/predicted_|foresight|cirium/i.test(JSON.stringify(b)))throw Error("FORBIDDEN_PROVIDER_FIELDS");return b;
