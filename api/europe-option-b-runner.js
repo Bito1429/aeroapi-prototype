@@ -59,8 +59,11 @@ export async function runEurope(phase){
  const keyFor=f=>{const ident=String(f.ident_icao||f.ident||"");const o=String(f.origin?.code_icao||f.origin?.code||"");const d=String(f.destination?.code_icao||f.destination?.code||"");return [...routes.keys()].find(k=>{const a=k.split("|");return a[1]===ident&&a[2]===o&&a[3]===d})};
  if(phase==="collect"){
   // Only live/current airport departures; no history, no lookback parameters.
-  const airport=airports[Math.floor(Date.now()/900000)%Math.max(airports.length,1)];
-  if(airport){
+  // Rotate across three distinct UK-route departure airports per collect run.
+  // Leave request budget for checking and capturing already-enrolled landed flights.
+  const start=(Math.floor(Date.now()/900000)*3)%Math.max(airports.length,1);
+  const scan=Array.from({length:Math.min(3,airports.length)},(_,i)=>airports[(start+i)%airports.length]);
+  for(const airport of scan){
    try{
     const data=await invoke("/airports/"+airport+"/flights/departures?max_pages=1");
     for(const f of (data.departures||[])){
