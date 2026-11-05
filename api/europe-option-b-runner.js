@@ -60,10 +60,10 @@ export async function runEurope(phase){
   }catch(e){if(/EUROPE_USAGE_STOP|EUROPE_HALTED|DAILY_REQUEST_CAP/.test(e.message))throw e;failures++}}
  }else{
   const [today]=await db`select count(*)::int n from europe_option_b.trial_flights where locked_at >= date_trunc('day',now() at time zone 'UTC')`;
-  for(const r of (phase==="seed"?await db`select m.route_key from europe_option_b.route_manifest m left join europe_option_b.seed_tracks s on s.route_key=m.route_key where m.uk_priority=true group by m.route_key having count(s.flight_id)<6 order by count(s.flight_id) desc,m.route_key limit 1`:routes)){if(calls>=budget||phase==="predict"&&today.n+locked>=MAX_FLIGHTS)break;
+  for(const r of (phase==="seed"?await db`select m.route_key from europe_option_b.route_manifest m left join europe_option_b.seed_tracks s on s.route_key=m.route_key where m.uk_priority=true group by m.route_key having count(s.flight_id)<6 order by count(s.flight_id) desc,case when split_part(m.route_key,'|',3) in ('EGKK','EGSS','EGCC','EGGW','EGGD','EGPH') then 0 else 1 end,m.route_key limit 24`:routes)){if(calls>=budget||phase==="predict"&&today.n+locked>=MAX_FLIGHTS)break;
    const [op,ident,origin,dest]=r.route_key.split("|");if(!valid(ident)||!origin||!dest)continue;
    try{
-    const start=new Date(Math.max(Date.parse("2026-11-04T00:00:00Z"),Date.now()-48*3600000)).toISOString();
+    const start=new Date(Date.now()-14*86400000).toISOString();
     const history=await request(db,"/flights/"+ident+"?start="+encodeURIComponent(start)+"&end="+encodeURIComponent(new Date().toISOString())+"&max_pages=1");calls++;
     const flights=(history.flights||[]).filter(f=>(f.origin?.code_icao||f.origin?.code)===origin&&(f.destination?.code_icao||f.destination?.code)===dest&&valid(f.fa_flight_id));
     if(phase==="seed"){
