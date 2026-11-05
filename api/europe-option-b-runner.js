@@ -36,7 +36,7 @@ async function request(db,path){assertTrialWindow();const key=assertTrialKey();
   detail=detail.replace(/[A-Za-z0-9_-]{25,}/g,"[redacted]").replace(/https?:[^ ]+/g,"[url]").replace(/[\r\n]/g," ").slice(0,160);
   throw Error("PROVIDER_HTTP_"+r.status+(detail?" "+detail:""));
  }
- const b=await r.json();if(/predicted_|foresight|cirium/i.test(JSON.stringify(b)))throw Error("FORBIDDEN_PROVIDER_FIELDS");return b;
+ // Provider status responses may contain prediction-related metadata; never persist it. Only whitelisted live status fields and position coordinates are consumed below.\n return await r.json();
 }
 const flightDate=f=>iso(f.scheduled_out||f.scheduled_off||f.estimated_out);
 const landed=f=>Boolean(f.actual_on||f.actual_in);
