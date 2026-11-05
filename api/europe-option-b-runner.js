@@ -1,6 +1,6 @@
 import { neon } from "@neondatabase/serverless";
 import { assertTrialWindow,assertTrialKey,assertCleanDerived } from "./europe-option-b-core.js";
-const MAX_FLIGHTS=150,MAX_REQUESTS=1000,BASE="https://aeroapi.flightaware.com/aeroapi";
+const MAX_FLIGHTS=150,MAX_REQUESTS=300,BASE="https://aeroapi.flightaware.com/aeroapi";
 const sql=()=>{if(!process.env.EUROPE_DATABASE_URL)throw Error("EUROPE_DB_MISSING");return neon(process.env.EUROPE_DATABASE_URL)};
 const valid=s=>/^[A-Za-z0-9_-]{1,90}$/.test(s);
 const iso=s=>s&&Number.isFinite(Date.parse(s))?new Date(s).toISOString():null;
@@ -31,7 +31,7 @@ async function request(db,path){assertTrialWindow();const key=assertTrialKey();i
 const flightDate=f=>iso(f.scheduled_out||f.scheduled_off||f.estimated_out);
 const landed=f=>Boolean(f.actual_on||f.actual_in);
 export async function runEurope(phase){
- assertTrialWindow();assertTrialKey();if(!["probe","seed","predict","score"].includes(phase))throw Error("PHASE_NOT_ALLOWED");
+ assertTrialWindow();assertTrialKey();if(!["collect","predict","score"].includes(phase))throw Error("PHASE_NOT_ALLOWED");
  const db=sql();const [st]=await db`select halted from europe_option_b.trial_state where id=1`;if(st?.halted)throw Error("EUROPE_HALTED");
  if(phase==="probe"){
   let result="UNKNOWN",calls=0,status="FAILED";
@@ -43,9 +43,10 @@ export async function runEurope(phase){
   await db`insert into europe_option_b.run_audit(phase,request_count,predicted_count,scored_count,details) values('probe',${calls},0,0,${JSON.stringify({result,status})}::jsonb)`;
   return {phase,requests:calls,result,status};
  }
- const routes=await db`select route_key from europe_option_b.route_manifest order by uk_priority desc,route_key`;
+ const routes=await db`select route_key from europe_option_b.route_manifest where uk_priority=true order by route_key limit 50`;
  let calls=0,locked=0,scored=0,seeded=0,failures=0;
  const budget=8;
+ if(phase==="collect"){await db`insert into europe_option_b.run_audit(phase,request_count,predicted_count,scored_count,details) values(${phase},0,0,0,${JSON.stringify({status:"COLLECTION_PAUSED_PENDING_LIVE_CAPTURE"})}::jsonb)`;return {phase,requests:0,status:"COLLECTION_PAUSED_PENDING_LIVE_CAPTURE"};}
  if(phase==="score"){
   const pending=await db`select flight_id,route_key,locked_path from europe_option_b.trial_flights where locked_at is not null and scored_at is null order by departure_at asc limit 24`;
   for(const f of pending){if(calls+2>budget)break;try{
@@ -59,6 +60,7 @@ export async function runEurope(phase){
    scored++;
   }catch(e){if(/EUROPE_USAGE_STOP|EUROPE_HALTED|DAILY_REQUEST_CAP/.test(e.message))throw e;failures++}}
  }else{
+  if(phase!=="predict")throw Error("HISTORY_SEEDING_DISABLED");
   const [today]=await db`select count(*)::int n from europe_option_b.trial_flights where locked_at >= date_trunc('day',now() at time zone 'UTC')`;
   for(const r of (phase==="seed"?await db`select m.route_key from europe_option_b.route_manifest m left join europe_option_b.seed_tracks s on s.route_key=m.route_key where m.uk_priority=true group by m.route_key having count(s.flight_id)<6 order by count(s.flight_id) desc,case when split_part(m.route_key,'|',3) in ('EGKK','EGSS','EGCC','EGGW','EGGD','EGPH') then 0 else 1 end,m.route_key limit 24`:routes)){if(calls>=budget||phase==="predict"&&today.n+locked>=MAX_FLIGHTS)break;
    const [op,ident,origin,dest]=r.route_key.split("|");if(!valid(ident)||!origin||!dest)continue;
@@ -66,7 +68,7 @@ export async function runEurope(phase){
     const start=new Date(Date.now()-14*86400000).toISOString();
     const history=await request(db,"/flights/"+ident+"?start="+encodeURIComponent(start)+"&end="+encodeURIComponent(new Date().toISOString())+"&max_pages=1");calls++;
     const flights=(history.flights||[]).filter(f=>(f.origin?.code_icao||f.origin?.code)===origin&&(f.destination?.code_icao||f.destination?.code)===dest&&valid(f.fa_flight_id));
-    if(phase==="seed"){
+    if(false){
      const past=flights.filter(landed).slice(0,6);
      for(const f of past){if(calls>=budget)break;const [exists]=await db`select 1 ok from europe_option_b.seed_tracks where flight_id=${f.fa_flight_id}`;if(exists)continue;
       const t=await request(db,"/flights/"+f.fa_flight_id+"/track");calls++;const p=points(t.positions||t.track);if(p.length<2)continue;
