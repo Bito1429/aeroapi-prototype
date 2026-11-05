@@ -45,4 +45,5 @@ jobs:
           test -n "$VERCEL_BYPASS" || { echo "Vercel automation bypass secret missing"; exit 1; }
           curl --fail-with-body --silent --show-error --max-time 170 \
             -X POST -H "Authorization: Bearer $OIDC" \
+            -H "x-vercel-protection-bypass: $VERCEL_BYPASS" \
             "$ENDPOINT/api/europe-option-b?phase=$PHASE"
