@@ -46,6 +46,7 @@ export async function runEurope(phase){
  const routes=await db`select route_key from europe_option_b.route_manifest where uk_priority=true order by route_key limit 50`;
  let calls=0,locked=0,scored=0,seeded=0,failures=0;
  const budget=8;
+ if(phase==="predict"){await db`insert into europe_option_b.run_audit(phase,request_count,predicted_count,scored_count,details) values(${phase},0,0,0,${JSON.stringify({status:"PREDICTION_PAUSED_PENDING_LIVE_DISCOVERY"})}::jsonb)`;return {phase,requests:0,status:"PREDICTION_PAUSED_PENDING_LIVE_DISCOVERY"};}
  if(phase==="collect"){await db`insert into europe_option_b.run_audit(phase,request_count,predicted_count,scored_count,details) values(${phase},0,0,0,${JSON.stringify({status:"COLLECTION_PAUSED_PENDING_LIVE_CAPTURE"})}::jsonb)`;return {phase,requests:0,status:"COLLECTION_PAUSED_PENDING_LIVE_CAPTURE"};}
  if(phase==="score"){
   const pending=await db`select flight_id,route_key,locked_path from europe_option_b.trial_flights where locked_at is not null and scored_at is null order by departure_at asc limit 24`;
