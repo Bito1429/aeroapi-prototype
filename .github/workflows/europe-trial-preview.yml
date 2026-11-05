@@ -9,7 +9,7 @@ on:
         required: true
         default: 'seed'
         type: choice
-        options: [probe, seed, predict, score]
+        options: [collect, predict, score]
 permissions:
   contents: read
   id-token: write
@@ -32,8 +32,8 @@ jobs:
             PHASE="$MANUAL_PHASE"
           else
             case "$(date -u +%M)" in
-              00) PHASE=seed ;;
-              15) PHASE=seed ;;
+              00) PHASE=collect ;;
+              15) PHASE=collect ;;
               30) PHASE=predict ;;
               *) PHASE=score ;;
             esac
