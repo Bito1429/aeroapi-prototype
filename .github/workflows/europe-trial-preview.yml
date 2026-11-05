@@ -25,6 +25,7 @@ jobs:
         env:
           ENDPOINT: https://aeroapi-prototype-git-trial-europe-opti-b2167a-benitogaldo-5827.vercel.app
           MANUAL_PHASE: ${{ inputs.phase }}
+          VERCEL_BYPASS: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         run: |
           set -euo pipefail
           if [ -n "$MANUAL_PHASE" ]; then
@@ -41,6 +42,7 @@ jobs:
             -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
             "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=aevpath-europe-option-b-20261104" | jq -r .value)"
           test -n "$OIDC" && test "$OIDC" != null
+          test -n "$VERCEL_BYPASS" || { echo "Vercel automation bypass secret missing"; exit 1; }
           curl --fail-with-body --silent --show-error --max-time 170 \
             -X POST -H "Authorization: Bearer $OIDC" \
             "$ENDPOINT/api/europe-option-b?phase=$PHASE"
