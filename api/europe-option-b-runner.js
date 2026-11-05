@@ -74,9 +74,10 @@ export async function runEurope(phase){
     collected+=ins.length;
     await db`update europe_option_b.trial_flights set state='CAPTURED',arrival_at=${actual} where flight_id=${f.flight_id} and state='ENROLLED'`;
     const stored=await db`select points from europe_option_b.seed_tracks where route_key=${f.route_key} and expires_at>now() order by received_at asc limit 6`;
-    if(stored.length===6){
+    if(stored.length>=1){
      const derived=assertCleanDerived(seed(stored));
-     const insSeed=await db`insert into europe_option_b.route_seeds(route_key,seed_version,source,derived_path) values(${f.route_key},${"live-six-"+new Date().toISOString().slice(0,10)},'live_trial',${JSON.stringify(derived)}::jsonb) on conflict(route_key) do nothing returning route_key`;
+     const version="live-rolling-"+stored.length+"-"+Date.now();
+     const insSeed=await db`insert into europe_option_b.route_seeds(route_key,seed_version,source,derived_path) values(${f.route_key},${version},'live_trial',${JSON.stringify(derived)}::jsonb) on conflict(route_key) do update set seed_version=excluded.seed_version,derived_path=excluded.derived_path,created_at=now() returning route_key`;
      seeded+=insSeed.length;
     }
    }catch(e){if(/EUROPE_USAGE_STOP|EUROPE_HALTED|DAILY_REQUEST_CAP/.test(e.message))throw e;failures++}
@@ -88,6 +89,14 @@ export async function runEurope(phase){
    if(count.n>=MAX_FLIGHTS)break;
    const ins=await db`update europe_option_b.trial_flights set predicted_at=now(),locked_at=now(),seed_version=${f.seed_version},locked_path=${JSON.stringify(f.derived_path)}::jsonb,state='LOCKED' where flight_id=${f.flight_id} and locked_at is null and departure_at>now()+interval '15 minutes' returning flight_id`;
    locked+=ins.length;
+   if(ins.length){
+    const tracks=await db`select flight_id,points from europe_option_b.seed_tracks where route_key=${f.route_key} and expires_at>now() order by received_at desc limit 6`;
+    if(tracks.length){
+     const methods=[["most_recent",assertCleanDerived(resample(points(tracks[0].points)))],["option_b_adaptive",assertCleanDerived(seed(tracks))]];
+     if(tracks.length===6)methods.push(["rolling_six",assertCleanDerived(seed(tracks))]);
+     for(const [method,path] of methods)await db`insert into europe_option_b.method_comparisons(flight_id,method,seed_version,locked_path) values(${f.flight_id},${method},${f.seed_version},${JSON.stringify(path)}::jsonb) on conflict(flight_id,method) do nothing`;
+    }
+   }
   }
  }else if(phase==="score"){
   const pending=await db`select flight_id,locked_path from europe_option_b.trial_flights where state='LOCKED' and locked_at is not null and scored_at is null and departure_at<now()-interval '50 minutes' order by departure_at limit 4`;
@@ -106,6 +115,13 @@ export async function runEurope(phase){
     const err=score(f.locked_path,p);
     const ins=await db`update europe_option_b.trial_flights set arrival_at=${actual},scored_at=now(),score_km=${err},track_receipt_id=${receipt.receipt_id},state='SCORED' where flight_id=${f.flight_id} and scored_at is null returning flight_id`;
     scored+=ins.length;
+    if(ins.length){
+     const comparisons=await db`select method,locked_path from europe_option_b.method_comparisons where flight_id=${f.flight_id} and scored_at is null`;
+     for(const m of comparisons){
+      const error=score(m.locked_path,p);
+      await db`update europe_option_b.method_comparisons set scored_at=now(),error_km=${error} where flight_id=${f.flight_id} and method=${m.method} and scored_at is null`;
+     }
+    }
    }catch(e){if(/EUROPE_USAGE_STOP|EUROPE_HALTED|DAILY_REQUEST_CAP/.test(e.message))throw e;failures++}
   }
  }
