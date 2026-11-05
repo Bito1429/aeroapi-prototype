@@ -104,7 +104,7 @@ export async function runEurope(phase){
    }
   }
  }else if(phase==="score"){
-  const pending=await db`select flight_id,locked_path from europe_option_b.trial_flights where state='LOCKED' and locked_at is not null and scored_at is null and departure_at<now()-interval '50 minutes' order by departure_at limit 4`;
+  const pending=await db`select flight_id,route_key,locked_path from europe_option_b.trial_flights where state='LOCKED' and locked_at is not null and scored_at is null and departure_at<now()-interval '50 minutes' order by departure_at limit 4`;
   for(const f of pending){
    if(calls+2>budget)break;
    try{
@@ -121,6 +121,10 @@ export async function runEurope(phase){
     const ins=await db`update europe_option_b.trial_flights set arrival_at=${actual},scored_at=now(),score_km=${err},track_receipt_id=${receipt.receipt_id},state='SCORED' where flight_id=${f.flight_id} and scored_at is null returning flight_id`;
     scored+=ins.length;
     if(ins.length){
+     const [previous]=await db`select derived_path from europe_option_b.route_seeds where route_key=${f.route_key}`;
+     const updatedPath=adaptivePath(previous?.derived_path||null,p);
+     await db`insert into europe_option_b.route_seeds(route_key,seed_version,source,derived_path) values(${f.route_key},${"adaptive-a030-"+Date.now()},'live_incremental_a030',${JSON.stringify(updatedPath)}::jsonb) on conflict(route_key) do update set seed_version=excluded.seed_version,source=excluded.source,derived_path=excluded.derived_path,created_at=now()`;
+
      const comparisons=await db`select method,locked_path from europe_option_b.method_comparisons where flight_id=${f.flight_id} and scored_at is null`;
      for(const m of comparisons){
       const error=score(m.locked_path,p);
