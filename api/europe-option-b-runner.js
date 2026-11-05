@@ -56,6 +56,13 @@ const landed=f=>Boolean(f.actual_on||f.actual_in);
 export async function runEurope(phase){
  assertTrialWindow();assertTrialKey();if(!["collect","predict","score"].includes(phase))throw Error("PHASE_NOT_ALLOWED");
  const db=sql();const [st]=await db`select halted from europe_option_b.trial_state where id=1`;if(st?.halted)throw Error("EUROPE_HALTED");
+ // Repair previously captured live tracks whose route seed insert failed;
+ // use trial-only, unexpired tracks, in receipt order, without provider calls.
+ const seedRows=await db`select s.route_key,s.points from europe_option_b.seed_tracks s left join europe_option_b.route_seeds r on r.route_key=s.route_key where r.route_key is null and s.expires_at>now() and s.provider='FlightAware' order by s.route_key,s.received_at`;
+ const missing=new Map();
+ for(const row of seedRows)missing.set(row.route_key,adaptivePath(missing.get(row.route_key)||null,row.points));
+ for(const [route,path] of missing)await db`insert into europe_option_b.route_seeds(route_key,seed_version,source,derived_path) values(${route},${"adaptive-a030-"+Date.now()},'fresh_trial',${JSON.stringify(path)}::jsonb) on conflict(route_key) do nothing`;
+
 
  const dbRoutes=await db`select route_key from europe_option_b.route_manifest where uk_priority=true order by case when split_part(route_key,'|',3) in ('EGKK','EGSS','EGCC','EGGW','EGGD','EGPH') then 0 else 1 end,route_key limit 50`;
  const routes=new Map(dbRoutes.map(r=>[r.route_key,r]));
@@ -86,7 +93,7 @@ export async function runEurope(phase){
      const ins=await db`insert into europe_option_b.trial_flights(flight_id,route_key,departure_at,state) values(${id},${route},${departure},'ENROLLED') on conflict(flight_id) do nothing returning flight_id`;
      discovered+=ins.length;
     }
-   }catch(e){if(/EUROPE_USAGE_STOP|EUROPE_HALTED|DAILY_REQUEST_CAP/.test(e.message))throw e;failures++}
+   }catch(e){if(/EUROPE_USAGE_STOP|EUROPE_HALTED|DAILY_REQUEST_CAP/.test(e.message))throw e;failures++;errors.push({message:safeError(e),status:Number((safeError(e).match(/PROVIDER_HTTP_([0-9]+)/)||[])[1])||0,stage:phase});}
   }
   // A flight must have been enrolled during the live trial before a post-landing track is requested.
   const pending=await db`select flight_id,route_key,departure_at from europe_option_b.trial_flights where state='ENROLLED' and departure_at<now()-interval '50 minutes' and departure_at>now()-interval '12 hours' order by departure_at limit 5`;
@@ -108,9 +115,9 @@ export async function runEurope(phase){
     const [previous]=await db`select derived_path from europe_option_b.route_seeds where route_key=${f.route_key}`;
     const derived=adaptivePath(previous?.derived_path||null,p);
     const version="adaptive-a030-"+Date.now();
-    const updated=await db`insert into europe_option_b.route_seeds(route_key,seed_version,source,derived_path) values(${f.route_key},${version},'live_incremental_a030',${JSON.stringify(derived)}::jsonb) on conflict(route_key) do update set seed_version=excluded.seed_version,source=excluded.source,derived_path=excluded.derived_path,created_at=now() returning route_key`;
+    const updated=await db`insert into europe_option_b.route_seeds(route_key,seed_version,source,derived_path) values(${f.route_key},${version},'fresh_trial',${JSON.stringify(derived)}::jsonb) on conflict(route_key) do update set seed_version=excluded.seed_version,source=excluded.source,derived_path=excluded.derived_path,created_at=now() returning route_key`;
     seeded+=updated.length;
-   }catch(e){if(/EUROPE_USAGE_STOP|EUROPE_HALTED|DAILY_REQUEST_CAP/.test(e.message))throw e;failures++}
+   }catch(e){if(/EUROPE_USAGE_STOP|EUROPE_HALTED|DAILY_REQUEST_CAP/.test(e.message))throw e;failures++;errors.push({message:safeError(e),status:Number((safeError(e).match(/PROVIDER_HTTP_([0-9]+)/)||[])[1])||0,stage:phase});}
   }
  }else if(phase==="predict"){
   const candidates=await db`select t.flight_id,t.route_key,t.departure_at,s.seed_version,s.derived_path from europe_option_b.trial_flights t join europe_option_b.route_seeds s on s.route_key=t.route_key where t.state='ENROLLED' and t.locked_at is null and t.departure_at>now()+interval '15 minutes' and t.departure_at<now()+interval '8 hours' order by t.departure_at limit 150`;
@@ -148,7 +155,7 @@ export async function runEurope(phase){
     if(ins.length){
      const [previous]=await db`select derived_path from europe_option_b.route_seeds where route_key=${f.route_key}`;
      const updatedPath=adaptivePath(previous?.derived_path||null,p);
-     await db`insert into europe_option_b.route_seeds(route_key,seed_version,source,derived_path) values(${f.route_key},${"adaptive-a030-"+Date.now()},'live_incremental_a030',${JSON.stringify(updatedPath)}::jsonb) on conflict(route_key) do update set seed_version=excluded.seed_version,source=excluded.source,derived_path=excluded.derived_path,created_at=now()`;
+     await db`insert into europe_option_b.route_seeds(route_key,seed_version,source,derived_path) values(${f.route_key},${"adaptive-a030-"+Date.now()},'fresh_trial',${JSON.stringify(updatedPath)}::jsonb) on conflict(route_key) do update set seed_version=excluded.seed_version,source=excluded.source,derived_path=excluded.derived_path,created_at=now()`;
 
      const comparisons=await db`select method,locked_path from europe_option_b.method_comparisons where flight_id=${f.flight_id} and scored_at is null`;
      for(const m of comparisons){
@@ -156,7 +163,7 @@ export async function runEurope(phase){
       await db`update europe_option_b.method_comparisons set scored_at=now(),error_km=${error} where flight_id=${f.flight_id} and method=${m.method} and scored_at is null`;
      }
     }
-   }catch(e){if(/EUROPE_USAGE_STOP|EUROPE_HALTED|DAILY_REQUEST_CAP/.test(e.message))throw e;failures++}
+   }catch(e){if(/EUROPE_USAGE_STOP|EUROPE_HALTED|DAILY_REQUEST_CAP/.test(e.message))throw e;failures++;errors.push({message:safeError(e),status:Number((safeError(e).match(/PROVIDER_HTTP_([0-9]+)/)||[])[1])||0,stage:phase});}
   }
  }
  await db`insert into europe_option_b.run_audit(phase,request_count,predicted_count,scored_count,details) values(${phase},${calls},${locked},${scored},${JSON.stringify({discovered,collected,seeded,failures,errors:errors.slice(0,8)})}::jsonb)`;
