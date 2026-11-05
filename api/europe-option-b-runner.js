@@ -10,6 +10,18 @@ function hav(a,b){const R=6371.0088,d=Math.PI/180,x=(b.latitude-a.latitude)*d,y=
 function resample(p,n=32){if(p.length<2)throw Error("TRACK_TOO_SHORT");const lens=[0];for(let i=1;i<p.length;i++)lens.push(lens.at(-1)+hav(p[i-1],p[i]));const total=lens.at(-1);if(total<1)throw Error("TRACK_TOO_SHORT");return Array.from({length:n},(_,i)=>{const target=total*i/(n-1);let k=1;while(k<lens.length-1&&lens[k]<target)k++;const t=(target-lens[k-1])/(lens[k]-lens[k-1]||1);return {latitude:p[k-1].latitude+(p[k].latitude-p[k-1].latitude)*t,longitude:p[k-1].longitude+(p[k].longitude-p[k-1].longitude)*t}})}
 function median(xs){const s=[...xs].sort((a,b)=>a-b);return(s[(s.length-1)>>1]+s[s.length>>1])/2}
 function seed(tracks){const samples=tracks.map(t=>resample(points(t.points)));return Array.from({length:32},(_,i)=>({latitude:median(samples.map(t=>t[i].latitude)),longitude:median(samples.map(t=>t[i].longitude))}))}
+function stripForbiddenProviderFields(value){
+ if(Array.isArray(value))return value.map(stripForbiddenProviderFields);
+ if(value&&typeof value==="object"){
+  const out={};
+  for(const [key,item] of Object.entries(value)){
+   if(/predicted_|foresight/i.test(key))continue;
+   out[key]=stripForbiddenProviderFields(item);
+  }
+  return out;
+ }
+ return value;
+}
 const OPTION_B_ALPHA=0.3,PATH_POINTS=101;
 function adaptivePath(oldPath,newTrack){
  const incoming=resample(points(newTrack),PATH_POINTS);
@@ -36,7 +48,8 @@ async function request(db,path){assertTrialWindow();const key=assertTrialKey();
   detail=detail.replace(/[A-Za-z0-9_-]{25,}/g,"[redacted]").replace(/https?:[^ ]+/g,"[url]").replace(/[\r\n]/g," ").slice(0,160);
   throw Error("PROVIDER_HTTP_"+r.status+(detail?" "+detail:""));
  }
- // Provider status responses may contain prediction-related metadata; never persist it. Only whitelisted live status fields and position coordinates are consumed below.\n return await r.json();
+ // Discard provider prediction and Foresight fields before any use or storage.
+ return stripForbiddenProviderFields(await r.json());
 }
 const flightDate=f=>iso(f.scheduled_out||f.scheduled_off||f.estimated_out);
 const landed=f=>Boolean(f.actual_on||f.actual_in);
