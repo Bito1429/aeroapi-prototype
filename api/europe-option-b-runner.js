@@ -19,7 +19,13 @@ async function request(db,path){assertTrialWindow();const key=assertTrialKey();i
  const halted=r.status===429||r.status===402||/quota|exceed|billing|credit|usage|rate.limit/i.test(warning)||/^(0|1)$/.test(warning.trim());
  await db`insert into europe_option_b.request_audit(day,status,warning,halted) values((now() at time zone 'UTC')::date,${r.status},${warning},${halted})`;
  if(halted){await db`update europe_option_b.trial_state set halted=true,reason='PROVIDER_USAGE_WARNING' where id=1`;throw Error("EUROPE_USAGE_STOP")}
- if(!r.ok)throw Error("PROVIDER_HTTP_"+r.status);
+ if(!r.ok){
+  const raw=(await r.text()).slice(0,1200);let detail="";
+  try{const j=JSON.parse(raw);detail=String(j.error?.message||j.error||j.message||j.detail||"")}catch{detail=""}
+  // Error message only: never retain response objects, tracks, coordinates, or credentials.
+  detail=detail.replace(/[A-Za-z0-9_-]{25,}/g,"[redacted]").replace(/https?:\\/\\/\\S+/g,"[url]").replace(/[\\r\\n]/g," ").slice(0,160);
+  throw Error("PROVIDER_HTTP_"+r.status+(detail?" "+detail:""));
+ }
  const b=await r.json();if(/predicted_|foresight|cirium/i.test(JSON.stringify(b)))throw Error("FORBIDDEN_PROVIDER_FIELDS");return b;
 }
 const flightDate=f=>iso(f.scheduled_out||f.scheduled_off||f.estimated_out);
@@ -31,9 +37,9 @@ export async function runEurope(phase){
   let result="UNKNOWN",calls=0,status="FAILED";
   try{
    // One history track request using UK-linked flight metadata only; no pretrial track reuse.
-   const track=await request(db,"/flights/WZZ1006-1790410938-airline-1672p/track");calls=1;
-   const p=points(track.positions||track.track);result=p.length>=2?"TRACK_AVAILABLE":"TRACK_EMPTY";status="OK";
-  }catch(e){result=String(e.message).slice(0,100);if(/PROVIDER_HTTP_|EUROPE_USAGE_STOP|FORBIDDEN_PROVIDER_FIELDS/.test(result))calls=1}
+   const history=await request(db,"/flights/WZZ1006?max_pages=1");calls=1;
+   const flights=Array.isArray(history.flights)?history.flights:[];result=flights.length?"HISTORY_AVAILABLE":"HISTORY_EMPTY";status="OK";
+  }catch(e){result=String(e.message).slice(0,200);if(/PROVIDER_HTTP_|EUROPE_USAGE_STOP|FORBIDDEN_PROVIDER_FIELDS/.test(result))calls=1}
   await db`insert into europe_option_b.run_audit(phase,request_count,predicted_count,scored_count,details) values('probe',${calls},0,0,${JSON.stringify({result,status})}::jsonb)`;
   return {phase,requests:calls,result,status};
  }
