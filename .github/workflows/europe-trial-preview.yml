@@ -33,9 +33,9 @@ jobs:
           else
             case "$(date -u +%M)" in
               00) PHASE=seed ;;
-              15) PHASE=predict ;;
-              30) PHASE=score ;;
-              *) PHASE=predict ;;
+              15) PHASE=seed ;;
+              30) PHASE=predict ;;
+              *) PHASE=score ;;
             esac
           fi
           OIDC="$(curl --fail --silent --show-error --max-time 10 \
