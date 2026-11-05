@@ -9,7 +9,7 @@ on:
         required: true
         default: 'seed'
         type: choice
-        options: [seed, predict, score]
+        options: [probe, seed, predict, score]
 permissions:
   contents: read
   id-token: write
