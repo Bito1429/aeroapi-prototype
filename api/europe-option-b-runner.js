@@ -10,6 +10,13 @@ function hav(a,b){const R=6371.0088,d=Math.PI/180,x=(b.latitude-a.latitude)*d,y=
 function resample(p,n=32){if(p.length<2)throw Error("TRACK_TOO_SHORT");const lens=[0];for(let i=1;i<p.length;i++)lens.push(lens.at(-1)+hav(p[i-1],p[i]));const total=lens.at(-1);if(total<1)throw Error("TRACK_TOO_SHORT");return Array.from({length:n},(_,i)=>{const target=total*i/(n-1);let k=1;while(k<lens.length-1&&lens[k]<target)k++;const t=(target-lens[k-1])/(lens[k]-lens[k-1]||1);return {latitude:p[k-1].latitude+(p[k].latitude-p[k-1].latitude)*t,longitude:p[k-1].longitude+(p[k].longitude-p[k-1].longitude)*t}})}
 function median(xs){const s=[...xs].sort((a,b)=>a-b);return(s[(s.length-1)>>1]+s[s.length>>1])/2}
 function seed(tracks){const samples=tracks.map(t=>resample(points(t.points)));return Array.from({length:32},(_,i)=>({latitude:median(samples.map(t=>t[i].latitude)),longitude:median(samples.map(t=>t[i].longitude))}))}
+const OPTION_B_ALPHA=0.3,PATH_POINTS=101;
+function adaptivePath(oldPath,newTrack){
+ const incoming=resample(points(newTrack),PATH_POINTS);
+ if(!oldPath)return assertCleanDerived(incoming);
+ const old=resample(points(oldPath),PATH_POINTS);
+ return assertCleanDerived(old.map((p,i)=>({latitude:(1-OPTION_B_ALPHA)*p.latitude+OPTION_B_ALPHA*incoming[i].latitude,longitude:(1-OPTION_B_ALPHA)*p.longitude+OPTION_B_ALPHA*incoming[i].longitude})));
+}
 function score(path,track){const a=resample(points(track),64),b=points(path);return median(a.map(p=>Math.min(...b.map(q=>hav(p,q)))))}
 async function request(db,path){assertTrialWindow();const key=assertTrialKey();if(!/^\/flights\/[A-Za-z0-9_-]{1,90}(?:\/track)?(?:\?[A-Za-z0-9_=&%:.+-]+)?$/.test(path))throw Error("PATH_BLOCKED");
  const [st]=await db`select halted from europe_option_b.trial_state where id=1`;if(st?.halted)throw Error("EUROPE_HALTED");
@@ -73,13 +80,11 @@ export async function runEurope(phase){
     const ins=await db`insert into europe_option_b.seed_tracks(flight_id,route_key,received_at,points,expires_at) values(${f.flight_id},${f.route_key},${received},${JSON.stringify(p)}::jsonb,${expires}) on conflict(flight_id) do nothing returning flight_id`;
     collected+=ins.length;
     await db`update europe_option_b.trial_flights set state='CAPTURED',arrival_at=${actual} where flight_id=${f.flight_id} and state='ENROLLED'`;
-    const stored=await db`select points from europe_option_b.seed_tracks where route_key=${f.route_key} and expires_at>now() order by received_at asc limit 6`;
-    if(stored.length>=1){
-     const derived=assertCleanDerived(seed(stored));
-     const version="live-rolling-"+stored.length+"-"+Date.now();
-     const insSeed=await db`insert into europe_option_b.route_seeds(route_key,seed_version,source,derived_path) values(${f.route_key},${version},'live_trial',${JSON.stringify(derived)}::jsonb) on conflict(route_key) do update set seed_version=excluded.seed_version,derived_path=excluded.derived_path,created_at=now() returning route_key`;
-     seeded+=insSeed.length;
-    }
+    const [previous]=await db`select derived_path from europe_option_b.route_seeds where route_key=${f.route_key}`;
+    const derived=adaptivePath(previous?.derived_path||null,p);
+    const version="adaptive-a030-"+Date.now();
+    const updated=await db`insert into europe_option_b.route_seeds(route_key,seed_version,source,derived_path) values(${f.route_key},${version},'live_incremental_a030',${JSON.stringify(derived)}::jsonb) on conflict(route_key) do update set seed_version=excluded.seed_version,source=excluded.source,derived_path=excluded.derived_path,created_at=now() returning route_key`;
+    seeded+=updated.length;
    }catch(e){if(/EUROPE_USAGE_STOP|EUROPE_HALTED|DAILY_REQUEST_CAP/.test(e.message))throw e;failures++}
   }
  }else if(phase==="predict"){
@@ -92,7 +97,7 @@ export async function runEurope(phase){
    if(ins.length){
     const tracks=await db`select flight_id,points from europe_option_b.seed_tracks where route_key=${f.route_key} and expires_at>now() order by received_at desc limit 6`;
     if(tracks.length){
-     const methods=[["most_recent",assertCleanDerived(resample(points(tracks[0].points)))],["option_b_adaptive",assertCleanDerived(seed(tracks))]];
+     const methods=[["most_recent",assertCleanDerived(resample(points(tracks[0].points)))],["option_b_adaptive",assertCleanDerived(points(f.derived_path))]];
      if(tracks.length===6)methods.push(["rolling_six",assertCleanDerived(seed(tracks))]);
      for(const [method,path] of methods)await db`insert into europe_option_b.method_comparisons(flight_id,method,seed_version,locked_path) values(${f.flight_id},${method},${f.seed_version},${JSON.stringify(path)}::jsonb) on conflict(flight_id,method) do nothing`;
     }
