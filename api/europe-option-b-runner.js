@@ -33,63 +33,82 @@ const landed=f=>Boolean(f.actual_on||f.actual_in);
 export async function runEurope(phase){
  assertTrialWindow();assertTrialKey();if(!["collect","predict","score"].includes(phase))throw Error("PHASE_NOT_ALLOWED");
  const db=sql();const [st]=await db`select halted from europe_option_b.trial_state where id=1`;if(st?.halted)throw Error("EUROPE_HALTED");
- if(phase==="probe"){
-  let result="UNKNOWN",calls=0,status="FAILED";
-  try{
-   // One history track request using UK-linked flight metadata only; no pretrial track reuse.
-   const history=await request(db,"/flights/WZZ1006?max_pages=1");calls=1;
-   const flights=Array.isArray(history.flights)?history.flights:[];result=flights.length?"HISTORY_AVAILABLE":"HISTORY_EMPTY";status="OK";
-  }catch(e){result=String(e.message).slice(0,200);if(/PROVIDER_HTTP_|EUROPE_USAGE_STOP|FORBIDDEN_PROVIDER_FIELDS/.test(result))calls=1}
-  await db`insert into europe_option_b.run_audit(phase,request_count,predicted_count,scored_count,details) values('probe',${calls},0,0,${JSON.stringify({result,status})}::jsonb)`;
-  return {phase,requests:calls,result,status};
- }
- const routes=await db`select route_key from europe_option_b.route_manifest where uk_priority=true order by route_key limit 50`;
- let calls=0,locked=0,scored=0,seeded=0,failures=0;
+
+ const dbRoutes=await db`select route_key from europe_option_b.route_manifest where uk_priority=true order by case when split_part(route_key,'|',3) in ('EGKK','EGSS','EGCC','EGGW','EGGD','EGPH') then 0 else 1 end,route_key limit 50`;
+ const routes=new Map(dbRoutes.map(r=>[r.route_key,r]));
+ const airports=[...new Set(dbRoutes.map(r=>r.route_key.split("|")[2]))].filter(x=>/^[A-Z]{4}$/.test(x));
+ let calls=0,discovered=0,collected=0,seeded=0,locked=0,scored=0,failures=0;
  const budget=8;
- if(phase==="predict"){await db`insert into europe_option_b.run_audit(phase,request_count,predicted_count,scored_count,details) values(${phase},0,0,0,${JSON.stringify({status:"PREDICTION_PAUSED_PENDING_LIVE_DISCOVERY"})}::jsonb)`;return {phase,requests:0,status:"PREDICTION_PAUSED_PENDING_LIVE_DISCOVERY"};}
- if(phase==="collect"){await db`insert into europe_option_b.run_audit(phase,request_count,predicted_count,scored_count,details) values(${phase},0,0,0,${JSON.stringify({status:"COLLECTION_PAUSED_PENDING_LIVE_CAPTURE"})}::jsonb)`;return {phase,requests:0,status:"COLLECTION_PAUSED_PENDING_LIVE_CAPTURE"};}
- if(phase==="score"){
-  const pending=await db`select flight_id,route_key,locked_path from europe_option_b.trial_flights where locked_at is not null and scored_at is null order by departure_at asc limit 24`;
-  for(const f of pending){if(calls+2>budget)break;try{
-   const info=await request(db,"/flights/"+encodeURIComponent(f.flight_id));calls++;const flight=(info.flights||[])[0];if(!flight||!landed(flight))continue;
-   const t=await request(db,"/flights/"+encodeURIComponent(f.flight_id)+"/track");calls++;
-   const p=points(t.positions||t.track);if(p.length<2)continue;
-   const receipt=new Date().toISOString(),error=score(f.locked_path,p);
-   const [row]=await db`insert into europe_option_b.raw_receipts(flight_id,received_at,delete_by,payload) values(${f.flight_id},${receipt},${new Date(Date.parse(receipt)+29*86400000).toISOString()},${JSON.stringify({positions:p})}::jsonb) returning receipt_id`;
-   await db`update europe_option_b.trial_flights set arrival_at=${iso(flight.actual_on||flight.actual_in)},scored_at=now(),score_km=${error},baseline_median_km=${error},track_receipt_id=${row.receipt_id},state='SCORED' where flight_id=${f.flight_id} and scored_at is null`;
-   await db`insert into europe_option_b.seed_tracks(flight_id,route_key,received_at,points,expires_at) values(${f.flight_id},${f.route_key},${receipt},${JSON.stringify(p)}::jsonb,${new Date(Date.parse(receipt)+29*86400000).toISOString()}) on conflict(flight_id) do nothing`;
-   scored++;
-  }catch(e){if(/EUROPE_USAGE_STOP|EUROPE_HALTED|DAILY_REQUEST_CAP/.test(e.message))throw e;failures++}}
- }else{
-  if(phase!=="predict")throw Error("HISTORY_SEEDING_DISABLED");
-  const [today]=await db`select count(*)::int n from europe_option_b.trial_flights where locked_at >= date_trunc('day',now() at time zone 'UTC')`;
-  for(const r of (phase==="seed"?await db`select m.route_key from europe_option_b.route_manifest m left join europe_option_b.seed_tracks s on s.route_key=m.route_key where m.uk_priority=true group by m.route_key having count(s.flight_id)<6 order by count(s.flight_id) desc,case when split_part(m.route_key,'|',3) in ('EGKK','EGSS','EGCC','EGGW','EGGD','EGPH') then 0 else 1 end,m.route_key limit 24`:routes)){if(calls>=budget||phase==="predict"&&today.n+locked>=MAX_FLIGHTS)break;
-   const [op,ident,origin,dest]=r.route_key.split("|");if(!valid(ident)||!origin||!dest)continue;
+ const invoke=async path=>{if(calls>=budget)throw Error("RUN_REQUEST_CAP");calls++;return request(db,path)};
+ const keyFor=f=>{const ident=String(f.ident_icao||f.ident||"");const o=String(f.origin?.code_icao||f.origin?.code||"");const d=String(f.destination?.code_icao||f.destination?.code||"");return [...routes.keys()].find(k=>{const a=k.split("|");return a[1]===ident&&a[2]===o&&a[3]===d})};
+ if(phase==="collect"){
+  // Only live/current airport departures; no history, no lookback parameters.
+  const airport=airports[Math.floor(Date.now()/900000)%Math.max(airports.length,1)];
+  if(airport){
    try{
-    const start=new Date(Date.now()-14*86400000).toISOString();
-    const history=await request(db,"/flights/"+ident+"?start="+encodeURIComponent(start)+"&end="+encodeURIComponent(new Date().toISOString())+"&max_pages=1");calls++;
-    const flights=(history.flights||[]).filter(f=>(f.origin?.code_icao||f.origin?.code)===origin&&(f.destination?.code_icao||f.destination?.code)===dest&&valid(f.fa_flight_id));
-    if(false){
-     const past=flights.filter(landed).slice(0,6);
-     for(const f of past){if(calls>=budget)break;const [exists]=await db`select 1 ok from europe_option_b.seed_tracks where flight_id=${f.fa_flight_id}`;if(exists)continue;
-      const t=await request(db,"/flights/"+f.fa_flight_id+"/track");calls++;const p=points(t.positions||t.track);if(p.length<2)continue;
-      const receipt=new Date().toISOString();
-      await db`insert into europe_option_b.seed_tracks(flight_id,route_key,received_at,points,expires_at) values(${f.fa_flight_id},${r.route_key},${receipt},${JSON.stringify(p)}::jsonb,${new Date(Date.parse(receipt)+29*86400000).toISOString()}) on conflict do nothing`;seeded++;
-     }
-    }
-    const stored=await db`select points from europe_option_b.seed_tracks where route_key=${r.route_key} and expires_at>now() order by received_at desc limit 6`;
-    if(stored.length===6){const path=assertCleanDerived(seed(stored));const version="trial-six-v1-"+new Date().toISOString().slice(0,10);
-     await db`insert into europe_option_b.route_seeds(route_key,seed_version,source,derived_path) values(${r.route_key},${version},'fresh_trial',${JSON.stringify(path)}::jsonb) on conflict(route_key) do update set seed_version=excluded.seed_version,derived_path=excluded.derived_path,created_at=now()`;
-    }
-    if(phase==="predict"){
-     const [s]=await db`select seed_version,derived_path from europe_option_b.route_seeds where route_key=${r.route_key}`;if(!s)continue;
-     for(const f of flights){if(today.n+locked>=MAX_FLIGHTS)break;const departure=flightDate(f);if(!departure||Date.parse(departure)<=Date.now()+15*60000||Date.parse(departure)>Date.now()+8*3600000||landed(f))continue;
-      const inserted=await db`insert into europe_option_b.trial_flights(flight_id,route_key,departure_at,predicted_at,locked_at,seed_version,locked_path,state) values(${f.fa_flight_id},${r.route_key},${departure},now(),now(),${s.seed_version},${JSON.stringify(s.derived_path)}::jsonb,'LOCKED') on conflict(flight_id) do nothing returning flight_id`;locked+=inserted.length;
-     }
+    const data=await invoke("/airports/"+airport+"/flights/departures?max_pages=1");
+    for(const f of (data.departures||[])){
+     const route=keyFor(f),id=String(f.fa_flight_id||"");
+     const departure=flightDate(f);
+     if(!route||!valid(id)||!departure||Date.parse(departure)<Date.now()-3*3600000||Date.parse(departure)>Date.now()+12*3600000)continue;
+     const ins=await db`insert into europe_option_b.trial_flights(flight_id,route_key,departure_at,state) values(${id},${route},${departure},'ENROLLED') on conflict(flight_id) do nothing returning flight_id`;
+     discovered+=ins.length;
     }
    }catch(e){if(/EUROPE_USAGE_STOP|EUROPE_HALTED|DAILY_REQUEST_CAP/.test(e.message))throw e;failures++}
   }
+  // A flight must have been enrolled during the live trial before a post-landing track is requested.
+  const pending=await db`select flight_id,route_key,departure_at from europe_option_b.trial_flights where state='ENROLLED' and departure_at<now()-interval '50 minutes' and departure_at>now()-interval '12 hours' order by departure_at limit 5`;
+  for(const f of pending){
+   if(calls+2>budget)break;
+   try{
+    const info=await invoke("/flights/"+f.flight_id);
+    const live=(info.flights||[]).find(x=>x.fa_flight_id===f.flight_id);
+    if(!live||!landed(live))continue;
+    const actual=iso(live.actual_on||live.actual_in);
+    if(!actual||Date.now()-Date.parse(actual)>3*3600000)continue;
+    const t=await invoke("/flights/"+f.flight_id+"/track");
+    const p=points(t.positions||t.track);
+    if(p.length<2)continue;
+    const received=new Date().toISOString(),expires=new Date(Date.now()+29*86400000).toISOString();
+    const ins=await db`insert into europe_option_b.seed_tracks(flight_id,route_key,received_at,points,expires_at) values(${f.flight_id},${f.route_key},${received},${JSON.stringify(p)}::jsonb,${expires}) on conflict(flight_id) do nothing returning flight_id`;
+    collected+=ins.length;
+    await db`update europe_option_b.trial_flights set state='CAPTURED',arrival_at=${actual} where flight_id=${f.flight_id} and state='ENROLLED'`;
+    const stored=await db`select points from europe_option_b.seed_tracks where route_key=${f.route_key} and expires_at>now() order by received_at asc limit 6`;
+    if(stored.length===6){
+     const derived=assertCleanDerived(seed(stored));
+     const insSeed=await db`insert into europe_option_b.route_seeds(route_key,seed_version,source,derived_path) values(${f.route_key},${"live-six-"+new Date().toISOString().slice(0,10)},'live_trial',${JSON.stringify(derived)}::jsonb) on conflict(route_key) do nothing returning route_key`;
+     seeded+=insSeed.length;
+    }
+   }catch(e){if(/EUROPE_USAGE_STOP|EUROPE_HALTED|DAILY_REQUEST_CAP/.test(e.message))throw e;failures++}
+  }
+ }else if(phase==="predict"){
+  const candidates=await db`select t.flight_id,t.route_key,t.departure_at,s.seed_version,s.derived_path from europe_option_b.trial_flights t join europe_option_b.route_seeds s on s.route_key=t.route_key where t.state='ENROLLED' and t.locked_at is null and t.departure_at>now()+interval '15 minutes' and t.departure_at<now()+interval '8 hours' order by t.departure_at limit 150`;
+  for(const f of candidates){
+   const [count]=await db`select count(*)::int n from europe_option_b.trial_flights where locked_at >= date_trunc('day',now() at time zone 'UTC')`;
+   if(count.n>=MAX_FLIGHTS)break;
+   const ins=await db`update europe_option_b.trial_flights set predicted_at=now(),locked_at=now(),seed_version=${f.seed_version},locked_path=${JSON.stringify(f.derived_path)}::jsonb,state='LOCKED' where flight_id=${f.flight_id} and locked_at is null and departure_at>now()+interval '15 minutes' returning flight_id`;
+   locked+=ins.length;
+  }
+ }else if(phase==="score"){
+  const pending=await db`select flight_id,locked_path from europe_option_b.trial_flights where state='LOCKED' and locked_at is not null and scored_at is null and departure_at<now()-interval '50 minutes' order by departure_at limit 4`;
+  for(const f of pending){
+   if(calls+2>budget)break;
+   try{
+    const info=await invoke("/flights/"+f.flight_id);
+    const live=(info.flights||[]).find(x=>x.fa_flight_id===f.flight_id);
+    if(!live||!landed(live))continue;
+    const actual=iso(live.actual_on||live.actual_in);
+    if(!actual||Date.now()-Date.parse(actual)>3*3600000)continue;
+    const track=await invoke("/flights/"+f.flight_id+"/track"),p=points(track.positions||track.track);
+    if(p.length<2)continue;
+    const received=new Date().toISOString();
+    const [receipt]=await db`insert into europe_option_b.raw_receipts(flight_id,received_at,delete_by,payload) values(${f.flight_id},${received},${new Date(Date.now()+29*86400000).toISOString()},${JSON.stringify({positions:p})}::jsonb) returning receipt_id`;
+    const err=score(f.locked_path,p);
+    const ins=await db`update europe_option_b.trial_flights set arrival_at=${actual},scored_at=now(),score_km=${err},track_receipt_id=${receipt.receipt_id},state='SCORED' where flight_id=${f.flight_id} and scored_at is null returning flight_id`;
+    scored+=ins.length;
+   }catch(e){if(/EUROPE_USAGE_STOP|EUROPE_HALTED|DAILY_REQUEST_CAP/.test(e.message))throw e;failures++}
+  }
  }
- await db`insert into europe_option_b.run_audit(phase,request_count,predicted_count,scored_count,details) values(${phase},${calls},${locked},${scored},${JSON.stringify({seeded,failures})}::jsonb)`;
- return {phase,requests:calls,predicted:locked,scored,seeded,failures};
+ await db`insert into europe_option_b.run_audit(phase,request_count,predicted_count,scored_count,details) values(${phase},${calls},${locked},${scored},${JSON.stringify({discovered,collected,seeded,failures})}::jsonb)`;
+ return {phase,requests:calls,discovered,collected,seeded,predicted:locked,scored,failures};
 }
