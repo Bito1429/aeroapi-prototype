@@ -1,13 +1,13 @@
 name: Europe trial preview
 on:
   schedule:
-    - cron: '0,15,30,45 * * * *'
+    - cron: '7,22,37,52 * * * *'
   workflow_dispatch:
     inputs:
       phase:
-        description: 'seed, predict, or score'
+        description: 'collect, predict, or score'
         required: true
-        default: 'seed'
+        default: 'collect'
         type: choice
         options: [collect, predict, score]
 permissions:
@@ -32,9 +32,9 @@ jobs:
             PHASE="$MANUAL_PHASE"
           else
             case "$(date -u +%M)" in
-              00) PHASE=collect ;;
-              15) PHASE=collect ;;
-              30) PHASE=predict ;;
+              07) PHASE=collect ;;
+              22) PHASE=collect ;;
+              37) PHASE=predict ;;
               *) PHASE=score ;;
             esac
           fi
