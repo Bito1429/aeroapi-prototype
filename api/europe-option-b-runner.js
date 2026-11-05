@@ -51,7 +51,7 @@ export async function runEurope(phase){
  const budget=8,errors=[];
  const safeError=e=>String(e?.message||e).replace(/https?:\/\/\S+/g,"[url]").replace(/[A-Za-z0-9_-]{32,}/g,"[redacted]").replace(/[\r\n]/g," ").slice(0,160);
  const invoke=async path=>{if(calls>=budget)throw Error("RUN_REQUEST_CAP");calls++;try{return await request(db,path)}catch(e){
-  const message=safeError(e);errors.push({message,status:Number((message.match(/PROVIDER_HTTP_(\\d+)/)||[])[1])||0});
+  const message=safeError(e);errors.push({message,status:Number((message.match(/PROVIDER_HTTP_([0-9]+)/)||[])[1])||0});
   if(!message.startsWith("PROVIDER_HTTP_"))await db`insert into europe_option_b.request_audit(day,status,warning,halted) values((now() at time zone 'UTC')::date,0,${message},false)`;
   else await db`update europe_option_b.request_audit set warning=left(concat_ws(' ',nullif(warning,''),${message}),160) where id=(select max(id) from europe_option_b.request_audit)`;
   throw e;
