@@ -18,7 +18,10 @@ function adaptivePath(oldPath,newTrack){
  return assertCleanDerived(old.map((p,i)=>({latitude:(1-OPTION_B_ALPHA)*p.latitude+OPTION_B_ALPHA*incoming[i].latitude,longitude:(1-OPTION_B_ALPHA)*p.longitude+OPTION_B_ALPHA*incoming[i].longitude})));
 }
 function score(path,track){const a=resample(points(track),64),b=points(path);return median(a.map(p=>Math.min(...b.map(q=>hav(p,q)))))}
-async function request(db,path){assertTrialWindow();const key=assertTrialKey();if(!/^\/flights\/[A-Za-z0-9_-]{1,90}(?:\/track)?(?:\?[A-Za-z0-9_=&%:.+-]+)?$/.test(path))throw Error("PATH_BLOCKED");
+async function request(db,path){assertTrialWindow();const key=assertTrialKey();
+ const flightAllowed=/^\/flights\/[A-Za-z0-9_-]{1,90}(?:\/track)?$/.test(path);
+ const airportAllowed=/^\/airports\/[A-Z]{4}\/flights\/departures\?max_pages=1$/.test(path);
+ if(!flightAllowed&&!airportAllowed)throw Error("PATH_BLOCKED");
  const [st]=await db`select halted from europe_option_b.trial_state where id=1`;if(st?.halted)throw Error("EUROPE_HALTED");
  const [c]=await db`select count(*)::int n from europe_option_b.request_audit where day=(now() at time zone 'UTC')::date`;if(c.n>=MAX_REQUESTS)throw Error("DAILY_REQUEST_CAP");
  let r;try{r=await fetch(BASE+path,{headers:{"x-apikey":key},cache:"no-store",signal:AbortSignal.timeout(12000)})}catch{throw Error("PROVIDER_NETWORK_ERROR")}
@@ -45,8 +48,14 @@ export async function runEurope(phase){
  const routes=new Map(dbRoutes.map(r=>[r.route_key,r]));
  const airports=[...new Set(dbRoutes.map(r=>r.route_key.split("|")[2]))].filter(x=>/^[A-Z]{4}$/.test(x));
  let calls=0,discovered=0,collected=0,seeded=0,locked=0,scored=0,failures=0;
- const budget=8;
- const invoke=async path=>{if(calls>=budget)throw Error("RUN_REQUEST_CAP");calls++;return request(db,path)};
+ const budget=8,errors=[];
+ const safeError=e=>String(e?.message||e).replace(/https?:\/\/\S+/g,"[url]").replace(/[A-Za-z0-9_-]{32,}/g,"[redacted]").replace(/[\r\n]/g," ").slice(0,160);
+ const invoke=async path=>{if(calls>=budget)throw Error("RUN_REQUEST_CAP");calls++;try{return await request(db,path)}catch(e){
+  const message=safeError(e);errors.push({message,status:Number((message.match(/PROVIDER_HTTP_(\\d+)/)||[])[1])||0});
+  if(!message.startsWith("PROVIDER_HTTP_"))await db`insert into europe_option_b.request_audit(day,status,warning,halted) values((now() at time zone 'UTC')::date,0,${message},false)`;
+  else await db`update europe_option_b.request_audit set warning=left(concat_ws(' ',nullif(warning,''),${message}),160) where id=(select max(id) from europe_option_b.request_audit)`;
+  throw e;
+ }};
  const keyFor=f=>{const ident=String(f.ident_icao||f.ident||"");const o=String(f.origin?.code_icao||f.origin?.code||"");const d=String(f.destination?.code_icao||f.destination?.code||"");return [...routes.keys()].find(k=>{const a=k.split("|");return a[1]===ident&&a[2]===o&&a[3]===d})};
  if(phase==="collect"){
   // Only live/current airport departures; no history, no lookback parameters.
@@ -134,6 +143,6 @@ export async function runEurope(phase){
    }catch(e){if(/EUROPE_USAGE_STOP|EUROPE_HALTED|DAILY_REQUEST_CAP/.test(e.message))throw e;failures++}
   }
  }
- await db`insert into europe_option_b.run_audit(phase,request_count,predicted_count,scored_count,details) values(${phase},${calls},${locked},${scored},${JSON.stringify({discovered,collected,seeded,failures})}::jsonb)`;
+ await db`insert into europe_option_b.run_audit(phase,request_count,predicted_count,scored_count,details) values(${phase},${calls},${locked},${scored},${JSON.stringify({discovered,collected,seeded,failures,errors:errors.slice(0,8)})}::jsonb)`;
  return {phase,requests:calls,discovered,collected,seeded,predicted:locked,scored,failures};
 }
