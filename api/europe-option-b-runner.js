@@ -78,25 +78,31 @@ export async function runEurope(phase){
  }};
  const keyFor=f=>{const ident=String(f.ident_icao||f.ident||"");const o=String(f.origin?.code_icao||f.origin?.code||"");const d=String(f.destination?.code_icao||f.destination?.code||"");return [...routes.keys()].find(k=>{const a=k.split("|");return a[1]===ident&&a[2]===o&&a[3]===d})};
  if(phase==="collect"){
-  // Discover upcoming live flight instances BEFORE departure; never use history.
-  // Rotate across three distinct UK-route departure airports per collect run.
-  // Leave request budget for checking and capturing already-enrolled landed flights.
-  const start=(Math.floor(Date.now()/900000)*3)%Math.max(airports.length,1);
-  const scan=Array.from({length:Math.min(3,airports.length)},(_,i)=>airports[(start+i)%airports.length]);
-  for(const airport of scan){
+  // Prioritize the frozen route flight numbers; airport first-pages missed them.
+  // Live GET /flights/{ident}, never history. Four calls maximum for discovery.
+  const seedList=await db`select route_key from europe_option_b.route_seeds where source='fresh_trial'`;
+  const seededSet=new Set(seedList.map(r=>r.route_key));
+  const seededRoutes=[...routes.keys()].filter(k=>seededSet.has(k));
+  const otherRoutes=[...routes.keys()].filter(k=>!seededSet.has(k));
+  const slot=Math.floor(Date.now()/3600000)*2+(new Date().getUTCMinutes()>=15?1:0);
+  const chosen=[];
+  const add=(pool,n,index)=>{for(let i=0;i<Math.min(n,pool.length);i++)chosen.push(pool[(index+i)%pool.length])};
+  add(seededRoutes,otherRoutes.length?3:4,slot*3);
+  add(otherRoutes,seededRoutes.length?1:4,slot);
+  for(const routeKey of chosen){
    try{
-    const airline=["EGKK","EGGW","EGPH"].includes(airport)?"EZY":airport==="EGSS"?"RYR":"";
-    const data=await invoke("/airports/"+airport+"/flights/scheduled_departures?max_pages=1"+(airline?"&airline="+airline:""));
-    for(const f of (data.scheduled||data.scheduled_departures||[])){
+    const ident=routeKey.split("|")[1];
+    if(!valid(ident))continue;
+    const data=await invoke("/flights/"+ident);
+    for(const f of (data.flights||[])){
      scheduledSeen++;
-     const route=keyFor(f),id=String(f.fa_flight_id||"");
-     const departure=flightDate(f);
+     const route=keyFor(f),id=String(f.fa_flight_id||""),departure=flightDate(f);
      if(route)routeMatched++;
-     if(!route||f.cancelled||f.diverted||!valid(id)||!departure||f.actual_out||f.actual_off||f.actual_on||f.actual_in||Date.parse(departure)<=Date.now()+15*60000||Date.parse(departure)>Date.now()+12*3600000)continue;
+     if(route!==routeKey||f.cancelled||f.diverted||!valid(id)||!departure||f.actual_out||f.actual_off||f.actual_on||f.actual_in||Date.parse(departure)<=Date.now()+15*60000||Date.parse(departure)>Date.now()+24*3600000)continue;
      const ins=await db`insert into europe_option_b.trial_flights(flight_id,route_key,departure_at,state) values(${id},${route},${departure},'ENROLLED') on conflict(flight_id) do nothing returning flight_id`;
      discovered+=ins.length;
     }
-   }catch(e){if(/EUROPE_USAGE_STOP|EUROPE_HALTED|DAILY_REQUEST_CAP/.test(e.message))throw e;failures++;errors.push({message:safeError(e),status:Number((safeError(e).match(/PROVIDER_HTTP_([0-9]+)/)||[])[1])||0,stage:phase});}
+   }catch(e){if(/EUROPE_USAGE_STOP|EUROPE_HALTED|DAILY_REQUEST_CAP/.test(e.message))throw e;failures++;errors.push({message:safeError(e),status:Number((safeError(e).match(/PROVIDER_HTTP_([0-9]+)/)||[])[1])||0,stage:"targeted_discovery"});}
   }
   // A flight must have been enrolled during the live trial before a post-landing track is requested.
   const pending=await db`select flight_id,route_key,departure_at from europe_option_b.trial_flights where state='ENROLLED' and departure_at<now()-interval '50 minutes' and departure_at>now()-interval '12 hours' order by departure_at limit 5`;
