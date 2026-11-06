@@ -32,7 +32,7 @@ function adaptivePath(oldPath,newTrack){
 function score(path,track){const a=resample(points(track),64),b=points(path);return median(a.map(p=>Math.min(...b.map(q=>hav(p,q)))))}
 async function request(db,path){assertTrialWindow();const key=assertTrialKey();
  const flightAllowed=/^\/flights\/[A-Za-z0-9_-]{1,90}(?:\/track)?$/.test(path);
- const airportAllowed=/^\/airports\/[A-Z]{4}\/flights\/scheduled_departures\?max_pages=1$/.test(path);
+ const airportAllowed=/^\/airports\/[A-Z]{4}\/flights\/scheduled_departures\?max_pages=1(?:&airline=(?:EZY|RYR|EXS|WZZ))?$/.test(path);
  if(!flightAllowed&&!airportAllowed)throw Error("PATH_BLOCKED");
  const [st]=await db`select halted from europe_option_b.trial_state where id=1`;if(st?.halted)throw Error("EUROPE_HALTED");
  const [c]=await db`select count(*)::int n from europe_option_b.request_audit where day=(now() at time zone 'UTC')::date`;if(c.n>=MAX_REQUESTS)throw Error("DAILY_REQUEST_CAP");
@@ -67,7 +67,7 @@ export async function runEurope(phase){
  const dbRoutes=await db`select route_key from europe_option_b.route_manifest where uk_priority=true order by case when split_part(route_key,'|',3) in ('EGKK','EGSS','EGCC','EGGW','EGGD','EGPH') then 0 else 1 end,route_key limit 50`;
  const routes=new Map(dbRoutes.map(r=>[r.route_key,r]));
  const airports=[...new Set(dbRoutes.map(r=>r.route_key.split("|")[2]))].filter(x=>/^[A-Z]{4}$/.test(x));
- let calls=0,discovered=0,collected=0,seeded=0,locked=0,scored=0,failures=0;
+ let calls=0,discovered=0,collected=0,seeded=0,locked=0,scored=0,failures=0,scheduledSeen=0,routeMatched=0,lockCandidates=0;
  const budget=8,errors=[];
  const safeError=e=>String(e?.message||e).replace(/https?:\/\/\S+/g,"[url]").replace(/[A-Za-z0-9_-]{32,}/g,"[redacted]").replace(/[\r\n]/g," ").slice(0,160);
  const invoke=async path=>{if(calls>=budget)throw Error("RUN_REQUEST_CAP");calls++;try{return await request(db,path)}catch(e){
@@ -85,11 +85,14 @@ export async function runEurope(phase){
   const scan=Array.from({length:Math.min(3,airports.length)},(_,i)=>airports[(start+i)%airports.length]);
   for(const airport of scan){
    try{
-    const data=await invoke("/airports/"+airport+"/flights/scheduled_departures?max_pages=1");
+    const airline=["EGKK","EGGW","EGPH"].includes(airport)?"EZY":airport==="EGSS"?"RYR":"";
+    const data=await invoke("/airports/"+airport+"/flights/scheduled_departures?max_pages=1"+(airline?"&airline="+airline:""));
     for(const f of (data.scheduled||data.scheduled_departures||[])){
+     scheduledSeen++;
      const route=keyFor(f),id=String(f.fa_flight_id||"");
      const departure=flightDate(f);
-     if(!route||!valid(id)||!departure||f.actual_out||f.actual_off||f.actual_on||f.actual_in||Date.parse(departure)<=Date.now()+15*60000||Date.parse(departure)>Date.now()+12*3600000)continue;
+     if(route)routeMatched++;
+     if(!route||f.cancelled||f.diverted||!valid(id)||!departure||f.actual_out||f.actual_off||f.actual_on||f.actual_in||Date.parse(departure)<=Date.now()+15*60000||Date.parse(departure)>Date.now()+12*3600000)continue;
      const ins=await db`insert into europe_option_b.trial_flights(flight_id,route_key,departure_at,state) values(${id},${route},${departure},'ENROLLED') on conflict(flight_id) do nothing returning flight_id`;
      discovered+=ins.length;
     }
@@ -124,6 +127,7 @@ export async function runEurope(phase){
   // Lock as soon as a future flight is discovered, not at the next hourly phase.
   // Recheck the cutoff in the write to avoid retrospective locks.
   const candidates=await db`select t.flight_id,t.route_key,t.departure_at,s.seed_version,s.derived_path from europe_option_b.trial_flights t join europe_option_b.route_seeds s on s.route_key=t.route_key where t.state='ENROLLED' and t.locked_at is null and t.departure_at>now()+interval '15 minutes' and t.departure_at<now()+interval '12 hours' order by t.departure_at limit 150`;
+  lockCandidates=candidates.length;
   for(const f of candidates){
    const [count]=await db`select count(*)::int n from europe_option_b.trial_flights where locked_at >= date_trunc('day',now() at time zone 'UTC')`;
    if(count.n>=MAX_FLIGHTS)break;
@@ -169,6 +173,6 @@ export async function runEurope(phase){
    }catch(e){if(/EUROPE_USAGE_STOP|EUROPE_HALTED|DAILY_REQUEST_CAP/.test(e.message))throw e;failures++;errors.push({message:safeError(e),status:Number((safeError(e).match(/PROVIDER_HTTP_([0-9]+)/)||[])[1])||0,stage:phase});}
   }
  }
- await db`insert into europe_option_b.run_audit(phase,request_count,predicted_count,scored_count,details) values(${phase},${calls},${locked},${scored},${JSON.stringify({discovered,collected,seeded,failures,errors:errors.slice(0,8)})}::jsonb)`;
- return {phase,requests:calls,discovered,collected,seeded,predicted:locked,scored,failures};
+ await db`insert into europe_option_b.run_audit(phase,request_count,predicted_count,scored_count,details) values(${phase},${calls},${locked},${scored},${JSON.stringify({discovered,collected,seeded,lock_candidates:lockCandidates,scheduled_seen:scheduledSeen,route_matched:routeMatched,failures,errors:errors.slice(0,8)})}::jsonb)`;
+ return {phase,requests:calls,discovered,collected,seeded,scheduledSeen,routeMatched,lockCandidates,predicted:locked,scored,failures};
 }
