@@ -32,7 +32,7 @@ function adaptivePath(oldPath,newTrack){
 function score(path,track){const a=resample(points(track),64),b=points(path);return median(a.map(p=>Math.min(...b.map(q=>hav(p,q)))))}
 async function request(db,path){assertTrialWindow();const key=assertTrialKey();
  const flightAllowed=/^\/flights\/[A-Za-z0-9_-]{1,90}(?:\/track)?$/.test(path);
- const airportAllowed=/^\/airports\/[A-Z]{4}\/flights\/departures\?max_pages=1$/.test(path);
+ const airportAllowed=/^\/airports\/[A-Z]{4}\/flights\/scheduled_departures\?max_pages=1$/.test(path);
  if(!flightAllowed&&!airportAllowed)throw Error("PATH_BLOCKED");
  const [st]=await db`select halted from europe_option_b.trial_state where id=1`;if(st?.halted)throw Error("EUROPE_HALTED");
  const [c]=await db`select count(*)::int n from europe_option_b.request_audit where day=(now() at time zone 'UTC')::date`;if(c.n>=MAX_REQUESTS)throw Error("DAILY_REQUEST_CAP");
@@ -78,18 +78,18 @@ export async function runEurope(phase){
  }};
  const keyFor=f=>{const ident=String(f.ident_icao||f.ident||"");const o=String(f.origin?.code_icao||f.origin?.code||"");const d=String(f.destination?.code_icao||f.destination?.code||"");return [...routes.keys()].find(k=>{const a=k.split("|");return a[1]===ident&&a[2]===o&&a[3]===d})};
  if(phase==="collect"){
-  // Only live/current airport departures; no history, no lookback parameters.
+  // Discover upcoming live flight instances BEFORE departure; never use history.
   // Rotate across three distinct UK-route departure airports per collect run.
   // Leave request budget for checking and capturing already-enrolled landed flights.
   const start=(Math.floor(Date.now()/900000)*3)%Math.max(airports.length,1);
   const scan=Array.from({length:Math.min(3,airports.length)},(_,i)=>airports[(start+i)%airports.length]);
   for(const airport of scan){
    try{
-    const data=await invoke("/airports/"+airport+"/flights/departures?max_pages=1");
-    for(const f of (data.departures||[])){
+    const data=await invoke("/airports/"+airport+"/flights/scheduled_departures?max_pages=1");
+    for(const f of (data.scheduled||data.scheduled_departures||[])){
      const route=keyFor(f),id=String(f.fa_flight_id||"");
      const departure=flightDate(f);
-     if(!route||!valid(id)||!departure||Date.parse(departure)<Date.now()-3*3600000||Date.parse(departure)>Date.now()+12*3600000)continue;
+     if(!route||!valid(id)||!departure||f.actual_out||f.actual_off||f.actual_on||f.actual_in||Date.parse(departure)<=Date.now()+15*60000||Date.parse(departure)>Date.now()+12*3600000)continue;
      const ins=await db`insert into europe_option_b.trial_flights(flight_id,route_key,departure_at,state) values(${id},${route},${departure},'ENROLLED') on conflict(flight_id) do nothing returning flight_id`;
      discovered+=ins.length;
     }
@@ -119,8 +119,11 @@ export async function runEurope(phase){
     seeded+=updated.length;
    }catch(e){if(/EUROPE_USAGE_STOP|EUROPE_HALTED|DAILY_REQUEST_CAP/.test(e.message))throw e;failures++;errors.push({message:safeError(e),status:Number((safeError(e).match(/PROVIDER_HTTP_([0-9]+)/)||[])[1])||0,stage:phase});}
   }
- }else if(phase==="predict"){
-  const candidates=await db`select t.flight_id,t.route_key,t.departure_at,s.seed_version,s.derived_path from europe_option_b.trial_flights t join europe_option_b.route_seeds s on s.route_key=t.route_key where t.state='ENROLLED' and t.locked_at is null and t.departure_at>now()+interval '15 minutes' and t.departure_at<now()+interval '8 hours' order by t.departure_at limit 150`;
+ }
+ if(phase==="collect"||phase==="predict"){
+  // Lock as soon as a future flight is discovered, not at the next hourly phase.
+  // Recheck the cutoff in the write to avoid retrospective locks.
+  const candidates=await db`select t.flight_id,t.route_key,t.departure_at,s.seed_version,s.derived_path from europe_option_b.trial_flights t join europe_option_b.route_seeds s on s.route_key=t.route_key where t.state='ENROLLED' and t.locked_at is null and t.departure_at>now()+interval '15 minutes' and t.departure_at<now()+interval '12 hours' order by t.departure_at limit 150`;
   for(const f of candidates){
    const [count]=await db`select count(*)::int n from europe_option_b.trial_flights where locked_at >= date_trunc('day',now() at time zone 'UTC')`;
    if(count.n>=MAX_FLIGHTS)break;
