@@ -1,3 +1,4 @@
+import {chesterAuthorized} from "./chester-auth.js";
 // Chester-format system package endpoint. No live provider requests: uses persisted capture only.
 // GET /api/chester-package?flight_id=<fa_flight_id>
 // Fail closed rather than fabricate missing provider fields.
@@ -6,6 +7,7 @@ import {toChesterV1} from "./chester-schema.js";
 import {json} from "./lib.js";
 export default async function handler(req,res){
  if(req.method!=="GET")return json(res,405,{error:"METHOD_NOT_ALLOWED"});
+ if(!chesterAuthorized(req,res))return;
  const id=typeof req.query?.flight_id==="string"?req.query.flight_id.trim():"";
  if(!id||id.length>160)return json(res,400,{error:"FLIGHT_ID_REQUIRED"});
  try{
