@@ -1,8 +1,10 @@
+import {chesterAuthorized} from "./chester-auth.js";
 // Read-only Chester flight details. Capture state is genuine; no invented readiness.
 import {db} from "./db.js";
 import {json} from "./lib.js";
 export default async function handler(req,res){
  if(req.method!=="GET")return json(res,405,{error:"METHOD_NOT_ALLOWED"});
+ if(!chesterAuthorized(req,res))return;
  const id=String(req.query?.flight_id||"").trim();
  if(!id||id.length>160)return json(res,400,{error:"FLIGHT_ID_REQUIRED"});
  try{
