@@ -41,6 +41,7 @@ const KNOWN_AIRPORTS=Object.freeze({
  KORD:["ORD","O'Hare International Airport","America/Chicago"],
  KSFO:["SFO","San Francisco International Airport","America/Los_Angeles"],
  KDEN:["DEN","Denver International Airport","America/Denver"],
+ KPHL:["PHL","Philadelphia International Airport","America/New_York"],
  KDFW:["DFW","Dallas Fort Worth International Airport","America/Chicago"]
 });
 export function airportFromFiledFix(icao,fix){
