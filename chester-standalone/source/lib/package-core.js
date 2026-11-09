@@ -1,0 +1,162 @@
+import crypto from "node:crypto";
+import{db}from"./db.js";
+import{havKm,polyKm}from"./lib.js";
+import{etaPackage}from"./eta-calibration.js";
+import{CORRIDOR_CALIBRATION,corridorMeta}from"./corridor-calibration.js";
+import{modelFiledTimeline}from"./filed-timeline.js";
+import{airlineFromOperator}from"./airline-reference.js";
+import{airportFromFiledFix}from"./airport-reference.js";
+
+function round(n,d=6){return Number.isFinite(n)?+n.toFixed(d):null;}
+function stable(value){
+ if(Array.isArray(value))return value.map(stable);
+ if(value&&typeof value==="object"){
+  const o={};for(const k of Object.keys(value).sort())o[k]=stable(value[k]);return o;
+ }
+ return value;
+}
+export function etagFor(body){
+ const clone={...body};
+ delete clone.generated_at;
+ const raw=JSON.stringify(stable(clone));
+ return '"'+crypto.createHash("sha256").update(raw).digest("hex").slice(0,24)+'"';
+}
+function pointAtFraction(points,f){
+ if(!points?.length)return null;
+ if(points.length===1)return points[0];
+ const total=polyKm(points);if(total<=0)return points[0];
+ const target=total*Math.max(0,Math.min(1,f));let d=0;
+ for(let i=1;i<points.length;i++){
+  const a=points[i-1],b=points[i],leg=havKm(a,b);
+  if(d+leg>=target){
+   const q=leg?((target-d)/leg):0;
+   return{latitude:a.latitude+(b.latitude-a.latitude)*q,longitude:a.longitude+(b.longitude-a.longitude)*q};
+  }
+  d+=leg;
+ }
+ return points.at(-1);
+}
+export function denseTimeline(points,{startIso=null,durationSeconds=null,maxMinutes=2,maxKm=25}={}){
+ const clean=(points||[]).filter(p=>Number.isFinite(p?.latitude)&&Number.isFinite(p?.longitude));
+ if(clean.length<2)return[];
+ const km=polyKm(clean);
+ const byDistance=Math.max(1,Math.ceil(km/maxKm));
+ const byTime=Number.isFinite(durationSeconds)&&durationSeconds>0?Math.max(1,Math.ceil(durationSeconds/(maxMinutes*60))):1;
+ const segments=Math.max(byDistance,byTime);
+ const start=startIso?new Date(startIso).getTime():NaN;
+ return Array.from({length:segments+1},(_,i)=>{
+  const f=i/segments,p=pointAtFraction(clean,f);
+  return{
+   fraction:+f.toFixed(6),
+   latitude:round(p.latitude),
+   longitude:round(p.longitude),
+   ...(Number.isFinite(start)&&Number.isFinite(durationSeconds)&&durationSeconds>0?{timestamp:new Date(start+f*durationSeconds*1000).toISOString()}:{}),
+  };
+ });
+}
+function projectLocal(p,lat0){
+ const kLat=111.195,kLon=111.195*Math.cos(lat0*Math.PI/180);
+ return{x:p.longitude*kLon,y:p.latitude*kLat,kLat,kLon};
+}
+function unprojectLocal(x,y,kLat,kLon){return{latitude:y/kLat,longitude:x/kLon};}
+function vertexNormal(points,i,lat0){
+ const prev=points[Math.max(0,i-1)],next=points[Math.min(points.length-1,i+1)];
+ const a=projectLocal(prev,lat0),b=projectLocal(next,lat0);
+ const dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy)||1;
+ return{x:-dy/len,y:dx/len,kLat:a.kLat,kLon:a.kLon};
+}
+export function corridorPolygon(points,halfWidthKm){
+ const clean=(points||[]).filter(p=>Number.isFinite(p?.latitude)&&Number.isFinite(p?.longitude));
+ if(clean.length<2||!Number.isFinite(halfWidthKm)||halfWidthKm<=0)return null;
+ const lat0=clean.reduce((a,p)=>a+p.latitude,0)/clean.length;
+ const left=[],right=[];
+ for(let i=0;i<clean.length;i++){
+  const base=projectLocal(clean[i],lat0),n=vertexNormal(clean,i,lat0);
+  const l=unprojectLocal(base.x+n.x*halfWidthKm,base.y+n.y*halfWidthKm,n.kLat,n.kLon);
+  const r=unprojectLocal(base.x-n.x*halfWidthKm,base.y-n.y*halfWidthKm,n.kLat,n.kLon);
+  left.push({latitude:round(l.latitude),longitude:round(l.longitude)});
+  right.push({latitude:round(r.latitude),longitude:round(r.longitude)});
+ }
+ const ring=[...left,...right.reverse(),left[0]];
+ return{type:"Polygon",coordinates:[ring.map(p=>[p.longitude,p.latitude])]};
+}
+function sanity(protocol){
+ if(!protocol)return{ok:false,reason:"NO_ROUTE_PROTOCOL"};
+ if(protocol.baseline_valid===false)return{ok:false,reason:"MISSING_FIX_COORDINATES"};
+ if(!Array.isArray(protocol.fixes)||protocol.fixes.filter(p=>Number.isFinite(p?.latitude)&&Number.isFinite(p?.longitude)).length<2)return{ok:false,reason:"INSUFFICIENT_ROUTE_POINTS"};
+ if(!Number.isFinite(protocol.computed_km)||protocol.computed_km<=0)return{ok:false,reason:"INVALID_ROUTE_DISTANCE"};
+ return{ok:true,reason:"OK"};
+}
+function saleState(job,flight,hasRoute){
+ if(/cancel/i.test(String(flight?.status||"")))return{state:"CANCELLED",sellable:false};
+ if(flight?.actual_out||job?.final_actual_out)return{state:"DEPARTED",sellable:false};
+ if(!String(job?.origin||"").startsWith("K")||!String(job?.destination||"").startsWith("K"))return{state:"UNSUPPORTED_MARKET",sellable:false};
+ if(!hasRoute)return{state:"PENDING_ROUTE",sellable:false};
+ return{state:"SELLABLE",sellable:true};
+}
+export async function buildDraftPackage(flightId){
+ const sql=db();
+ const jobs=await sql`select * from flight_jobs where fa_flight_id=${flightId} order by created_at desc limit 1`;
+ const job=jobs[0];if(!job)return{status:404,body:{error:"FLIGHT_NOT_FOUND",flight_id:flightId}};
+ const caps=await sql`select * from flight_captures where flight_job_id=${job.id}::uuid order by captured_at desc limit 1`;
+ const cap=caps[0]||null;
+ const raw=cap?.raw_capture||null,protocol=raw?.protocol||null,flight=raw?.flight||null;
+ const hasRoute=!!(protocol?.canonical_route&&Array.isArray(protocol?.fixes)&&protocol.fixes.length>=2);
+ const state=saleState(job,flight,hasRoute);
+ if(!hasRoute){
+  return{status:state.state==="PENDING_ROUTE"?202:200,body:{status:state.state,flight_id:flightId,package_version:1,retryable:state.state==="PENDING_ROUTE",sellable:false}};
+ }
+ const s=sanity(protocol);
+ const estimatedOff=flight?.estimated_off||cap?.estimated_off||null;
+ // Gate departure is distinct from takeoff; never fall back to estimated_off.
+ const estimatedOut=flight?.estimated_out||cap?.estimated_out||null;
+ const actualTakeoff=flight?.actual_off||cap?.actual_off||null;
+ const gateMs=estimatedOut?Date.parse(estimatedOut):NaN;
+ const checkAgainAfter=!actualTakeoff&&Number.isFinite(gateMs)?new Date(gateMs-30*60000).toISOString():null;
+ const startIso=estimatedOff||flight?.scheduled_off||job.scheduled_out_initial||null;
+ const rawDuration=cap?.filed_ete_seconds??flight?.filed_ete;
+ const durationSeconds=rawDuration==null||rawDuration===""?null:Number(rawDuration);
+ const points=protocol.fixes.filter(p=>Number.isFinite(p?.latitude)&&Number.isFinite(p?.longitude)).map(p=>({name:p.name||null,latitude:p.latitude,longitude:p.longitude}));
+ const corridor=corridorMeta();
+ const confidenceHalfWidth=CORRIDOR_CALIBRATION.confidence_half_width_km;
+ const eta=etaPackage({estimatedOff,filedEteSeconds:durationSeconds});
+ const body={
+  status:"READY",
+  package_version:1,
+  source_captured_at:cap?.captured_at||null,
+  ...(checkAgainAfter?{check_again_after:checkAgainAfter}:{}),
+  sale_state:state,
+  flight:{
+   id:flightId,
+   ident:job.ident,
+   ident_icao:flight?.ident_icao||(/^([A-Z]{3})\d/.test(job.ident||"")?job.ident:null),
+   airline:flight?.airline||airlineFromOperator(flight?.operator_icao,flight?.ident_icao||job.ident),
+   aircraft_type:flight?.aircraft_type||null,
+   scheduled_arrival:flight?.scheduled_on||null,
+   actual_off:actualTakeoff,
+   origin:job.origin,
+   destination:job.destination,
+   origin_airport:flight?.origin_airport||airportFromFiledFix(job.origin,points[0]),
+   destination_airport:flight?.destination_airport||airportFromFiledFix(job.destination,points.at(-1)),
+   scheduled_out:job.scheduled_out_initial,
+   estimated_off:estimatedOff,
+   estimated_out:estimatedOut
+  },
+  route:{
+   canonical_hash:protocol.canonical_hash||cap?.canonical_hash||null,
+   canonical_route:protocol.canonical_route,
+   distance_km:protocol.computed_km??cap?.baseline_km??null,
+   fixes:points,
+   resolver_sanity:s,
+   timeline:Number.isFinite(durationSeconds)&&durationSeconds>0?modelFiledTimeline(points,{durationSeconds,distanceKm:protocol.computed_km??cap?.baseline_km??null}):[]
+  },
+  eta,
+  corridor:{
+   ...corridor,
+   confidence_polygon:corridorPolygon(points,confidenceHalfWidth),
+   display_polygon:corridorPolygon(points,6)
+  },
+  generated_at:new Date().toISOString()
+ };
+ return{status:200,body};
+}
