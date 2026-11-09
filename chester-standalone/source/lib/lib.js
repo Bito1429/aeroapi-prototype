@@ -1,0 +1,3 @@
+export function json(res,status,body){res.statusCode=status;res.setHeader("content-type","application/json; charset=utf-8");res.setHeader("cache-control","private, no-store");res.end(JSON.stringify(body));}
+export function havKm(a,b){const R=6371.0088,rad=Math.PI/180,p1=a.latitude*rad,p2=b.latitude*rad,dp=(b.latitude-a.latitude)*rad,dl=(b.longitude-a.longitude)*rad,h=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;return 2*R*Math.asin(Math.min(1,Math.sqrt(h)));}
+export function polyKm(p){let d=0;for(let i=1;i<p.length;i++)d+=havKm(p[i-1],p[i]);return d;}
