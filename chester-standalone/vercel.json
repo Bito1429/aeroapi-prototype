@@ -1,0 +1,28 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "buildCommand": "npm run build",
+  "functions": {
+    "api/*.js": {
+      "maxDuration": 30
+    }
+  },
+  "routes": [
+    {
+      "src": "^/api/chester-search$",
+      "dest": "/api/chester-search"
+    },
+    {
+      "src": "^/api/chester-details$",
+      "dest": "/api/chester-details"
+    },
+    {
+      "src": "^/api/chester-package$",
+      "dest": "/api/chester-package"
+    },
+    {
+      "src": "^/.*$",
+      "status": 404
+    }
+  ]
+}
