@@ -64,7 +64,7 @@ export async function runEurope(phase){
  for(const [route,path] of missing)await db`insert into europe_option_b.route_seeds(route_key,seed_version,source,derived_path) values(${route},${"adaptive-a030-"+Date.now()},'fresh_trial',${JSON.stringify(path)}::jsonb) on conflict(route_key) do nothing`;
 
 
- const dbRoutes=await db`select route_key from europe_option_b.route_manifest where uk_priority=true order by case when split_part(route_key,'|',3) in ('EGKK','EGSS','EGCC','EGGW','EGGD','EGPH') then 0 else 1 end,route_key limit 50`;
+ const dbRoutes=await db`select route_key from europe_option_b.route_manifest where uk_priority=true order by case when split_part(route_key,'|',3) in ('EGKK','EGSS','EGCC','EGGW','EGGD','EGPH') then 0 else 1 end,route_key limit 100`;
  const routes=new Map(dbRoutes.map(r=>[r.route_key,r]));
  const airports=[...new Set(dbRoutes.map(r=>r.route_key.split("|")[2]))].filter(x=>/^[A-Z]{4}$/.test(x));
  let calls=0,discovered=0,collected=0,seeded=0,locked=0,scored=0,failures=0,scheduledSeen=0,routeMatched=0,lockCandidates=0;
@@ -84,11 +84,15 @@ export async function runEurope(phase){
   const seededSet=new Set(seedList.map(r=>r.route_key));
   const seededRoutes=[...routes.keys()].filter(k=>seededSet.has(k));
   const otherRoutes=[...routes.keys()].filter(k=>!seededSet.has(k));
-  const slot=Math.floor(Date.now()/3600000)*2+(new Date().getUTCMinutes()>=15?1:0);
+  // Each quarter-hour gets a distinct slot (previously 15/30/45 repeated one slot).
+  // Spend at most three discovery requests per collect run, not four:
+  // one on an already-seeded route likely to score, two on expansion routes.
+  // This frees calls for post-landing verification while covering more routes.
+  const slot=Math.floor(Date.now()/900000);
   const chosen=[];
   const add=(pool,n,index)=>{for(let i=0;i<Math.min(n,pool.length);i++)chosen.push(pool[(index+i)%pool.length])};
-  add(seededRoutes,otherRoutes.length?3:4,slot*3);
-  add(otherRoutes,seededRoutes.length?1:4,slot);
+  add(seededRoutes,otherRoutes.length?1:3,slot);
+  add(otherRoutes,seededRoutes.length?2:3,slot*2);
   for(const routeKey of chosen){
    try{
     const ident=routeKey.split("|")[1];
@@ -105,7 +109,7 @@ export async function runEurope(phase){
    }catch(e){if(/EUROPE_USAGE_STOP|EUROPE_HALTED|DAILY_REQUEST_CAP/.test(e.message))throw e;failures++;errors.push({message:safeError(e),status:Number((safeError(e).match(/PROVIDER_HTTP_([0-9]+)/)||[])[1])||0,stage:"targeted_discovery"});}
   }
   // A flight must have been enrolled during the live trial before a post-landing track is requested.
-  const pending=await db`select flight_id,route_key,departure_at from europe_option_b.trial_flights where state='ENROLLED' and departure_at<now()-interval '50 minutes' and departure_at>now()-interval '12 hours' order by departure_at limit 5`;
+  const pending=await db`select flight_id,route_key,departure_at from europe_option_b.trial_flights where state='ENROLLED' and departure_at<now()-interval '100 minutes' and departure_at>now()-interval '12 hours' order by departure_at limit 5;
   for(const f of pending){
    if(calls+2>budget)break;
    try{
@@ -149,7 +153,7 @@ export async function runEurope(phase){
    }
   }
  }else if(phase==="score"){
-  const pending=await db`select flight_id,route_key,locked_path from europe_option_b.trial_flights where state='LOCKED' and locked_at is not null and scored_at is null and departure_at<now()-interval '50 minutes' order by departure_at limit 4`;
+  const pending=await db`select flight_id,route_key,locked_path from europe_option_b.trial_flights where state='LOCKED' and locked_at is not null and scored_at is null and departure_at<now()-interval '100 minutes' order by departure_at limit 4;
   for(const f of pending){
    if(calls+2>budget)break;
    try{
