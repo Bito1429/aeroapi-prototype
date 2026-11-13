@@ -3,6 +3,7 @@ import {chesterAuthorized} from "./chester-auth.js";
 import {db} from "./db.js";
 import {json} from "./lib.js";
 import {saleState,nextCheckAfter} from "./chester-sale-state.js";
+import {airlineFromOperator} from "./airline-reference.js";
 export default async function handler(req,res){
  if(req.method!=="GET")return json(res,405,{error:"METHOD_NOT_ALLOWED"});
  if(!chesterAuthorized(req,res))return;
@@ -21,7 +22,7 @@ export default async function handler(req,res){
   if(!rows.length)return json(res,404,{error:"FLIGHT_NOT_FOUND"});
   const r=rows[0],state=saleState(r),flight=r.raw_capture?.flight||{};
   const {raw_capture,...publicFields}=r;
-  const airline=flight.airline||null;
+  const airline=flight.airline||airlineFromOperator(flight.operator_icao,flight.ident_icao||r.ident)||null;
   const aircraft_type=flight.aircraft_type||null;
   res.setHeader("cache-control","private, no-store");
   return json(res,200,{generated_at:new Date().toISOString(),source:"stored_us_flight_jobs",sale_state:state,flight:{...publicFields,sale_state:state,sellable:state==="SELLABLE",airline,aircraft_type,check_again_after:state==="PENDING_ROUTE"?nextCheckAfter():null,package_status:r.has_route?"CAPTURE_AVAILABLE":"PENDING_CAPTURE",package_url:"/api/chester-package?flight_id="+encodeURIComponent(id)}});
