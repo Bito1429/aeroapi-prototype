@@ -8,8 +8,9 @@ export default async function handler(req,res){
  if(req.method!=="GET") return json(res,405,{error:"METHOD_NOT_ALLOWED"});
  if(!chesterAuthorized(req,res))return;
  const ident=String(req.query?.ident||"").trim().toUpperCase();
- const origin=String(req.query?.origin||"").trim().toUpperCase();
- const destination=String(req.query?.destination||"").trim().toUpperCase();
+ const normalizeAirport=raw=>{const code=String(raw||"").trim().toUpperCase();if(code.length!==3)return code;return ({ANC:"PANC",FAI:"PAFA",HNL:"PHNL",OGG:"PHOG",GUM:"PGUM"})[code]||"K"+code;};
+ const origin=normalizeAirport(req.query?.origin);
+ const destination=normalizeAirport(req.query?.destination);
  if(ident.length>16||origin.length>4||destination.length>4||!(/^[A-Z0-9]*$/.test(ident+origin+destination))) return json(res,400,{error:"INVALID_SEARCH"});
  try{
   const sql=db();
