@@ -1,0 +1,95 @@
+{
+  "schema": "aevpath.chester.us-groundstop-derived-cases.v2",
+  "generated_at_utc": "2026-11-13T23:10:00Z",
+  "source": "read-only SQL observations of AevPath US production flight_jobs/flight_captures columns; AevPath-derived test records only, no raw_capture payloads or provider response files",
+  "event": {
+    "start_utc": "2026-11-13T20:54:00Z",
+    "description": "FAA US nationwide ground stop",
+    "attribution": "Potentially impacted; no per-flight causality established"
+  },
+  "notes": [
+    "Source snapshots reflect different last capture times, not a synchronized current-time feed.",
+    "A filed canonical route does not guarantee Chester schema READY validation or eligibility to sell.",
+    "No post-flight accuracy score or actual aircraft position is inferred.",
+    "When the original scheduled gate-out has passed and there is neither a confirmed actual_out nor a recent future estimated_out, fail closed rather than showing SELLABLE; treat expected sale state below as a test requirement, not an already deployed endpoint behaviour.",
+    "check_again_after is a policy-generated retry time, not a field sourced from FlightAware."
+  ],
+  "cases": [
+    {
+      "ident": "JBU136",
+      "route": "KPHX-KJFK",
+      "scheduled_out": "2026-11-13T21:30:00Z",
+      "latest_capture_at": "2026-11-13T22:39:44Z",
+      "latest_observed_status": "Scheduled / Delayed",
+      "estimated_out": "2026-11-13T23:59:00Z",
+      "delay_minutes": 149,
+      "observed_estimated_out_sequence": [
+        "2026-11-13T21:30:00Z",
+        "2026-11-13T22:30:00Z",
+        "2026-11-13T23:00:00Z",
+        "2026-11-13T23:59:00Z"
+      ],
+      "confirmed_actual_gate_out": false,
+      "route_fix_count": 28,
+      "test": "Successive delay revisions; defer sale until complete validated derived package exists, recheck time must be in future"
+    },
+    {
+      "ident": "UAL1962",
+      "route": "KLAX-KIAD",
+      "scheduled_out": "2026-11-13T21:15:00Z",
+      "latest_capture_at": "2026-11-13T22:21:44Z",
+      "latest_observed_status": "Scheduled / Delayed",
+      "estimated_out": "2026-11-13T23:30:00Z",
+      "delay_minutes": 135,
+      "confirmed_actual_gate_out": false,
+      "route_fix_count": 39,
+      "test": "Ground-stop-window delay, no false DEPARTED solely because scheduled time passed"
+    },
+    {
+      "ident": "DAL3146",
+      "route": "KATL-KMSY",
+      "scheduled_out": "2026-11-13T20:30:00Z",
+      "latest_capture_at": "2026-11-13T21:30:44Z",
+      "latest_observed_status": "Scheduled / Delayed",
+      "estimated_out": "2026-11-13T22:00:00Z",
+      "delay_minutes": 90,
+      "confirmed_actual_gate_out": false,
+      "route_fix_count": 17,
+      "test": "Originally scheduled before event, observed delayed during event; refresh stale estimated departure"
+    },
+    {
+      "ident": "DAL2546",
+      "route": "KMCO-KATL",
+      "scheduled_out": "2026-11-13T21:45:00Z",
+      "latest_capture_at": "2026-11-13T21:58:44Z",
+      "latest_observed_status": "Scheduled / Delayed",
+      "estimated_out": "2026-11-13T22:45:00Z",
+      "delay_minutes": 60,
+      "confirmed_actual_gate_out": false,
+      "route_fix_count": 17,
+      "test": "Delay observed; future recheck or fail closed after estimate becomes stale"
+    },
+    {
+      "ident": "SWA3266",
+      "route": "KLAX-KOAK",
+      "scheduled_out": "2026-11-13T21:00:00Z",
+      "latest_capture_at": "2026-11-13T20:55:44Z",
+      "latest_observed_status": "Scheduled",
+      "estimated_out": "2026-11-13T21:00:00Z",
+      "confirmed_actual_gate_out": false,
+      "route_fix_count": 21,
+      "test": "Potential stale departure time. Do not treat route availability as sufficient to declare SELLABLE when estimate is past and status is old."
+    },
+    {
+      "ident": "SKW5717",
+      "route": "KLAX-KRNO",
+      "scheduled_out": "2026-11-13T21:00:00Z",
+      "latest_capture_at": "2026-11-13T21:29:44Z",
+      "latest_observed_status": "Scheduled",
+      "estimated_out": "2026-11-13T21:00:00Z",
+      "confirmed_actual_gate_out": false,
+      "route_fix_count": 18,
+      "test": "Observed scheduled status persisted after scheduled departure. Force cautious recheck and no sale without recent confirmed package state."
+    }
+  ]
+}

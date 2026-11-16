@@ -1,0 +1,56 @@
+{
+  "schema": "aevpath.chester.disruption-cases.v1",
+  "source": "AevPath US production database derived fields; no FlightAware raw payload, tracks, or provider response stored",
+  "event": {
+    "date": "2026-11-13",
+    "name": "FAA nationwide ground stop",
+    "effective_at": "2026-11-13T20:54:00Z",
+    "event_provenance": "public news / FAA advisory reported; incident attribution for individual flights not established"
+  },
+  "notes": "These are EXPECTED Chester response cases reconstructed from the US database at the investigation snapshot, not live Chester response logs. check_again_after is dynamic response-time plus 15 minutes. Sale state is PENDING_ROUTE if no finished stored package exists.",
+  "cases": [
+    {
+      "label": "cancelled_before_event",
+      "ident": "AAL2224",
+      "route": "KBWI-KCLT",
+      "scheduled_out": "2026-11-13T10:00:00Z",
+      "expected_sale_state": "CANCELLED",
+      "expected_sellable": false,
+      "expected_check_again_after": null,
+      "scoring": "excluded",
+      "incident_attribution": "NOT established; scheduled before event"
+    },
+    {
+      "label": "delayed_prestop_schedule",
+      "ident": "DAL3146",
+      "route": "KATL-KMSY",
+      "scheduled_out": "2026-11-13T20:30:00Z",
+      "observation_at": "2026-11-13T21:30:44Z",
+      "estimated_out_at_observation": "2026-11-13T22:00:00Z",
+      "expected_sale_state_without_ready_package": "PENDING_ROUTE",
+      "expected_check_again_after_rule": "response timestamp + 15 minutes",
+      "incident_attribution": "possible; not proven"
+    },
+    {
+      "label": "delayed_in_event_window",
+      "ident": "UAL1962",
+      "route": "KLAX-KIAD",
+      "scheduled_out": "2026-11-13T21:15:00Z",
+      "estimated_out_at_observation": "2026-11-13T23:30:00Z",
+      "expected_sale_state_without_ready_package": "PENDING_ROUTE",
+      "expected_check_again_after_rule": "response timestamp + 15 minutes",
+      "incident_attribution": "possible; not proven"
+    },
+    {
+      "label": "left_gate_before_nationwide_stop",
+      "ident": "DAL2595",
+      "route": "KATL-KBOS",
+      "scheduled_out": "2026-11-13T20:15:00Z",
+      "actual_gate_out": "2026-11-13T20:34:00Z",
+      "expected_sale_state": "DEPARTED",
+      "expected_sellable": false,
+      "expected_check_again_after": null,
+      "incident_attribution": "actual gate departure before event; airborne status not asserted"
+    }
+  ]
+}
