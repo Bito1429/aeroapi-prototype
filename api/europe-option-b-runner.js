@@ -35,7 +35,7 @@ async function request(db,path,phase){assertTrialWindow();const key=assertTrialK
  const airportAllowed=/^\/airports\/[A-Z]{4}\/flights\/scheduled_departures\?max_pages=1(?:&airline=(?:EZY|RYR|EXS|WZZ))?$/.test(path);
  if(!flightAllowed&&!airportAllowed)throw Error("PATH_BLOCKED");
  const [st]=await db`select halted from europe_option_b.trial_state where id=1`;if(st?.halted)throw Error("EUROPE_HALTED");
- const [c]=await db`select count(*)::int n from europe_option_b.request_audit where day=(now() at time zone 'UTC')::date and status>0`;
+ const [c]=await db`select count(*)::int n from europe_option_b.request_audit where day=(now() at time zone 'UTC')::date`;
  if(c.n>=MAX_REQUESTS)throw Error("DAILY_REQUEST_CAP");
  if(c.n>=(phase==="collect"?COLLECT_REQUESTS:SCORE_REQUESTS))throw Error("PHASE_BUDGET_EXHAUSTED");
  let r;try{r=await fetch(BASE+path,{headers:{"x-apikey":key},cache:"no-store",signal:AbortSignal.timeout(12000)})}catch{throw Error("PROVIDER_NETWORK_ERROR")}
