@@ -14,7 +14,7 @@ export default async function handler(req,res){
   const rows=await sql`SELECT j.fa_flight_id AS flight_id,j.ident,j.origin,j.destination,
    j.scheduled_out_initial AS scheduled_out,j.scheduled_on_initial AS scheduled_on,
    j.status,j.final_actual_out,p.flight_id IS NOT NULL AS has_route,
-   p.generated_at AS last_capture_at
+   p.generated_at AS last_capture_at,p.package_json->'flight'->>'estimated_out' AS estimated_out
    FROM public.flight_jobs j LEFT JOIN public.chester_ready_packages p
     ON p.flight_id=j.fa_flight_id AND p.expires_at>now()
    WHERE j.scheduled_out_initial>now()-interval '2 hours' AND j.scheduled_out_initial<now()+interval '48 hours'
