@@ -12,7 +12,7 @@ export default async function handler(req,res){
   const sql=db();
   const rows=await sql`SELECT j.fa_flight_id AS flight_id,j.ident,j.origin,j.destination,j.status,
     j.scheduled_out_initial AS scheduled_out,j.scheduled_on_initial AS scheduled_on,
-    j.final_actual_out,p.package_json,p.generated_at AS last_capture_at,p.flight_id IS NOT NULL AS has_route
+    j.final_actual_out,p.package_json,p.generated_at AS last_capture_at,p.package_json->'flight'->>'estimated_out' AS estimated_out,p.flight_id IS NOT NULL AS has_route
     FROM public.flight_jobs j LEFT JOIN public.chester_ready_packages p
     ON p.flight_id=j.fa_flight_id AND p.expires_at>now() WHERE j.fa_flight_id=${id} LIMIT 1`;
   if(!rows.length)return json(res,404,{error:"FLIGHT_NOT_FOUND"});
