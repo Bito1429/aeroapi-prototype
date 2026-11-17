@@ -55,11 +55,17 @@ async function request(db,path,phase){
  const [permit]=await db`with initial as(
     select count(*)::int n from europe_option_b.request_audit
     where day=(now() at time zone 'UTC')::date
+ ), existing_collect as(
+    select least(${COLLECT_REQUESTS},coalesce(sum(request_count),0)::int) c
+    from europe_option_b.run_audit
+    where phase='collect' and (run_at at time zone 'UTC')::date=(now() at time zone 'UTC')::date
  )
  insert into europe_option_b.daily_call_budget as b(day,used,collect_used,score_used)
- select (now() at time zone 'UTC')::date,n+1,${incCollect},${incScore}
- from initial
- where n<${OPERATING_REQUESTS} and (not ${isCollect} or n<${COLLECT_REQUESTS})
+ select (now() at time zone 'UTC')::date,n+1,
+        least(${COLLECT_REQUESTS},existing_collect.c+${incCollect}),${incScore}
+ from initial cross join existing_collect
+ where n<${OPERATING_REQUESTS}
+   and (not ${isCollect} or existing_collect.c<${COLLECT_REQUESTS})
  on conflict(day) do update set
     used=b.used+1,collect_used=b.collect_used+${incCollect},
     score_used=b.score_used+${incScore}
