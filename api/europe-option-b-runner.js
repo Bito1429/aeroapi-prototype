@@ -1,6 +1,8 @@
 import { neon } from "@neondatabase/serverless";
+import { createHash } from "node:crypto";
+import {MAX_PROVIDER_REQUESTS,OPERATING_REQUESTS,COLLECT_REQUESTS,cooldownMinutes,chooseDiscoveryRoutes} from "./europe-option-b-efficiency.js";
 import { assertTrialWindow,assertTrialKey,assertCleanDerived } from "./europe-option-b-core.js";
-const MAX_FLIGHTS=150,MAX_REQUESTS=300,COLLECT_REQUESTS=160,SCORE_REQUESTS=280,BASE="https://aeroapi.flightaware.com/aeroapi";
+const MAX_FLIGHTS=150,BASE="https://aeroapi.flightaware.com/aeroapi";
 const sql=()=>{if(!process.env.EUROPE_DATABASE_URL)throw Error("EUROPE_DB_MISSING");return neon(process.env.EUROPE_DATABASE_URL)};
 const valid=s=>/^[A-Za-z0-9_-]{1,90}$/.test(s);
 const iso=s=>s&&Number.isFinite(Date.parse(s))?new Date(s).toISOString():null;
@@ -30,28 +32,65 @@ function adaptivePath(oldPath,newTrack){
  return assertCleanDerived(old.map((p,i)=>({latitude:(1-OPTION_B_ALPHA)*p.latitude+OPTION_B_ALPHA*incoming[i].latitude,longitude:(1-OPTION_B_ALPHA)*p.longitude+OPTION_B_ALPHA*incoming[i].longitude})));
 }
 function score(path,track){const a=resample(points(track),64),b=points(path);return median(a.map(p=>Math.min(...b.map(q=>hav(p,q)))))}
-async function request(db,path,phase){assertTrialWindow();const key=assertTrialKey();
+async function request(db,path,phase){
+ assertTrialWindow();const key=assertTrialKey();
  const flightAllowed=/^\/flights\/[A-Za-z0-9_-]{1,90}(?:\/track)?$/.test(path);
  const airportAllowed=/^\/airports\/[A-Z]{4}\/flights\/scheduled_departures\?max_pages=1(?:&airline=(?:EZY|RYR|EXS|WZZ))?$/.test(path);
  if(!flightAllowed&&!airportAllowed)throw Error("PATH_BLOCKED");
- const [st]=await db`select halted from europe_option_b.trial_state where id=1`;if(st?.halted)throw Error("EUROPE_HALTED");
- const [c]=await db`select count(*)::int n from europe_option_b.request_audit where day=(now() at time zone 'UTC')::date`;
- if(c.n>=MAX_REQUESTS)throw Error("DAILY_REQUEST_CAP");
- if(c.n>=(phase==="collect"?COLLECT_REQUESTS:SCORE_REQUESTS))throw Error("PHASE_BUDGET_EXHAUSTED");
- let r;try{r=await fetch(BASE+path,{headers:{"x-apikey":key},cache:"no-store",signal:AbortSignal.timeout(12000)})}catch{throw Error("PROVIDER_NETWORK_ERROR")}
- const warning=[r.headers.get("warning"),r.headers.get("x-usage-warning"),r.headers.get("x-ratelimit-remaining")].filter(Boolean).join(" ").slice(0,160);
- const halted=r.status===429||r.status===402||/quota|exceed|billing|credit|usage|rate.limit/i.test(warning)||/^(0|1)$/.test(warning.trim());
- await db`insert into europe_option_b.request_audit(day,status,warning,halted) values((now() at time zone 'UTC')::date,${r.status},${warning},${halted})`;
- if(halted){await db`update europe_option_b.trial_state set halted=true,reason='PROVIDER_USAGE_WARNING' where id=1`;throw Error("EUROPE_USAGE_STOP")}
- if(!r.ok){
-  const raw=(await r.text()).slice(0,1200);let detail="";
-  try{const j=JSON.parse(raw);detail=String(j.error?.message||j.error||j.message||j.detail||"")}catch{detail=""}
-  // Error message only: never retain response objects, tracks, coordinates, or credentials.
-  detail=detail.replace(/[A-Za-z0-9_-]{25,}/g,"[redacted]").replace(/https?:[^ ]+/g,"[url]").replace(/[\r\n]/g," ").slice(0,160);
-  throw Error("PROVIDER_HTTP_"+r.status+(detail?" "+detail:""));
+ const [st]=await db`select halted from europe_option_b.trial_state where id=1`;
+ if(st?.halted)throw Error("EUROPE_HALTED");
+ const pathHash=createHash("sha256").update(path).digest("hex");
+ const cooldown=cooldownMinutes(phase);
+ // Atomic lease on the hash of the exact endpoint, not the raw flight identifier.
+ // Suppress duplicate lookups across overlapping runs or phases.
+ const [lease]=await db`insert into europe_option_b.lookup_leases as l(path_hash,next_after)
+ values(${pathHash},now()+(${cooldown}::int*interval '1 minute'))
+ on conflict(path_hash) do update set next_after=excluded.next_after
+ where l.next_after<=now()
+ returning path_hash`;
+ if(!lease)throw Error("LOOKUP_COOLDOWN");
+ const isCollect=phase==="collect",incCollect=isCollect?1:0,incScore=phase==="score"?1:0;
+ // Reserve before making a provider request. ON CONFLICT holds an atomic row lock.
+ // First use on deployment day includes EVERY previously-audited entry conservatively.
+ const [permit]=await db`with initial as(
+    select count(*)::int n from europe_option_b.request_audit
+    where day=(now() at time zone 'UTC')::date
+ )
+ insert into europe_option_b.daily_call_budget as b(day,used,collect_used,score_used)
+ select (now() at time zone 'UTC')::date,n+1,${incCollect},${incScore}
+ from initial
+ where n<${OPERATING_REQUESTS} and (not ${isCollect} or n<${COLLECT_REQUESTS})
+ on conflict(day) do update set
+    used=b.used+1,collect_used=b.collect_used+${incCollect},
+    score_used=b.score_used+${incScore}
+ where b.used<${OPERATING_REQUESTS} and b.used<${MAX_PROVIDER_REQUESTS}
+   and (not ${isCollect} or b.collect_used<${COLLECT_REQUESTS})
+ returning used`;
+ if(!permit)throw Error("DAILY_REQUEST_CAP");
+ let response;
+ try{response=await fetch(BASE+path,{headers:{"x-apikey":key},cache:"no-store",signal:AbortSignal.timeout(12000)})}
+ catch{
+   await db`insert into europe_option_b.request_audit(day,status,warning,halted)
+      values((now() at time zone 'UTC')::date,0,'PROVIDER_NETWORK_ERROR',false)`;
+   throw Error("PROVIDER_NETWORK_ERROR");
  }
- // Discard provider prediction and Foresight fields before any use or storage.
- return stripForbiddenProviderFields(await r.json());
+ const warning=[response.headers.get("warning"),response.headers.get("x-usage-warning"),response.headers.get("x-ratelimit-remaining")].filter(Boolean).join(" ").slice(0,160);
+ const halted=response.status===429||response.status===402||/quota|exceed|billing|credit|usage|rate.limit/i.test(warning)||/^(0|1)$/.test(warning.trim());
+ await db`insert into europe_option_b.request_audit(day,status,warning,halted)
+ values((now() at time zone 'UTC')::date,${response.status},${warning},${halted})`;
+ if(response.status===503){
+   await db`update europe_option_b.lookup_leases
+   set next_after=greatest(next_after,now()+interval '90 minutes')
+   where path_hash=${pathHash}`;
+ }
+ if(halted){await db`update europe_option_b.trial_state set halted=true,reason='PROVIDER_USAGE_WARNING' where id=1`;throw Error("EUROPE_USAGE_STOP")}
+ if(!response.ok){
+  const raw=(await response.text()).slice(0,1200);let detail="";
+  try{const j=JSON.parse(raw);detail=String(j.error?.message||j.error||j.message||j.detail||"")}catch{detail=""}
+  detail=detail.replace(/[A-Za-z0-9_-]{25,}/g,"[redacted]").replace(/https?:[^ ]+/g,"[url]").replace(/[\r\n]/g," ").slice(0,160);
+  throw Error("PROVIDER_HTTP_"+response.status+(detail?" "+detail:""));
+ }
+ return stripForbiddenProviderFields(await response.json());
 }
 const flightDate=f=>iso(f.scheduled_out||f.scheduled_off||f.estimated_out);
 const landed=f=>Boolean(f.actual_on||f.actual_in);
@@ -73,12 +112,11 @@ export async function runEurope(phase){
  const budget=8,errors=[];
  const safeError=e=>String(e?.message||e).replace(/https?:\/\/\S+/g,"[url]").replace(/[A-Za-z0-9_-]{32,}/g,"[redacted]").replace(/[\r\n]/g," ").slice(0,160);
  const invoke=async path=>{if(calls>=budget)throw Error("RUN_REQUEST_CAP");try{const result=await request(db,path,phase);calls++;return result}catch(e){
-  if(!/PHASE_BUDGET_EXHAUSTED|DAILY_REQUEST_CAP|EUROPE_HALTED/.test(String(e.message)))calls++;
+  if(!/PHASE_BUDGET_EXHAUSTED|DAILY_REQUEST_CAP|EUROPE_HALTED|LOOKUP_COOLDOWN/.test(String(e.message)))calls++;
   const message=safeError(e);
   if(/PHASE_BUDGET_EXHAUSTED|DAILY_REQUEST_CAP/.test(message))budgetExhausted=true;
   errors.push({message,status:Number((message.match(/PROVIDER_HTTP_([0-9]+)/)||[])[1])||0});
-  if(!message.startsWith("PROVIDER_HTTP_")&&!/PHASE_BUDGET_EXHAUSTED|DAILY_REQUEST_CAP/.test(message))await db`insert into europe_option_b.request_audit(day,status,warning,halted) values((now() at time zone 'UTC')::date,0,${message},false)`;
-  else await db`update europe_option_b.request_audit set warning=left(concat_ws(' ',nullif(warning,''),${message}::text),160) where id=(select max(id) from europe_option_b.request_audit)`;
+  // request() owns audit rows; never change another request's latest row.
   throw e;
  }};
  const keyFor=f=>{const ident=String(f.ident_icao||f.ident||"");const o=String(f.origin?.code_icao||f.origin?.code||"");const d=String(f.destination?.code_icao||f.destination?.code||"");return [...routes.keys()].find(k=>{const a=k.split("|");return a[1]===ident&&a[2]===o&&a[3]===d})};
@@ -87,13 +125,15 @@ export async function runEurope(phase){
   // Live GET /flights/{ident}, never history. Four calls maximum for discovery.
   const seedList=await db`select route_key from europe_option_b.route_seeds where source='fresh_trial'`;
   const seededSet=new Set(seedList.map(r=>r.route_key));
-  const seededRoutes=[...routes.keys()].filter(k=>seededSet.has(k));
-  const otherRoutes=[...routes.keys()].filter(k=>!seededSet.has(k));
-  const slot=Math.floor(Date.now()/3600000)*2+(new Date().getUTCMinutes()>=15?1:0);
-  const chosen=[];
-  const add=(pool,n,index)=>{for(let i=0;i<Math.min(n,pool.length);i++)chosen.push(pool[(index+i)%pool.length])};
-  add(seededRoutes,otherRoutes.length?3:4,slot*3);
-  add(otherRoutes,seededRoutes.length?1:4,slot);
+  // Do not rediscover flights already enrolled for the next day.
+  const upcoming=await db`select distinct route_key from europe_option_b.trial_flights
+    where state in ('ENROLLED','LOCKED') and departure_at>now()
+     and departure_at<now()+interval '24 hours'`;
+  const known=new Set(upcoming.map(r=>r.route_key));
+  const seededRoutes=[...routes.keys()].filter(k=>seededSet.has(k)&&!known.has(k));
+  const otherRoutes=[...routes.keys()].filter(k=>!seededSet.has(k)&&!known.has(k));
+  const slot=Math.floor(Date.now()/900000);
+  const chosen=chooseDiscoveryRoutes(seededRoutes,otherRoutes,slot,2);
   for(const routeKey of chosen){
    try{
     const ident=routeKey.split("|")[1];
@@ -107,7 +147,7 @@ export async function runEurope(phase){
      const ins=await db`insert into europe_option_b.trial_flights(flight_id,route_key,departure_at,state) values(${id},${route},${departure},'ENROLLED') on conflict(flight_id) do nothing returning flight_id`;
      discovered+=ins.length;
     }
-   }catch(e){if(/PHASE_BUDGET_EXHAUSTED|DAILY_REQUEST_CAP/.test(e.message)){budgetExhausted=true;break}if(/EUROPE_USAGE_STOP|EUROPE_HALTED/.test(e.message))throw e;failures++;errors.push({message:safeError(e),status:Number((safeError(e).match(/PROVIDER_HTTP_([0-9]+)/)||[])[1])||0,stage:"targeted_discovery"});}
+   }catch(e){if(e.message==='LOOKUP_COOLDOWN')continue;if(/PHASE_BUDGET_EXHAUSTED|DAILY_REQUEST_CAP/.test(e.message)){budgetExhausted=true;break}if(/EUROPE_USAGE_STOP|EUROPE_HALTED/.test(e.message))throw e;failures++;errors.push({message:safeError(e),status:Number((safeError(e).match(/PROVIDER_HTTP_([0-9]+)/)||[])[1])||0,stage:"targeted_discovery"});}
   }
   // A flight must have been enrolled during the live trial before a post-landing track is requested.
   const pending=await db`select flight_id,route_key,departure_at from europe_option_b.trial_flights where state='ENROLLED' and departure_at<now()-interval '50 minutes' and departure_at>now()-interval '12 hours' order by departure_at limit 5`;
@@ -131,7 +171,7 @@ export async function runEurope(phase){
     const version="adaptive-a030-"+Date.now();
     const updated=await db`insert into europe_option_b.route_seeds(route_key,seed_version,source,derived_path) values(${f.route_key},${version},'fresh_trial',${JSON.stringify(derived)}::jsonb) on conflict(route_key) do update set seed_version=excluded.seed_version,source=excluded.source,derived_path=excluded.derived_path,created_at=now() returning route_key`;
     seeded+=updated.length;
-   }catch(e){if(/PHASE_BUDGET_EXHAUSTED|DAILY_REQUEST_CAP/.test(e.message)){budgetExhausted=true;break}if(/EUROPE_USAGE_STOP|EUROPE_HALTED/.test(e.message))throw e;failures++;errors.push({message:safeError(e),status:Number((safeError(e).match(/PROVIDER_HTTP_([0-9]+)/)||[])[1])||0,stage:phase});}
+   }catch(e){if(e.message==='LOOKUP_COOLDOWN')continue;if(/PHASE_BUDGET_EXHAUSTED|DAILY_REQUEST_CAP/.test(e.message)){budgetExhausted=true;break}if(/EUROPE_USAGE_STOP|EUROPE_HALTED/.test(e.message))throw e;failures++;errors.push({message:safeError(e),status:Number((safeError(e).match(/PROVIDER_HTTP_([0-9]+)/)||[])[1])||0,stage:phase});}
   }
  }
  if(phase==="collect"||phase==="predict"){
@@ -187,7 +227,7 @@ export async function runEurope(phase){
       await db`update europe_option_b.method_comparisons set scored_at=now(),error_km=${error} where flight_id=${f.flight_id} and method=${m.method} and scored_at is null`;
      }
     }
-   }catch(e){if(/PHASE_BUDGET_EXHAUSTED|DAILY_REQUEST_CAP/.test(e.message)){budgetExhausted=true;break}if(/EUROPE_USAGE_STOP|EUROPE_HALTED/.test(e.message))throw e;failures++;errors.push({message:safeError(e),status:Number((safeError(e).match(/PROVIDER_HTTP_([0-9]+)/)||[])[1])||0,stage:phase});}
+   }catch(e){if(e.message==='LOOKUP_COOLDOWN')continue;if(/PHASE_BUDGET_EXHAUSTED|DAILY_REQUEST_CAP/.test(e.message)){budgetExhausted=true;break}if(/EUROPE_USAGE_STOP|EUROPE_HALTED/.test(e.message))throw e;failures++;errors.push({message:safeError(e),status:Number((safeError(e).match(/PROVIDER_HTTP_([0-9]+)/)||[])[1])||0,stage:phase});}
   }
  }
  await db`insert into europe_option_b.run_audit(phase,request_count,predicted_count,scored_count,details) values(${phase},${calls},${locked},${scored},${JSON.stringify({discovered,collected,seeded,lock_candidates:lockCandidates,scheduled_seen:scheduledSeen,route_matched:routeMatched,eligible_waiting:eligibleWaiting,missed,budget_exhausted:budgetExhausted,failures,errors:errors.slice(0,8)})}::jsonb)`;
