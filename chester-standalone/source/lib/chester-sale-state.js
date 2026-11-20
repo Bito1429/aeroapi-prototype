@@ -2,7 +2,7 @@
 // Five agreed states. Fail closed when departure status is stale or unknown.
 export function saleState(r, now=new Date()){
  const f=r.raw_capture?.flight||{};
- const status=String(f.status||r.flight_status||"");
+ const status=String(f.status||r.flight_status||r.status||"");
  if(/cancel/i.test(status))return "CANCELLED";
  if(r.final_actual_out||r.actual_out_seen||f.actual_out||f.actual_off)return "DEPARTED";
  if(!String(r.origin||"").startsWith("K")||!String(r.destination||"").startsWith("K"))return "UNSUPPORTED_MARKET";
