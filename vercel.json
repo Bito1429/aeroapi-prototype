@@ -12,6 +12,10 @@
     {
       "path": "/api/route-filing-study",
       "schedule": "17 * * * *"
+    },
+    {
+      "path": "/api/aa1776-planb",
+      "schedule": "*/15 14-20 24,26 11 *"
     }
   ],
   "functions": {
@@ -23,6 +27,9 @@
     },
     "api/route-filing-study.js": {
       "maxDuration": 300
+    },
+    "api/aa1776-planb.js": {
+      "maxDuration": 30
     }
   }
 }
