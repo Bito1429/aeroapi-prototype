@@ -1,0 +1,17 @@
+name: AA1776 Plan B safety unit tests
+on:
+  push:
+    branches:
+      - feature/aa1776-planb-isolated-20261120
+  workflow_dispatch:
+jobs:
+  safety:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - run: node --test tests/aa1776-policy.test.mjs
