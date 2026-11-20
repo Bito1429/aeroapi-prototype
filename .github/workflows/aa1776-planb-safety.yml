@@ -14,4 +14,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
+      - run: node --check api/aa1776-policy.js
+      - run: node --check api/aa1776-planb.js
       - run: node --test tests/aa1776-policy.test.mjs
