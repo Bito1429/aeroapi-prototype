@@ -5,6 +5,7 @@ import {chesterAuthorized} from "../lib/chester-auth.js";
 import {buildDraftPackage} from "../lib/package-core.js";
 import {toChesterV1} from "../lib/chester-schema.js";
 import {json} from "../lib/lib.js";
+import {nextCheckAfter} from "../lib/chester-sale-state.js";
 export default async function handler(req,res){
  if(!chesterAuthorized(req,res))return;
  if(req.method!=="GET")return json(res,405,{error:"METHOD_NOT_ALLOWED"});
@@ -12,6 +13,7 @@ export default async function handler(req,res){
  if(!id||id.length>160)return json(res,400,{error:"FLIGHT_ID_REQUIRED"});
  try{
   const result=await buildDraftPackage(id);
+  if(result.status===202)return json(res,202,{...result.body,check_again_after:nextCheckAfter()});
   if(result.status!==200||result.body?.status!=="READY")return json(res,result.status,result.body);
   const draft=result.body,flight=draft.flight;
   // The gate, takeoff and airport fields come only from persisted AeroAPI capture.
