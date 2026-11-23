@@ -2,7 +2,7 @@
 // No provider credentials, no persistence and no calls in this module.
 export const AA1776_DATES=Object.freeze(["2026-11-23","2026-11-24","2026-11-25","2026-11-26"]);
 export const MAX_DAILY_RESERVED_MILLS=2000;
-export const MAX_DAILY_PROVIDER_REQUESTS=16; // independent atomic request cap
+export const MAX_DAILY_PROVIDER_REQUESTS=30; // independent atomic request cap
 export const MIN_RETRY_INTERVAL_MS=55*60000; // pre-19:00 UTC
 export const EVENING_RETRY_INTERVAL_MS=13*60000; // 15-minute cron cadence; tolerate provider/cron jitter
 // Published rates are $0.005 per flight result set and $0.010 per route.
@@ -12,20 +12,21 @@ export const ROUTE_RESERVATION_MILLS=20;
 const TWO_HOURS=120*60000;
 const MONDAY_START="2026-11-23T11:00:00Z";
 const MONDAY_END="2026-11-23T20:15:00Z";
-const TUESDAY_START="2026-11-24T14:00:00Z";
-const TUESDAY_END="2026-11-24T21:15:00Z";
-const WEDNESDAY_START="2026-11-25T14:00:00Z";
-const WEDNESDAY_END="2026-11-25T21:15:00Z";
-const THURSDAY_START="2026-11-26T15:00:00Z";
-const THURSDAY_END="2026-11-26T21:15:00Z";
+// Tue-Thu: one pre-route-filed paid opportunity at 16:00 UTC,
+// then quarter-hour checks between 19:00 and 21:15 UTC.
+// Narrow post-minute grace allows normal Vercel cron scheduling jitter.
+const EARLY_START="T16:00:00Z", EARLY_END="T16:10:00Z";
+const EVENING_START="T19:00:00Z", EVENING_END="T21:18:00Z";
 // Pure retry gate. Every no-call outcome is checkable with zero provider access.
 export function paidCheckDecision({state,lastCheckedAt,now,requestCount=0}={}){
  if(["READY","DEPARTED","CANCELLED"].includes(state))return"TERMINAL_STATE";
  const t=Date.parse(lastCheckedAt||""),n=Date.parse(now||"");
  const evening=Number.isFinite(n)&&new Date(n).getUTCHours()>=19;
  const gap=evening?EVENING_RETRY_INTERVAL_MS:MIN_RETRY_INTERVAL_MS;
- if(Number.isFinite(t)&&Number.isFinite(n)&&n-t<gap)return"RETRY_COOLDOWN";
  if(Number(requestCount)>=MAX_DAILY_PROVIDER_REQUESTS)return"DAILY_REQUEST_CAP_REACHED";
+ // A pre-19:00 check is a single paid attempt, even if it only fetched one endpoint.
+ if(!evening&&Number(requestCount)>0)return"EARLY_CHECK_ALREADY_USED";
+ if(Number.isFinite(t)&&Number.isFinite(n)&&n-t<gap)return"RETRY_COOLDOWN";
  return"CHECK_ROUTE";
 }
 export function isTargetDate(date){return AA1776_DATES.includes(date);}
@@ -33,9 +34,11 @@ export function inCollectionWindow(date,at){
  const t=Date.parse(at);
  if(!Number.isFinite(t))return false;
  if(date==="2026-11-23")return t>=Date.parse(MONDAY_START)&&t<=Date.parse(MONDAY_END);
- if(date==="2026-11-24")return t>=Date.parse(TUESDAY_START)&&t<=Date.parse(TUESDAY_END);
- if(date==="2026-11-25")return t>=Date.parse(WEDNESDAY_START)&&t<=Date.parse(WEDNESDAY_END);
- if(date==="2026-11-26")return t>=Date.parse(THURSDAY_START)&&t<=Date.parse(THURSDAY_END);
+ if(["2026-11-24","2026-11-25","2026-11-26"].includes(date)){
+  const early=t>=Date.parse(date+EARLY_START)&&t<Date.parse(date+EARLY_END);
+  const evening=t>=Date.parse(date+EVENING_START)&&t<Date.parse(date+EVENING_END);
+  return early||evening;
+ }
  return false;
 }
 function airportCode(a){return String(a?.code_icao||a?.code||a||"").toUpperCase();}
