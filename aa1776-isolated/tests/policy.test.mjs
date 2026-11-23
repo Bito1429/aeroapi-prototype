@@ -1,0 +1,16 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {AA1776_DATES,inCollectionWindow,selectAA1776,saleDecision,routeValid,aa1776PackageExpiresAt,MAX_DAILY_RESERVED_MILLS,LOOKUP_RESERVATION_MILLS,ROUTE_RESERVATION_MILLS} from "../api/aa1776-policy.js";
+const flight=(date="2026-11-23",over={})=>({ident_icao:"AAL1776",ident:"AAL1776",fa_flight_id:"TEST_ID_NOT_REAL",origin:{code_icao:"KPHL"},destination:{code_icao:"KBOS"},scheduled_out:date+"T21:25:00Z",status:"Scheduled",...over});
+test("only approved dates and 23 Nov rehearsal",()=>assert.deepEqual(AA1776_DATES,["2026-11-23","2026-11-24","2026-11-26"]));
+test("Monday UTC window",()=>{assert.equal(inCollectionWindow("2026-11-23","2026-11-23T19:00:00Z"),true);assert.equal(inCollectionWindow("2026-11-23","2026-11-23T21:00:00Z"),false)});
+test("Tuesday UTC window",()=>{assert.equal(inCollectionWindow("2026-11-24","2026-11-24T20:00:00Z"),true);assert.equal(inCollectionWindow("2026-11-24","2026-11-24T22:00:00Z"),false)});
+test("Thursday UTC cutoff",()=>{assert.equal(inCollectionWindow("2026-11-26","2026-11-26T19:30:00Z"),true);assert.equal(inCollectionWindow("2026-11-26","2026-11-26T19:30:01Z"),false)});
+test("actual identity, origin, destination and date required",()=>{assert.equal(selectAA1776([flight()],"2026-11-23").ok,true);assert.equal(selectAA1776([flight("2026-11-24")],"2026-11-23").ok,false);assert.equal(selectAA1776([flight("2026-11-23",{destination:{code_icao:"KJFK"}})],"2026-11-23").ok,false)});
+test("multiple matching flights fail closed",()=>assert.equal(selectAA1776([flight(),flight()],"2026-11-23").error,"AMBIGUOUS_FLIGHT"));
+test("reject Thursday 4h off schedule",()=>assert.equal(selectAA1776([flight("2026-11-26",{scheduled_out:"2026-11-26T16:00:00Z"})],"2026-11-26").error,"UNEXPECTED_DEPARTURE_TIME"));
+test("departed and cancelled flights fail closed",()=>{assert.equal(saleDecision(flight(),"2026-11-23T21:26:00Z"),"DEPARTED");assert.equal(saleDecision(flight("2026-11-23",{status:"Cancelled"}),"2026-11-23T20:00:00Z"),"CANCELLED")});
+test("unfiled or invalid route never accepted",()=>{assert.equal(routeValid({baseline_valid:false,canonical_route:"FAKE",computed_km:300,fixes:[{latitude:40,longitude:-75},{latitude:42,longitude:-71}]}),false);assert.equal(routeValid({baseline_valid:true,canonical_route:"A-B",computed_km:0,fixes:[{latitude:40,longitude:-75},{latitude:42,longitude:-71}]}),false)});
+test("conservative daily cap reservations",()=>{assert.equal(MAX_DAILY_RESERVED_MILLS,2000);assert.ok(LOOKUP_RESERVATION_MILLS>=5);assert.ok(ROUTE_RESERVATION_MILLS>=10)});
+test("Thursday 12 hours after scheduled landing",()=>assert.equal(aa1776PackageExpiresAt("2026-11-26","2026-11-26T22:45:00Z"),"2026-11-27T10:45:00.000Z"));
+test("Monday and Tuesday internal expiry remains midnight",()=>{assert.equal(aa1776PackageExpiresAt("2026-11-23","2026-11-23T22:45:00Z"),"2026-11-24T00:00:00.000Z");assert.equal(aa1776PackageExpiresAt("2026-11-24","2026-11-24T22:45:00Z"),"2026-11-25T00:00:00.000Z")});
