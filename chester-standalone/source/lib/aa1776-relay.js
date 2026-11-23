@@ -1,6 +1,6 @@
 // Narrow Chester-only access to the AA1776, same-day derived package relay.
 // This module has no FlightAware credentials, no provider network access and no writes.
-export const ALLOWED_DATES=new Set(["2026-11-24","2026-11-26"]);
+export const ALLOWED_DATES=new Set(["2026-11-23","2026-11-24","2026-11-26"]);
 const stamp=x=>new Date(x||0).getTime();
 export async function aa1776ByDate(sql,date){
  if(!ALLOWED_DATES.has(date))return null;
