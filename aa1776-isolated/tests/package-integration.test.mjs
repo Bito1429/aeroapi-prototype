@@ -5,7 +5,7 @@ import {airportView} from "../lib/airport-reference.js";
 import {canonicalize} from "../lib/lib.js";
 import {checkFlightFields,packageFromLive} from "../api/cron.js";
 import {toChesterV1} from "../lib/chester-schema.js";
-import {AA1776_DATES,aa1776PackageExpiresAt,MAX_DAILY_PROVIDER_REQUESTS,MIN_RETRY_INTERVAL_MS,paidCheckDecision} from "../lib/aa1776-policy.js";
+import {AA1776_DATES,aa1776PackageExpiresAt,MAX_DAILY_PROVIDER_REQUESTS,MIN_RETRY_INTERVAL_MS,EVENING_RETRY_INTERVAL_MS,paidCheckDecision} from "../lib/aa1776-policy.js";
 
 // No paid service calls. The historical v1 fixture is a real persisted/accepted
 // November 8 flight, not AA1776. We do not manufacture an AA1776 route.
@@ -97,4 +97,15 @@ test("actual retry gate skips 15-minute repeat, terminal READY, and 16-call cap"
  assert.equal(paidCheckDecision({state:"PENDING_SOURCE",lastCheckedAt:date,now:"2026-11-24T15:00:00Z",requestCount:2}),"CHECK_ROUTE");
  assert.equal(paidCheckDecision({state:"READY",lastCheckedAt:date,now:"2026-11-24T17:00:00Z"}),"TERMINAL_STATE");
  assert.equal(paidCheckDecision({state:"PENDING_SOURCE",lastCheckedAt:date,now:"2026-11-24T17:00:00Z",requestCount:16}),"DAILY_REQUEST_CAP_REACHED");
+});
+
+test("55-minute before 19:00; 15-minute from 19:00; READY/DEPARTED/CANCELLED block",()=>{
+ assert.equal(EVENING_RETRY_INTERVAL_MS,15*60000);
+ assert.equal(paidCheckDecision({state:"PENDING_ROUTE",lastCheckedAt:"2026-11-24T18:30:00Z",now:"2026-11-24T18:45:00Z",requestCount:3}),"RETRY_COOLDOWN");
+ assert.equal(paidCheckDecision({state:"PENDING_ROUTE",lastCheckedAt:"2026-11-24T18:45:00Z",now:"2026-11-24T19:00:00Z",requestCount:3}),"CHECK_ROUTE");
+ assert.equal(paidCheckDecision({state:"PENDING_ROUTE",lastCheckedAt:"2026-11-24T19:00:00Z",now:"2026-11-24T19:14:59Z",requestCount:3}),"RETRY_COOLDOWN");
+ assert.equal(paidCheckDecision({state:"PENDING_ROUTE",lastCheckedAt:"2026-11-24T19:00:00Z",now:"2026-11-24T19:15:00Z",requestCount:3}),"CHECK_ROUTE");
+ for(const state of ["READY","DEPARTED","CANCELLED"])
+  assert.equal(paidCheckDecision({state,now:"2026-11-24T20:15:00Z"}),"TERMINAL_STATE");
+ assert.equal(paidCheckDecision({state:"PENDING_ROUTE",now:"2026-11-24T20:15:00Z",requestCount:16}),"DAILY_REQUEST_CAP_REACHED");
 });
