@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {AA1776_DATES,inCollectionWindow,selectAA1776,saleDecision,routeValid,aa1776PackageExpiresAt,MAX_DAILY_RESERVED_MILLS,LOOKUP_RESERVATION_MILLS,ROUTE_RESERVATION_MILLS} from "../lib/aa1776-policy.js";
 const flight=(date="2026-11-23",over={})=>({ident_icao:"AAL1776",ident:"AAL1776",fa_flight_id:"TEST_ID_NOT_REAL",origin:{code_icao:"KPHL"},destination:{code_icao:"KBOS"},scheduled_out:date+"T21:25:00Z",status:"Scheduled",...over});
-test("only approved dates and 23 Nov rehearsal",()=>assert.deepEqual(AA1776_DATES,["2026-11-23","2026-11-24","2026-11-26"]));
+test("only approved dates and 23 Nov rehearsal",()=>assert.deepEqual(AA1776_DATES,["2026-11-23","2026-11-24","2026-11-25","2026-11-26"]));
 test("Monday UTC window",()=>{assert.equal(inCollectionWindow("2026-11-23","2026-11-23T19:00:00Z"),true);assert.equal(inCollectionWindow("2026-11-23","2026-11-23T21:00:00Z"),false)});
 test("Tuesday UTC window",()=>{assert.equal(inCollectionWindow("2026-11-24","2026-11-24T20:00:00Z"),true);assert.equal(inCollectionWindow("2026-11-24","2026-11-24T22:00:00Z"),false)});
 test("Thursday UTC cutoff",()=>{assert.equal(inCollectionWindow("2026-11-26","2026-11-26T19:30:00Z"),true);assert.equal(inCollectionWindow("2026-11-26","2026-11-26T19:30:01Z"),false)});
@@ -14,3 +14,11 @@ test("unfiled or invalid route never accepted",()=>{assert.equal(routeValid({bas
 test("conservative daily cap reservations",()=>{assert.equal(MAX_DAILY_RESERVED_MILLS,2000);assert.ok(LOOKUP_RESERVATION_MILLS>=5);assert.ok(ROUTE_RESERVATION_MILLS>=10)});
 test("Thursday 12 hours after scheduled landing",()=>assert.equal(aa1776PackageExpiresAt("2026-11-26","2026-11-26T22:45:00Z"),"2026-11-27T10:45:00.000Z"));
 test("Monday and Tuesday internal expiry remains midnight",()=>{assert.equal(aa1776PackageExpiresAt("2026-11-23","2026-11-23T22:45:00Z"),"2026-11-24T00:00:00.000Z");assert.equal(aa1776PackageExpiresAt("2026-11-24","2026-11-24T22:45:00Z"),"2026-11-25T00:00:00.000Z")});
+
+
+test("Wednesday additional rehearsal is allowed only inside 14:00-20:15 UTC",()=>{
+ assert.equal(inCollectionWindow("2026-11-25","2026-11-25T13:59:59Z"),false);
+ assert.equal(inCollectionWindow("2026-11-25","2026-11-25T14:00:00Z"),true);
+ assert.equal(inCollectionWindow("2026-11-25","2026-11-25T20:15:00Z"),true);
+ assert.equal(inCollectionWindow("2026-11-25","2026-11-25T20:15:01Z"),false);
+});
