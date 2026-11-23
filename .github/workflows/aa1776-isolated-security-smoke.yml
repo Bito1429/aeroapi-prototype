@@ -1,0 +1,22 @@
+name: AA1776 isolated production security smoke
+on:
+  push:
+    branches:
+      - release/aa1776-isolated-cron-20261123
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Non-cron requests rejected before provider access
+        run: |
+          set -euo pipefail
+          addr="https://aevpath-aa1776-planb.vercel.app/api/cron"
+          code="$(curl -sS --max-time 25 -o /tmp/aa-noauth -w '%{http_code}' "$addr")"
+          echo "No key: HTTP $code"
+          test "$code" = 401
+          code="$(curl -sS --max-time 25 -H 'User-Agent: vercel-cron/1.0' -H 'Authorization: Bearer invalid' -o /tmp/aa-bad -w '%{http_code}' "$addr")"
+          echo "Bad key: HTTP $code"
+          test "$code" = 401
+          echo "PASS: cron-only access enforced"
