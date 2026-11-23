@@ -4,6 +4,7 @@ on:
     branches:
       - feature/aa1776-planb-isolated-20261120
       - release/aa1776-planb-us-isolated-20261120
+      - fix/aa1776-chester-relay-us-20261123
   workflow_dispatch:
 jobs:
   safety:
@@ -17,4 +18,5 @@ jobs:
           node-version: "24"
       - run: node --check api/aa1776-policy.js
       - run: node --check api/aa1776-planb.js
+      - run: node --check api/aa1776-planb-purge.js
       - run: node --test tests/aa1776-policy.test.mjs
