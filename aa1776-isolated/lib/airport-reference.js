@@ -14,20 +14,30 @@ export function normalizeAirportName(name,codeIata=null){
 }
 
 export function airportView(a){
+ if(typeof a==="string")a={code_icao:a};
  if(!a||typeof a!=="object")return null;
- const codeIata=a.code_iata||a.iata||null;
- const codeIcao=a.code_icao||a.icao||a.code||null;
- const latitude=Number.isFinite(a.latitude)?a.latitude:(Number.isFinite(a.lat)?a.lat:null);
- const longitude=Number.isFinite(a.longitude)?a.longitude:(Number.isFinite(a.lon)?a.lon:null);
+ const codeIcao=String(a.code_icao||a.icao||a.code||"").toUpperCase();
+ const known=aa1776AirportMetadata(codeIcao);
+ const codeIata=a.code_iata||a.iata||known?.code_iata||null;
+ const latitude=Number.isFinite(a.latitude)?a.latitude:(Number.isFinite(a.lat)?a.lat:known?.latitude??null);
+ const longitude=Number.isFinite(a.longitude)?a.longitude:(Number.isFinite(a.lon)?a.lon:known?.longitude??null);
  return{
   code_iata:codeIata,
-  code_icao:codeIcao,
-  name:normalizeAirportName(a.name,codeIata),
-  timezone:a.timezone||a.tz||null,
+  code_icao:codeIcao||null,
+  name:normalizeAirportName(a.name||known?.name,codeIata),
+  timezone:a.timezone||a.tz||known?.timezone||null,
   latitude,
   longitude
  };
 }
+
+// Isolated AA1776 airport metadata from MIT-licensed airportsdata ICAO registry,
+// queried 2026-11-23; never inferred from flight path.
+const AA1776_AIRPORTS=Object.freeze({
+ KPHL:{code_iata:"PHL",code_icao:"KPHL",name:"Philadelphia International Airport",timezone:"America/New_York",latitude:39.872084,longitude:-75.240663},
+ KBOS:{code_iata:"BOS",code_icao:"KBOS",name:"General Edward Lawrence Logan International Airport",timezone:"America/New_York",latitude:42.362944,longitude:-71.006389}
+});
+export function aa1776AirportMetadata(code){return AA1776_AIRPORTS[String(code||"").toUpperCase()]||null;}
 
 // Static airport identity metadata for persisted captures which predate airportView.
 // Coordinates are taken from captured route fixes, never guessed.
