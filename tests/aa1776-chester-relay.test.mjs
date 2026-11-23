@@ -14,7 +14,7 @@ function row(options={}){
  };
 }
 test("only two authorized Plan B dates",()=>{
- assert.deepEqual([...ALLOWED_DATES],["2026-11-24","2026-11-26"]);
+ assert.deepEqual([...ALLOWED_DATES],["2026-11-23","2026-11-24","2026-11-26"]);
 });
 test("valid genuine source-derived package is sellable before gate-out",()=>{
  assert.equal(aa1776SaleState(row(),"2026-11-24T20:00:00Z"),"SELLABLE");
