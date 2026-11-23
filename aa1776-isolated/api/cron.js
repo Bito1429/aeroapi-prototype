@@ -2,12 +2,12 @@
 // Entry points: Vercel cron (mode=check) and Chester key (mode=package/status).
 // There are no changes to the 250-flight/day cohort or European trial.
 import{timingSafeEqual}from"node:crypto";
-import{aero,flightView,canonicalize,json}from"./lib.js";
-import{db}from"./db.js";
-import{etaPackage}from"./eta-calibration.js";
-import{modelFiledTimeline}from"./filed-timeline.js";
-import{toChesterV1}from"./chester-schema.js";
-import{inCollectionWindow,isTargetDate,selectAA1776,saleDecision,routeValid,LOOKUP_RESERVATION_MILLS,ROUTE_RESERVATION_MILLS,MAX_DAILY_RESERVED_MILLS,aa1776PackageExpiresAt}from"./aa1776-policy.js";
+import{aero,flightView,canonicalize,json}from"../lib/lib.js";
+import{db}from"../lib/db.js";
+import{etaPackage}from"../lib/eta-calibration.js";
+import{modelFiledTimeline}from"../lib/filed-timeline.js";
+import{toChesterV1}from"../lib/chester-schema.js";
+import{inCollectionWindow,isTargetDate,selectAA1776,saleDecision,routeValid,LOOKUP_RESERVATION_MILLS,ROUTE_RESERVATION_MILLS,MAX_DAILY_RESERVED_MILLS,aa1776PackageExpiresAt}from"../lib/aa1776-policy.js";
 
 function equalSecret(provided,expected){
  if(!expected||typeof provided!=="string")return false;
