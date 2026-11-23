@@ -1,0 +1,29 @@
+name: Chester AA1776 relay safety
+on:
+  push:
+    branches:
+      - fix/aa1776-chester-relay-api-20261123
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  safety:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - run: node --check chester-standalone/source/api/chester-aa1776.js
+      - run: node --check chester-standalone/source/lib/aa1776-relay.js
+      - run: node --check chester-standalone/source/api/chester-package.js
+      - run: node --check chester-standalone/source/api/chester-search.js
+      - run: node --check chester-standalone/source/api/chester-details.js
+      - run: node --test tests/aa1776-chester-relay.test.mjs
+      - name: Bundle all four Chester-only endpoints
+        working-directory: chester-standalone
+        run: |
+          npm install --no-audit --no-fund
+          npm run build
+          test -s api/chester-aa1776.js
+          ! grep -q 'NOT_BUILT' api/chester-aa1776.js
