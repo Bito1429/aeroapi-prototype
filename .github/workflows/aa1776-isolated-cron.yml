@@ -23,13 +23,13 @@ jobs:
         run: |
           node --check aa1776-isolated/api/cron.js
           node --check aa1776-isolated/api/purge.js
-          node --check aa1776-isolated/api/aa1776-policy.js
+          node --check aa1776-isolated/lib/aa1776-policy.js
       - name: Run 12 isolated safety tests
         run: node --test aa1776-isolated/tests/policy.test.mjs
       - name: Assert no Chester credentials and no exposed status API
         run: |
-          ! grep -R 'CHESTER_SHARED_KEY' aa1776-isolated/api/
-          test "$(find aa1776-isolated/api -maxdepth 1 -type f -name '*.js' | grep -E '/(cron|purge)\.js$' | wc -l)" -eq 2
+          ! grep -R 'CHESTER_SHARED_KEY' aa1776-isolated/
+          test "$(find aa1776-isolated/api -maxdepth 1 -type f -name '*.js' | wc -l)" -eq 2
       - name: Static policy smoke
         run: |
-          node --input-type=module -e "import {AA1776_DATES,inCollectionWindow,aa1776PackageExpiresAt} from './aa1776-isolated/api/aa1776-policy.js'; if(AA1776_DATES.join(',')!=='2026-11-23,2026-11-24,2026-11-26')process.exit(1);if(!inCollectionWindow('2026-11-23','2026-11-23T19:00:00Z'))process.exit(1);if(aa1776PackageExpiresAt('2026-11-26','2026-11-26T22:45:00Z')!=='2026-11-27T10:45:00.000Z')process.exit(1)"
+          node --input-type=module -e "import {AA1776_DATES,inCollectionWindow,aa1776PackageExpiresAt} from './aa1776-isolated/lib/aa1776-policy.js'; if(AA1776_DATES.join(',')!=='2026-11-23,2026-11-24,2026-11-26')process.exit(1);if(!inCollectionWindow('2026-11-23','2026-11-23T19:00:00Z'))process.exit(1);if(aa1776PackageExpiresAt('2026-11-26','2026-11-26T22:45:00Z')!=='2026-11-27T10:45:00.000Z')process.exit(1)"
