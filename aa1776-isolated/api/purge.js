@@ -11,7 +11,7 @@ export default async function handler(req,res){
  if(req.method!=="GET"||process.env.VERCEL_ENV!=="production")return json(res,403,{error:"CRON_PRODUCTION_ONLY"});
  const now=new Date().toISOString();
  const date=now.slice(0,10);
- if(!["2026-11-24","2026-11-25","2026-11-27"].includes(date))return json(res,403,{error:"PURGE_DATE_CLOSED"});
+ if(!["2026-11-24","2026-11-25","2026-11-26","2026-11-27"].includes(date))return json(res,403,{error:"PURGE_DATE_CLOSED"});
  try{const sql=db();const rows=await sql`delete from aa1776_planb_relay where expires_at<=now() returning flight_date`;return json(res,200,{ok:true,derived_records_purged:rows.length});}
  catch{return json(res,500,{error:"AA1776_PURGE_FAILED"});}
 }
