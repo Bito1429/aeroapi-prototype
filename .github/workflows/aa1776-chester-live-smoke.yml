@@ -10,6 +10,19 @@ jobs:
   smoke:
     runs-on: ubuntu-latest
     steps:
+      - name: Diagnose Chester routing across canonical and deployment URLs
+        shell: bash
+        run: |
+          set -euo pipefail
+          for url in \
+            'https://aevpath-chester-api-20261108.vercel.app/api/chester-search' \
+            'https://aevpath-chester-api-20261108.vercel.app/api/chester-package?flight_id=notreal' \
+            'https://aevpath-chester-api-20261108.vercel.app/api/chester-aa1776?date=2026-11-24' \
+            'https://aevpath-chester-api-20261108-bniwjgyo0-benitogaldo-5827.vercel.app/api/chester-aa1776?date=2026-11-24' \
+            'https://aevpath-chester-api-20261108-git-fix-aa-e562de-benitogaldo-5827.vercel.app/api/chester-aa1776?date=2026-11-24'; do
+            code="$(curl -sS --max-time 15 -o /tmp/aa1776-probe -w '%{http_code}' "$url")"
+            echo "$code $url"
+          done
       - name: Missing key must return HTTP 401
         shell: bash
         run: |
