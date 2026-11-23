@@ -1,0 +1,30 @@
+name: AA1776 Chester production unauthenticated smoke
+on:
+  push:
+    branches:
+      - fix/aa1776-chester-relay-api-20261123
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Missing key must return HTTP 401
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="https://aevpath-chester-api-20261108.vercel.app/api/chester-aa1776?date=2026-11-24&mode=package"
+          code="$(curl -sS --max-time 20 -o /tmp/aa1776-response -w '%{http_code}' "$url")"
+          test "$code" = 401
+          grep -q 'CHESTER_UNAUTHORIZED' /tmp/aa1776-response
+          echo "PASS: missing key rejected 401; no FlightAware API invoked"
+      - name: Incorrect key must also return HTTP 401
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="https://aevpath-chester-api-20261108.vercel.app/api/chester-aa1776?date=2026-11-24&mode=package"
+          code="$(curl -sS --max-time 20 -H 'x-aevpath-key: invalid-test-value' -o /tmp/aa1776-invalid -w '%{http_code}' "$url")"
+          test "$code" = 401
+          grep -q 'CHESTER_UNAUTHORIZED' /tmp/aa1776-invalid
+          echo "PASS: incorrect key rejected 401"
