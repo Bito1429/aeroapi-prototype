@@ -32,7 +32,7 @@ export function aa1776SaleState(row,nowIso=new Date().toISOString()){
  if(row.upstream_state!=="READY"||pkg?.schema!=="aevpath.package.v1"||
     pkg?.market!=="US"||pkg?.flight_id!==row.fa_flight_id)return"PENDING_ROUTE";
  const pkgDate=String(pkg?.flight?.scheduled_departure||"").slice(0,10);
- const rowDate=String(row.flight_date||"").slice(0,10);
+ const rowDate=Number.isFinite(stamp(row.flight_date))?new Date(row.flight_date).toISOString().slice(0,10):"";
  if(!ALLOWED_DATES.has(rowDate)||rowDate!==pkgDate)return"PENDING_ROUTE";
  if(pkg?.flight?.origin?.icao!=="KPHL"||pkg?.flight?.destination?.icao!=="KBOS")return"PENDING_ROUTE";
  return"SELLABLE";
