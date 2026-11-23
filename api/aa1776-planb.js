@@ -7,7 +7,7 @@ import{db}from"./db.js";
 import{etaPackage}from"./eta-calibration.js";
 import{modelFiledTimeline}from"./filed-timeline.js";
 import{toChesterV1}from"./chester-schema.js";
-import{inCollectionWindow,isTargetDate,selectAA1776,saleDecision,routeValid,LOOKUP_RESERVATION_MILLS,ROUTE_RESERVATION_MILLS,MAX_DAILY_RESERVED_MILLS}from"./aa1776-policy.js";
+import{inCollectionWindow,isTargetDate,selectAA1776,saleDecision,routeValid,LOOKUP_RESERVATION_MILLS,ROUTE_RESERVATION_MILLS,MAX_DAILY_RESERVED_MILLS,aa1776PackageExpiresAt}from"./aa1776-policy.js";
 
 function equalSecret(provided,expected){
  if(!expected||typeof provided!=="string")return false;
@@ -42,7 +42,7 @@ async function mark(sql,date,state,code,flightId=null){
  state=excluded.state,reason=excluded.reason,fa_flight_id=excluded.fa_flight_id,last_checked_at=now(),
  ready_at=case when excluded.state='READY' then now() else aa1776_planb_state.ready_at end`;
 }
-function packageFromLive(f,protocol,nowIso){
+function packageFromLive(f,protocol,nowIso,flightDate){
  const flight=flightView(f);
  const estimatedOff=flight.estimated_off;
  const duration=Number(flight.filed_ete);
@@ -68,8 +68,7 @@ function packageFromLive(f,protocol,nowIso){
   route:{distance_km:routeKm,fixes:routePoints,resolver_sanity:{ok:true},timeline},
   eta:etaPackage({estimatedOff,filedEteSeconds:duration})
  };
- const arrivalMs=Date.parse(flight.scheduled_on);
- const expiresAt=new Date(Math.floor(arrivalMs/86400000)*86400000+86400000).toISOString();
+ const expiresAt=aa1776PackageExpiresAt(flightDate,flight.scheduled_on);
  return toChesterV1(draft,{
   airports:{origin:flight.origin_airport,destination:flight.destination_airport},
   airline:flight.airline,aircraftType:flight.aircraft_type,expiresAt
@@ -131,7 +130,7 @@ export default async function handler(req,res){
    return deny(res,202,"PENDING_ROUTE",{flight_date:date,sellable:false});
   }
   let derived;
-  try{derived=packageFromLive(f,protocol,nowIso);}
+  try{derived=packageFromLive(f,protocol,nowIso,date);}
   catch(e){
    const reason=String(e?.message||"PACKAGE_INCOMPLETE").slice(0,100);
    await mark(sql,date,"PENDING_SOURCE",reason,f.fa_flight_id);
