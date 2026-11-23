@@ -1,6 +1,6 @@
 import{timingSafeEqual}from"node:crypto";
-import{db}from"./db.js";
-import{json}from"./lib.js";
+import{db}from"../lib/db.js";
+import{json}from"../lib/lib.js";
 export default async function handler(req,res){
  res.setHeader("cache-control","private,no-store");
  const auth=String(req.headers?.authorization||"");
