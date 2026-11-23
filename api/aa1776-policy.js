@@ -50,3 +50,12 @@ export function routeValid(protocol){
  return !!(protocol?.baseline_valid&&protocol?.canonical_route&&protocol?.computed_km>0&&
  Array.isArray(protocol?.fixes)&&protocol.fixes.length>=2&&protocol.fixes.every(p=>Number.isFinite(p.latitude)&&Number.isFinite(p.longitude)));
 }
+
+// Internal package expiry only. The separate US-to-Chester relay still expires at midnight.
+// Thursday AA1776's package survives a long delay after download. Tuesday is unchanged.
+export function aa1776PackageExpiresAt(flightDate,scheduledArrival){
+ const arrivalMs=Date.parse(scheduledArrival||"");
+ if(!Number.isFinite(arrivalMs))throw Error("SCHEDULED_ARRIVAL_REQUIRED");
+ if(flightDate==="2026-11-26")return new Date(arrivalMs+12*60*60*1000).toISOString();
+ return new Date(Math.floor(arrivalMs/86400000)*86400000+86400000).toISOString();
+}
