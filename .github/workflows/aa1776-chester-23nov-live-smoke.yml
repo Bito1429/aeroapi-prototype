@@ -1,0 +1,23 @@
+name: Chester 23 Nov live endpoint authentication smoke
+on:
+  push:
+    branches:
+      - fix/aa1776-chester-23nov-rehearsal
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Route exists and refuses missing or incorrect key
+        run: |
+          set -euo pipefail
+          url='https://aevpath-chester-api-20261108.vercel.app/api/chester-aa1776?date=2026-11-23&mode=package'
+          c1="$(curl -sS --max-time 20 -o /tmp/a1 -w '%{http_code}' "$url")"
+          c2="$(curl -sS --max-time 20 -H 'x-aevpath-key: incorrect-test-key' -o /tmp/a2 -w '%{http_code}' "$url")"
+          echo "Missing key: HTTP $c1"
+          echo "Wrong key: HTTP $c2"
+          test "$c1" = 401
+          test "$c2" = 401
+          grep -q 'CHESTER_UNAUTHORIZED' /tmp/a1
+          grep -q 'CHESTER_UNAUTHORIZED' /tmp/a2
