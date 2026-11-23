@@ -1,0 +1,33 @@
+name: Isolated AA1776 cron safety
+on:
+  push:
+    branches:
+      - release/aa1776-isolated-cron-20261123
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Install isolated dependencies
+        working-directory: aa1776-isolated
+        run: npm install --no-audit --no-fund
+      - name: Check isolated cron syntax
+        run: |
+          node --check aa1776-isolated/api/cron.js
+          node --check aa1776-isolated/api/purge.js
+          node --check aa1776-isolated/api/aa1776-policy.js
+      - name: Assert no Chester credentials and no exposed status API
+        run: |
+          ! grep -R 'CHESTER_SHARED_KEY' aa1776-isolated/api/
+          test "$(find aa1776-isolated/api -maxdepth 1 -type f -name '*.js' | grep -E '/(cron|purge)\.js$' | wc -l)" -eq 2
+      - name: Static policy smoke
+        run: |
+          node --input-type=module -e "import {AA1776_DATES,inCollectionWindow,aa1776PackageExpiresAt} from './aa1776-isolated/api/aa1776-policy.js'; if(AA1776_DATES.join(',')!=='2026-11-23,2026-11-24,2026-11-26')process.exit(1);if(!inCollectionWindow('2026-11-23','2026-11-23T19:00:00Z'))process.exit(1);if(aa1776PackageExpiresAt('2026-11-26','2026-11-26T22:45:00Z')!=='2026-11-27T10:45:00.000Z')process.exit(1)"
