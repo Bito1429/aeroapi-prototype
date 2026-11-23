@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {AA1776_DATES,inCollectionWindow,selectAA1776,saleDecision,routeValid,aa1776PackageExpiresAt,MAX_DAILY_RESERVED_MILLS,LOOKUP_RESERVATION_MILLS,ROUTE_RESERVATION_MILLS} from "../api/aa1776-policy.js";
+import {AA1776_DATES,inCollectionWindow,selectAA1776,saleDecision,routeValid,aa1776PackageExpiresAt,MAX_DAILY_RESERVED_MILLS,LOOKUP_RESERVATION_MILLS,ROUTE_RESERVATION_MILLS} from "../lib/aa1776-policy.js";
 const flight=(date="2026-11-23",over={})=>({ident_icao:"AAL1776",ident:"AAL1776",fa_flight_id:"TEST_ID_NOT_REAL",origin:{code_icao:"KPHL"},destination:{code_icao:"KBOS"},scheduled_out:date+"T21:25:00Z",status:"Scheduled",...over});
 test("only approved dates and 23 Nov rehearsal",()=>assert.deepEqual(AA1776_DATES,["2026-11-23","2026-11-24","2026-11-26"]));
 test("Monday UTC window",()=>{assert.equal(inCollectionWindow("2026-11-23","2026-11-23T19:00:00Z"),true);assert.equal(inCollectionWindow("2026-11-23","2026-11-23T21:00:00Z"),false)});
