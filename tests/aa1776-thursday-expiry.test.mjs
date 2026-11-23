@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {aa1776PackageExpiresAt} from "../api/aa1776-policy.js";
 import {toChesterV1} from "../api/chester-schema.js";
-import {aa1776SaleState} from "../chester-standalone/source/lib/aa1776-relay.js";
+import {aa1776SaleState} from "../chester-reference/chester-standalone/source/lib/aa1776-relay.js";
 
 const arrive="2026-11-26T22:45:00Z";
 test("THURSDAY ONLY: scheduled arrival + 12h crosses midnight",()=>{
