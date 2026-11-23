@@ -1,0 +1,20 @@
+name: AA1776 Thursday-only expiry and Chester schema
+on:
+  push:
+    branches:
+      - fix/aa1776-thursday-expiry-20261123
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  expiry-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - run: npm install --ignore-scripts --no-audit --no-fund
+      - run: node --check api/aa1776-policy.js
+      - run: node --check api/aa1776-planb.js
+      - run: node --test tests/aa1776-policy.test.mjs tests/aa1776-thursday-expiry.test.mjs
