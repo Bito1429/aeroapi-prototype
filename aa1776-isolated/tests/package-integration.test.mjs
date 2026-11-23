@@ -86,26 +86,36 @@ test("Thursday source landing +12 h is package expiry (and relay must use that t
  assert.equal(aa1776PackageExpiresAt("2026-11-26",when),"2026-11-27T10:45:00.000Z");
 });
 test("hard request cap + cooldown + Wednesday rehearsal policy",()=>{
- assert.ok(MAX_DAILY_PROVIDER_REQUESTS<=16);
+ assert.equal(MAX_DAILY_PROVIDER_REQUESTS,30);
  assert.ok(MIN_RETRY_INTERVAL_MS>=55*60000);
  assert.deepEqual(AA1776_DATES,["2026-11-23","2026-11-24","2026-11-25","2026-11-26"]);
 });
 
-test("actual retry gate skips 15-minute repeat, terminal READY, and 16-call cap",()=>{
+test("actual retry gate skips repeat, terminal READY, and 30-call cap",()=>{
  const date="2026-11-24T14:00:00Z";
- assert.equal(paidCheckDecision({state:"PENDING_SOURCE",lastCheckedAt:date,now:"2026-11-24T14:15:00Z",requestCount:2}),"RETRY_COOLDOWN");
- assert.equal(paidCheckDecision({state:"PENDING_SOURCE",lastCheckedAt:date,now:"2026-11-24T15:00:00Z",requestCount:2}),"CHECK_ROUTE");
+ assert.equal(paidCheckDecision({state:"PENDING_SOURCE",lastCheckedAt:date,now:"2026-11-24T14:15:00Z",requestCount:2}),"EARLY_CHECK_ALREADY_USED");
+ assert.equal(paidCheckDecision({state:"PENDING_SOURCE",lastCheckedAt:date,now:"2026-11-24T15:00:00Z",requestCount:2}),"EARLY_CHECK_ALREADY_USED");
  assert.equal(paidCheckDecision({state:"READY",lastCheckedAt:date,now:"2026-11-24T17:00:00Z"}),"TERMINAL_STATE");
- assert.equal(paidCheckDecision({state:"PENDING_SOURCE",lastCheckedAt:date,now:"2026-11-24T17:00:00Z",requestCount:16}),"DAILY_REQUEST_CAP_REACHED");
+ assert.equal(paidCheckDecision({state:"PENDING_SOURCE",lastCheckedAt:date,now:"2026-11-24T17:00:00Z",requestCount:30}),"DAILY_REQUEST_CAP_REACHED");
 });
 
 test("55-minute before 19:00; 15-minute from 19:00; READY/DEPARTED/CANCELLED block",()=>{
  assert.equal(EVENING_RETRY_INTERVAL_MS,13*60000);
- assert.equal(paidCheckDecision({state:"PENDING_ROUTE",lastCheckedAt:"2026-11-24T18:30:00Z",now:"2026-11-24T18:45:00Z",requestCount:3}),"RETRY_COOLDOWN");
+ assert.equal(paidCheckDecision({state:"PENDING_ROUTE",lastCheckedAt:"2026-11-24T18:30:00Z",now:"2026-11-24T18:45:00Z",requestCount:3}),"EARLY_CHECK_ALREADY_USED");
  assert.equal(paidCheckDecision({state:"PENDING_ROUTE",lastCheckedAt:"2026-11-24T18:45:00Z",now:"2026-11-24T19:00:00Z",requestCount:3}),"CHECK_ROUTE");
  assert.equal(paidCheckDecision({state:"PENDING_ROUTE",lastCheckedAt:"2026-11-24T19:00:00Z",now:"2026-11-24T19:12:59Z",requestCount:3}),"RETRY_COOLDOWN");
  assert.equal(paidCheckDecision({state:"PENDING_ROUTE",lastCheckedAt:"2026-11-24T19:00:00Z",now:"2026-11-24T19:13:00Z",requestCount:3}),"CHECK_ROUTE");
  for(const state of ["READY","DEPARTED","CANCELLED"])
   assert.equal(paidCheckDecision({state,now:"2026-11-24T20:15:00Z"}),"TERMINAL_STATE");
- assert.equal(paidCheckDecision({state:"PENDING_ROUTE",now:"2026-11-24T20:15:00Z",requestCount:16}),"DAILY_REQUEST_CAP_REACHED");
+ assert.equal(paidCheckDecision({state:"PENDING_ROUTE",now:"2026-11-24T20:15:00Z",requestCount:30}),"DAILY_REQUEST_CAP_REACHED");
+});
+
+test("one paid pre-19 attempt, ten evening attempts and 30-request hard limit",()=>{
+ assert.equal(paidCheckDecision({state:"PENDING_SOURCE",now:"2026-11-24T16:00:31Z",requestCount:0}),"CHECK_ROUTE");
+ assert.equal(paidCheckDecision({state:"PENDING_SOURCE",lastCheckedAt:"2026-11-24T16:00:31Z",now:"2026-11-24T16:05:31Z",requestCount:1}),"EARLY_CHECK_ALREADY_USED");
+ assert.equal(paidCheckDecision({state:"PENDING_SOURCE",lastCheckedAt:"2026-11-24T16:00:31Z",now:"2026-11-24T19:00:31Z",requestCount:2}),"CHECK_ROUTE");
+ assert.equal(paidCheckDecision({state:"PENDING_ROUTE",lastCheckedAt:"2026-11-24T19:00:31Z",now:"2026-11-24T19:15:31Z",requestCount:4}),"CHECK_ROUTE");
+ assert.equal(paidCheckDecision({state:"PENDING_ROUTE",lastCheckedAt:"2026-11-24T19:00:31Z",now:"2026-11-24T19:15:31Z",requestCount:30}),"DAILY_REQUEST_CAP_REACHED");
+ for(const state of ["READY","DEPARTED","CANCELLED"])
+  assert.equal(paidCheckDecision({state,now:"2026-11-24T21:00:31Z",requestCount:0}),"TERMINAL_STATE");
 });
