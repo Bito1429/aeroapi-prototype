@@ -1,7 +1,9 @@
 // Pure safety policy for the isolated, test-only AA1776 Plan B.
 // No provider credentials, no persistence and no calls in this module.
-export const AA1776_DATES=Object.freeze(["2026-11-23","2026-11-24","2026-11-26"]);
-export const MAX_DAILY_RESERVED_MILLS=2000; // $2.000
+export const AA1776_DATES=Object.freeze(["2026-11-23","2026-11-24","2026-11-25","2026-11-26"]);
+export const MAX_DAILY_RESERVED_MILLS=2000;
+export const MAX_DAILY_PROVIDER_REQUESTS=16; // independent atomic request cap
+export const MIN_RETRY_INTERVAL_MS=55*60000; // paid checks no more than hourly // $2.000
 // Published rates are $0.005 per flight result set and $0.010 per route.
 // Reserve twice the published amount as a conservative allowance.
 export const LOOKUP_RESERVATION_MILLS=10;
@@ -11,14 +13,25 @@ const MONDAY_START="2026-11-23T11:00:00Z";
 const MONDAY_END="2026-11-23T20:15:00Z";
 const TUESDAY_START="2026-11-24T14:00:00Z";
 const TUESDAY_END="2026-11-24T20:15:00Z";
+const WEDNESDAY_START="2026-11-25T14:00:00Z";
+const WEDNESDAY_END="2026-11-25T20:15:00Z";
 const THURSDAY_START="2026-11-26T15:00:00Z";
 const THURSDAY_END="2026-11-26T19:30:00Z";
+// Pure retry gate. Every no-call outcome is checkable with zero provider access.
+export function paidCheckDecision({state,lastCheckedAt,now,requestCount=0}={}){
+ if(["READY","DEPARTED","CANCELLED"].includes(state))return"TERMINAL_STATE";
+ const t=Date.parse(lastCheckedAt||""),n=Date.parse(now||"");
+ if(Number.isFinite(t)&&Number.isFinite(n)&&n-t<MIN_RETRY_INTERVAL_MS)return"RETRY_COOLDOWN";
+ if(Number(requestCount)>=MAX_DAILY_PROVIDER_REQUESTS)return"DAILY_REQUEST_CAP_REACHED";
+ return"CHECK_ROUTE";
+}
 export function isTargetDate(date){return AA1776_DATES.includes(date);}
 export function inCollectionWindow(date,at){
  const t=Date.parse(at);
  if(!Number.isFinite(t))return false;
  if(date==="2026-11-23")return t>=Date.parse(MONDAY_START)&&t<=Date.parse(MONDAY_END);
  if(date==="2026-11-24")return t>=Date.parse(TUESDAY_START)&&t<=Date.parse(TUESDAY_END);
+ if(date==="2026-11-25")return t>=Date.parse(WEDNESDAY_START)&&t<=Date.parse(WEDNESDAY_END);
  if(date==="2026-11-26")return t>=Date.parse(THURSDAY_START)&&t<=Date.parse(THURSDAY_END);
  return false;
 }
@@ -33,7 +46,7 @@ export function selectAA1776(flights,date){
  });
  if(eligible.length!==1)return{ok:false,error:eligible.length?"AMBIGUOUS_FLIGHT":"FLIGHT_NOT_FOUND"};
  const f=eligible[0];
- if(date==="2026-11-26"&&Math.abs(Date.parse(f.scheduled_out)-Date.parse("2026-11-26T21:25:00Z"))>TWO_HOURS)
+ if(["2026-11-25","2026-11-26"].includes(date)&&Math.abs(Date.parse(f.scheduled_out)-Date.parse("2026-11-26T21:25:00Z"))>TWO_HOURS)
   return{ok:false,error:"UNEXPECTED_DEPARTURE_TIME"};
  if(!f.fa_flight_id)return{ok:false,error:"MISSING_PROVIDER_FLIGHT_ID"};
  return{ok:true,flight:f};
@@ -54,8 +67,7 @@ export function routeValid(protocol){
  Array.isArray(protocol?.fixes)&&protocol.fixes.length>=2&&protocol.fixes.every(p=>Number.isFinite(p.latitude)&&Number.isFinite(p.longitude)));
 }
 
-// Internal package expiry only. The separate US-to-Chester relay still expires at midnight.
-// Thursday AA1776's package survives a long delay after download. Tuesday is unchanged.
+// Derived package and relay use the same expiry: Thursday arrival + 12h, other dates midnight.
 export function aa1776PackageExpiresAt(flightDate,scheduledArrival){
  const arrivalMs=Date.parse(scheduledArrival||"");
  if(!Number.isFinite(arrivalMs))throw Error("SCHEDULED_ARRIVAL_REQUIRED");
