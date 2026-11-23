@@ -21,6 +21,10 @@
       "dest": "/api/chester-package"
     },
     {
+      "src": "^/api/chester-aa1776$",
+      "dest": "/api/chester-aa1776"
+    },
+    {
       "src": "^/.*$",
       "status": 404
     }
