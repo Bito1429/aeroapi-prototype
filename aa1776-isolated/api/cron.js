@@ -98,6 +98,7 @@ export default async function handler(req,res){
     await sql`insert into aa1776_planb_cron_runs(flight_date,phase,detail) values(${date}::date,'DRY_RUN_PASS','CRON_AND_DB_PERMISSIONS_OK')`;
     return json(res,200,{ok:true,dry_run:true,provider_calls:0,flight_date:date});
   }
+  if(!process.env.AEROAPI_KEY)return deny(res,503,"US_PAID_AEROAPI_KEY_NOT_CONFIGURED");
   await sql`insert into aa1776_planb_cron_runs(flight_date,phase,detail) values(${date}::date,'CHECK_STARTED','VERCEL_CRON_AUTHENTICATED')`;
   // No scheduled/interactive calls on other days, outside narrow UTC windows,
   // or before the real flight can be captured within 24 hours of departure.
