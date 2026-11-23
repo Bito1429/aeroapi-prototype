@@ -16,6 +16,10 @@
     {
       "path": "/api/aa1776-planb",
       "schedule": "*/15 14-20 24,26 11 *"
+    },
+    {
+      "path": "/api/aa1776-planb-purge",
+      "schedule": "15 0 25,27 11 *"
     }
   ],
   "functions": {
@@ -29,6 +33,9 @@
       "maxDuration": 300
     },
     "api/aa1776-planb.js": {
+      "maxDuration": 30
+    },
+    "api/aa1776-planb-purge.js": {
       "maxDuration": 30
     }
   }
