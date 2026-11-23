@@ -4,6 +4,7 @@ import {chesterAuthorized} from "../lib/chester-auth.js";
 import {db} from "../lib/db.js";
 import {json} from "../lib/lib.js";
 import {saleState,nextCheckAfter} from "../lib/chester-sale-state.js";
+import {aa1776ByDate,aa1776Summary} from "../lib/aa1776-relay.js";
 export default async function handler(req,res){
  if(!chesterAuthorized(req,res))return;
  if(req.method!=="GET")return json(res,405,{error:"METHOD_NOT_ALLOWED"});
@@ -23,7 +24,21 @@ export default async function handler(req,res){
      and (${origin}='' or j.origin=${origin})
      and (${destination}='' or j.destination=${destination})
    order by j.scheduled_out_initial asc,j.fa_flight_id asc limit 30`;
+  const flights=rows.map(({raw_capture,...r})=>{const state=saleState({...r,raw_capture});return {...r,sale_state:state,sellable:state==="SELLABLE",package_status:r.has_route?"CAPTURE_AVAILABLE":"PENDING_CAPTURE",...(state==="PENDING_ROUTE"?{check_again_after:nextCheckAfter()}: {})}});
+  // Include only a genuine AA1776 that the separate US collector has already captured.
+  // No invented flight/date and no provider call from Chester.
+  if((!ident||ident==="AA1776"||ident==="AAL1776")&&(!origin||origin==="KPHL")&&(!destination||destination==="KBOS")){
+   const now=Date.now();
+   for(const day of ["2026-11-24","2026-11-26"]){
+    const a=await aa1776ByDate(sql,day);
+    if(!a)continue;
+    const out=Date.parse(a.scheduled_out);
+    if(out<=now-2*3600000||out>=now+48*3600000)continue;
+    if(!flights.some(f=>f.flight_id===a.fa_flight_id))flights.push(aa1776Summary(a));
+   }
+   flights.sort((a,b)=>Date.parse(a.scheduled_out)-Date.parse(b.scheduled_out));
+  }
   res.setHeader("cache-control","private, no-store");
-  return json(res,200,{generated_at:new Date().toISOString(),source:"stored_us_flight_jobs",flights:rows.map(({raw_capture,...r})=>{const state=saleState({...r,raw_capture});return {...r,sale_state:state,sellable:state==="SELLABLE",package_status:r.has_route?"CAPTURE_AVAILABLE":"PENDING_CAPTURE",...(state==="PENDING_ROUTE"?{check_again_after:nextCheckAfter()}: {})}})});
+  return json(res,200,{generated_at:new Date().toISOString(),source:"stored_us_flight_jobs_and_aa1776_derived_relay",flights:flights.slice(0,30)});
  }catch(e){console.error("chester-search",e);return json(res,500,{error:"SEARCH_UNAVAILABLE"});}
 }
