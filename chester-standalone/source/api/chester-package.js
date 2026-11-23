@@ -6,12 +6,27 @@ import {buildDraftPackage} from "../lib/package-core.js";
 import {toChesterV1} from "../lib/chester-schema.js";
 import {json} from "../lib/lib.js";
 import {nextCheckAfter} from "../lib/chester-sale-state.js";
+import {db} from "../lib/db.js";
+import {aa1776ById,aa1776SaleState} from "../lib/aa1776-relay.js";
 export default async function handler(req,res){
  if(!chesterAuthorized(req,res))return;
  if(req.method!=="GET")return json(res,405,{error:"METHOD_NOT_ALLOWED"});
  const id=typeof req.query?.flight_id==="string"?req.query.flight_id.trim():"";
  if(!id||id.length>160)return json(res,400,{error:"FLIGHT_ID_REQUIRED"});
  try{
+  // AA1776 is available only as an ephemeral, derived package in the separate US relay.
+  // This uses only the existing Chester DATABASE_URL and Chester shared key.
+  const row=await aa1776ById(db(),id);
+  if(row){
+   const state=aa1776SaleState(row);
+   res.setHeader("cache-control","private, no-store");
+   if(state==="DEPARTED"||state==="CANCELLED")
+    return json(res,409,{status:state,sale_state:state,sellable:false,flight_id:id});
+   if(state!=="SELLABLE")
+    return json(res,202,{status:"PENDING_ROUTE",sale_state:state,sellable:false,
+     check_again_after:nextCheckAfter(),flight_id:id});
+   return json(res,200,row.package_json);
+  }
   const result=await buildDraftPackage(id);
   if(result.status===202)return json(res,202,{...result.body,check_again_after:nextCheckAfter()});
   if(result.status!==200||result.body?.status!=="READY")return json(res,result.status,result.body);
