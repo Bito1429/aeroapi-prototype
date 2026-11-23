@@ -4,7 +4,7 @@ export const AA1776_DATES=Object.freeze(["2026-11-23","2026-11-24","2026-11-25",
 export const MAX_DAILY_RESERVED_MILLS=2000;
 export const MAX_DAILY_PROVIDER_REQUESTS=16; // independent atomic request cap
 export const MIN_RETRY_INTERVAL_MS=55*60000; // pre-19:00 UTC
-export const EVENING_RETRY_INTERVAL_MS=15*60000; // 19:00-21:15 UTC
+export const EVENING_RETRY_INTERVAL_MS=13*60000; // 15-minute cron cadence; tolerate provider/cron jitter
 // Published rates are $0.005 per flight result set and $0.010 per route.
 // Reserve twice the published amount as a conservative allowance.
 export const LOOKUP_RESERVATION_MILLS=10;

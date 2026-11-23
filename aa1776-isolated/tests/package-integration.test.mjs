@@ -100,11 +100,11 @@ test("actual retry gate skips 15-minute repeat, terminal READY, and 16-call cap"
 });
 
 test("55-minute before 19:00; 15-minute from 19:00; READY/DEPARTED/CANCELLED block",()=>{
- assert.equal(EVENING_RETRY_INTERVAL_MS,15*60000);
+ assert.equal(EVENING_RETRY_INTERVAL_MS,13*60000);
  assert.equal(paidCheckDecision({state:"PENDING_ROUTE",lastCheckedAt:"2026-11-24T18:30:00Z",now:"2026-11-24T18:45:00Z",requestCount:3}),"RETRY_COOLDOWN");
  assert.equal(paidCheckDecision({state:"PENDING_ROUTE",lastCheckedAt:"2026-11-24T18:45:00Z",now:"2026-11-24T19:00:00Z",requestCount:3}),"CHECK_ROUTE");
- assert.equal(paidCheckDecision({state:"PENDING_ROUTE",lastCheckedAt:"2026-11-24T19:00:00Z",now:"2026-11-24T19:14:59Z",requestCount:3}),"RETRY_COOLDOWN");
- assert.equal(paidCheckDecision({state:"PENDING_ROUTE",lastCheckedAt:"2026-11-24T19:00:00Z",now:"2026-11-24T19:15:00Z",requestCount:3}),"CHECK_ROUTE");
+ assert.equal(paidCheckDecision({state:"PENDING_ROUTE",lastCheckedAt:"2026-11-24T19:00:00Z",now:"2026-11-24T19:12:59Z",requestCount:3}),"RETRY_COOLDOWN");
+ assert.equal(paidCheckDecision({state:"PENDING_ROUTE",lastCheckedAt:"2026-11-24T19:00:00Z",now:"2026-11-24T19:13:00Z",requestCount:3}),"CHECK_ROUTE");
  for(const state of ["READY","DEPARTED","CANCELLED"])
   assert.equal(paidCheckDecision({state,now:"2026-11-24T20:15:00Z"}),"TERMINAL_STATE");
  assert.equal(paidCheckDecision({state:"PENDING_ROUTE",now:"2026-11-24T20:15:00Z",requestCount:16}),"DAILY_REQUEST_CAP_REACHED");
