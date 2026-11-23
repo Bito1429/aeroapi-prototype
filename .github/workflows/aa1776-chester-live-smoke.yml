@@ -16,6 +16,8 @@ jobs:
           set -euo pipefail
           url="https://aevpath-chester-api-20261108.vercel.app/api/chester-aa1776?date=2026-11-24&mode=package"
           code="$(curl -sS --max-time 20 -o /tmp/aa1776-response -w '%{http_code}' "$url")"
+          echo "Canonical Chester endpoint returned HTTP $code"
+          if [ "$code" != 401 ]; then head -c 220 /tmp/aa1776-response | sed 's/</\\</g'; echo; fi
           test "$code" = 401
           grep -q 'CHESTER_UNAUTHORIZED' /tmp/aa1776-response
           echo "PASS: missing key rejected 401; no FlightAware API invoked"
