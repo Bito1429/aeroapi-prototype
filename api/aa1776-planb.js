@@ -137,6 +137,21 @@ export default async function handler(req,res){
    await mark(sql,date,"PENDING_SOURCE",reason,f.fa_flight_id);
    return deny(res,202,"PENDING_SOURCE",{flight_date:date,reason});
   }
+  // One-flight, short-lived derived-payload relay for the Chester-only API.
+  // The US provider response and raw filed-route JSON never enter the database.
+  // No 7-day store: the relay expires by midnight UTC on this SAME date, always <12 hours.
+  const expiryMs=Math.min(Date.parse(date+"T00:00:00Z")+86400000,Date.parse(nowIso)+12*3600000);
+  const expiresAt=new Date(expiryMs).toISOString();
+  const stored=await sql`insert into aa1776_planb_relay
+   (flight_date,fa_flight_id,source_captured_at,scheduled_out,expires_at,package_json)
+   values(${date}::date,${f.fa_flight_id},${nowIso}::timestamptz,${f.scheduled_out}::timestamptz,
+    ${expiresAt}::timestamptz,${JSON.stringify(derived)}::jsonb)
+   on conflict(flight_date) do update set
+    fa_flight_id=excluded.fa_flight_id,source_captured_at=excluded.source_captured_at,
+    scheduled_out=excluded.scheduled_out,expires_at=excluded.expires_at,
+    package_json=excluded.package_json,updated_at=now()
+   returning flight_date,expires_at`;
+  if(stored.length!==1)throw Error("DERIVED_RELAY_WRITE_FAILED");
   await mark(sql,date,"READY","GENUINE_ROUTE_VALIDATED",f.fa_flight_id);
   if(mode==="check")return json(res,200,{ok:true,status:"READY",flight_date:date,flight_id:f.fa_flight_id,
    package_schema:derived.schema,source_captured_at:nowIso,delivery:"on_demand_no_package_store"});
