@@ -15,7 +15,7 @@
     },
     {
       "path": "/api/cron",
-      "schedule": "0,30 19 25-26 11 *"
+      "schedule": "0 19 25-26 11 *"
     },
     {
       "path": "/api/cron",
