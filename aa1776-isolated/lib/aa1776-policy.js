@@ -13,19 +13,19 @@ const TWO_HOURS=120*60000;
 const MONDAY_START="2026-11-23T11:00:00Z";
 const MONDAY_END="2026-11-23T20:15:00Z";
 // Tue-Thu: one pre-route-filed paid opportunity at 16:00 UTC,
-// then quarter-hour checks from 19:00 until the date-specific cutoff.
+// then date-specific evening slots (Thu starts at 18:30 UTC).
 // Narrow post-minute grace allows normal Vercel cron scheduling jitter.
 const EARLY_START="T16:00:00Z", EARLY_END="T16:10:00Z";
 const EVENING_START="T19:00:00Z";
-const EVENING_ENDS={"2026-11-24":"T21:18:00Z","2026-11-25":"T23:48:00Z","2026-11-26":"T23:48:00Z"};
+const EVENING_ENDS={"2026-11-24":"T21:18:00Z","2026-11-25":"T23:48:00Z","2026-11-26":"T21:18:00Z"};
 // Pure retry gate. Every no-call outcome is checkable with zero provider access.
 export function paidCheckDecision({state,lastCheckedAt,now,requestCount=0}={}){
  if(["READY","DEPARTED","CANCELLED"].includes(state))return"TERMINAL_STATE";
  const t=Date.parse(lastCheckedAt||""),n=Date.parse(now||"");
- const evening=Number.isFinite(n)&&new Date(n).getUTCHours()>=19;
+ const evening=Number.isFinite(n)&&(new Date(n).getUTCHours()>=19||(new Date(n).toISOString().slice(0,10)==="2026-11-26"&&new Date(n).getUTCHours()===18&&new Date(n).getUTCMinutes()>=30));
  const gap=evening?EVENING_RETRY_INTERVAL_MS:MIN_RETRY_INTERVAL_MS;
  if(Number(requestCount)>=MAX_DAILY_PROVIDER_REQUESTS)return"DAILY_REQUEST_CAP_REACHED";
- // A pre-19:00 check is a single paid attempt, even if it only fetched one endpoint.
+ // A pre-evening check is a single paid attempt, even if it only fetched one endpoint.
  if(!evening&&Number(requestCount)>0)return"EARLY_CHECK_ALREADY_USED";
  if(Number.isFinite(t)&&Number.isFinite(n)&&n-t<gap)return"RETRY_COOLDOWN";
  return"CHECK_ROUTE";
@@ -37,10 +37,11 @@ export function inCollectionWindow(date,at){
  if(date==="2026-11-23")return t>=Date.parse(MONDAY_START)&&t<=Date.parse(MONDAY_END);
  if(["2026-11-24","2026-11-25","2026-11-26"].includes(date)){
   const early=t>=Date.parse(date+EARLY_START)&&t<Date.parse(date+EARLY_END);
-  const evening=t>=Date.parse(date+EVENING_START)&&t<Date.parse(date+EVENING_ENDS[date]);
+  const evening=t>=Date.parse(date+(date==="2026-11-26"?"T18:30:00Z":EVENING_START))&&t<Date.parse(date+EVENING_ENDS[date]);
   if(evening&&date!=="2026-11-24"){
    const minute=new Date(t).getUTCHours()*60+new Date(t).getUTCMinutes();
-   return [1140,1200,...Array.from({length:11},(_,i)=>1275+i*15)].some(slot=>minute>=slot&&minute<slot+3);
+   const slots=date==="2026-11-26"?Array.from({length:12},(_,i)=>1110+i*15):[1140,1200,...Array.from({length:11},(_,i)=>1275+i*15)];
+   return slots.some(slot=>minute>=slot&&minute<slot+3);
   }
   return early||evening;
  }
