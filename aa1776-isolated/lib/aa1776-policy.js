@@ -40,7 +40,7 @@ export function inCollectionWindow(date,at){
   const evening=t>=Date.parse(date+EVENING_START)&&t<Date.parse(date+EVENING_ENDS[date]);
   if(evening&&date!=="2026-11-24"){
    const minute=new Date(t).getUTCHours()*60+new Date(t).getUTCMinutes();
-   return [1140,1170,1200,...Array.from({length:11},(_,i)=>1275+i*15)].some(slot=>minute>=slot&&minute<slot+3);
+   return [1140,1200,...Array.from({length:11},(_,i)=>1275+i*15)].some(slot=>minute>=slot&&minute<slot+3);
   }
   return early||evening;
  }
