@@ -13,10 +13,11 @@ const TWO_HOURS=120*60000;
 const MONDAY_START="2026-11-23T11:00:00Z";
 const MONDAY_END="2026-11-23T20:15:00Z";
 // Tue-Thu: one pre-route-filed paid opportunity at 16:00 UTC,
-// then quarter-hour checks between 19:00 and 21:15 UTC.
+// then quarter-hour checks from 19:00 until the date-specific cutoff.
 // Narrow post-minute grace allows normal Vercel cron scheduling jitter.
 const EARLY_START="T16:00:00Z", EARLY_END="T16:10:00Z";
-const EVENING_START="T19:00:00Z", EVENING_END="T21:18:00Z";
+const EVENING_START="T19:00:00Z";
+const EVENING_ENDS={"2026-11-24":"T21:18:00Z","2026-11-25":"T23:33:00Z","2026-11-26":"T23:48:00Z"};
 // Pure retry gate. Every no-call outcome is checkable with zero provider access.
 export function paidCheckDecision({state,lastCheckedAt,now,requestCount=0}={}){
  if(["READY","DEPARTED","CANCELLED"].includes(state))return"TERMINAL_STATE";
@@ -36,7 +37,7 @@ export function inCollectionWindow(date,at){
  if(date==="2026-11-23")return t>=Date.parse(MONDAY_START)&&t<=Date.parse(MONDAY_END);
  if(["2026-11-24","2026-11-25","2026-11-26"].includes(date)){
   const early=t>=Date.parse(date+EARLY_START)&&t<Date.parse(date+EARLY_END);
-  const evening=t>=Date.parse(date+EVENING_START)&&t<Date.parse(date+EVENING_END);
+  const evening=t>=Date.parse(date+EVENING_START)&&t<Date.parse(date+EVENING_ENDS[date]);
   return early||evening;
  }
  return false;
@@ -52,7 +53,7 @@ export function selectAA1776(flights,date){
  });
  if(eligible.length!==1)return{ok:false,error:eligible.length?"AMBIGUOUS_FLIGHT":"FLIGHT_NOT_FOUND"};
  const f=eligible[0];
- if(["2026-11-25","2026-11-26"].includes(date)&&Math.abs(Date.parse(f.scheduled_out)-Date.parse(date+"T21:25:00Z"))>TWO_HOURS)
+ if(["2026-11-25","2026-11-26"].includes(date)&&Math.abs(Date.parse(f.scheduled_out)-Date.parse(date+(date==="2026-11-25"?"T23:40:00Z":"T21:25:00Z")))>TWO_HOURS)
   return{ok:false,error:"UNEXPECTED_DEPARTURE_TIME"};
  if(!f.fa_flight_id)return{ok:false,error:"MISSING_PROVIDER_FLIGHT_ID"};
  return{ok:true,flight:f};
