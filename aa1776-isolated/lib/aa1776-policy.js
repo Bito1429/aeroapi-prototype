@@ -17,7 +17,7 @@ const MONDAY_END="2026-11-23T20:15:00Z";
 // Narrow post-minute grace allows normal Vercel cron scheduling jitter.
 const EARLY_START="T16:00:00Z", EARLY_END="T16:10:00Z";
 const EVENING_START="T19:00:00Z";
-const EVENING_ENDS={"2026-11-24":"T21:18:00Z","2026-11-25":"T23:33:00Z","2026-11-26":"T23:48:00Z"};
+const EVENING_ENDS={"2026-11-24":"T21:18:00Z","2026-11-25":"T23:48:00Z","2026-11-26":"T23:48:00Z"};
 // Pure retry gate. Every no-call outcome is checkable with zero provider access.
 export function paidCheckDecision({state,lastCheckedAt,now,requestCount=0}={}){
  if(["READY","DEPARTED","CANCELLED"].includes(state))return"TERMINAL_STATE";
@@ -38,6 +38,10 @@ export function inCollectionWindow(date,at){
  if(["2026-11-24","2026-11-25","2026-11-26"].includes(date)){
   const early=t>=Date.parse(date+EARLY_START)&&t<Date.parse(date+EARLY_END);
   const evening=t>=Date.parse(date+EVENING_START)&&t<Date.parse(date+EVENING_ENDS[date]);
+  if(evening&&date!=="2026-11-24"){
+   const minute=new Date(t).getUTCHours()*60+new Date(t).getUTCMinutes();
+   return [1140,1170,1200,...Array.from({length:11},(_,i)=>1275+i*15)].some(slot=>minute>=slot&&minute<slot+3);
+  }
   return early||evening;
  }
  return false;
