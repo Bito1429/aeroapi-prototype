@@ -122,7 +122,7 @@ export default async function handler(req,res){
  const mode="check";
  const date=today;
  if(!isTargetDate(date))return deny(res,403,"DATE_NOT_ALLOWED");
- let sql;
+ let sql,stage="DATABASE",flightId=null;
  try{
   sql=db();
   const ctl=await sql`select enabled from aa1776_planb_isolated_control where id=1`;
@@ -146,35 +146,45 @@ export default async function handler(req,res){
    return deny(res,429,retry,{flight_date:date,provider_calls:0});
   if(retry!=="CHECK_ROUTE")
    return json(res,200,{ok:true,skipped:retry,state:prior[0]?.state,flight_date:date,provider_calls:0});
+  stage="LOOKUP_RESERVATION";
   await reserve(sql,today,LOOKUP_RESERVATION_MILLS,"lookup");
   // One page (<=15 results), exact flight/date/airports matched; NEVER use historical or Europe endpoints.
+  stage="PROVIDER_LOOKUP";
   const resp=await aero("/flights/AAL1776",{
    start:date+"T00:00:00Z",end:new Date(Date.parse(date+"T00:00:00Z")+86400000).toISOString(),
    max_pages:1
   });
+  stage="FLIGHT_SELECTION";
   const selected=selectAA1776(resp.flights||[],date);
   if(!selected.ok){
    await mark(sql,date,"PENDING_SOURCE",selected.error);
    return deny(res,202,"PENDING_SOURCE",{reason:selected.error,flight_date:date});
   }
-  const f=selected.flight,decision=saleDecision(f,nowIso);
+  const f=selected.flight; flightId=f.fa_flight_id||null;
+  stage="SALE_DECISION";
+  const decision=saleDecision(f,nowIso);
   if(decision!=="CHECK_ROUTE"){
    await mark(sql,date,decision,decision,f.fa_flight_id);
    return deny(res,decision==="DEPARTED"||decision==="CANCELLED"?409:202,decision,
     {sale_state:decision,sellable:false,flight_date:date});
   }
+  stage="FIELD_VALIDATION";
   const preflight=checkFlightFields(f);
   if(!preflight.ok){
    await mark(sql,date,"PENDING_SOURCE",preflight.reason,f.fa_flight_id);
    return deny(res,202,"PENDING_SOURCE",{flight_date:date,reason:preflight.reason});
   }
+  stage="ROUTE_RESERVATION";
   await reserve(sql,today,ROUTE_RESERVATION_MILLS,"route");
+  stage="PROVIDER_ROUTE";
   const route=await aero("/flights/"+encodeURIComponent(f.fa_flight_id)+"/route");
+  stage="ROUTE_VALIDATION";
   const protocol=canonicalize(route.fixes||[]);
   if(!routeValid(protocol)){
    await mark(sql,date,"PENDING_ROUTE","NO_GENUINE_FILED_ROUTE",f.fa_flight_id);
    return deny(res,202,"PENDING_ROUTE",{flight_date:date,sellable:false});
   }
+  stage="PACKAGE_BUILD";
   let derived;
   try{derived=packageFromLive(f,protocol,nowIso,date);}
   catch(e){
@@ -187,6 +197,7 @@ export default async function handler(req,res){
   // No 7-day server store; derived relay expiry is same as package expiry.
   // Thursday remains available until scheduled arrival + 12 hours on Friday.
   const expiresAt=derived.expires_at;
+  stage="RELAY_WRITE";
   const stored=await sql`insert into aa1776_planb_relay
    (flight_date,fa_flight_id,source_captured_at,scheduled_out,expires_at,package_json)
    values(${date}::date,${f.fa_flight_id},${nowIso}::timestamptz,${f.scheduled_out}::timestamptz,
@@ -197,6 +208,7 @@ export default async function handler(req,res){
     package_json=excluded.package_json,updated_at=now()
    returning flight_date,expires_at`;
   if(stored.length!==1)throw Error("DERIVED_RELAY_WRITE_FAILED");
+  stage="READY_STATE_WRITE";
   await mark(sql,date,"READY","GENUINE_ROUTE_VALIDATED",f.fa_flight_id);
   await sql`insert into aa1776_planb_cron_runs(flight_date,phase,detail) values(${date}::date,'READY','GENUINE_ROUTE_VALIDATED')`;
   if(true)return json(res,200,{ok:true,status:"READY",flight_date:date,flight_id:f.fa_flight_id,
@@ -205,9 +217,13 @@ export default async function handler(req,res){
  }catch(e){
   const code=String(e?.message||"CHECK_FAILED");
   const status=e?.httpStatus||((e?.status>=400&&e?.status<500)?502:500);
-  // Never log or store provider responses. Persist only coarse retry state.
+  // Only fixed stage labels and numeric HTTP status; never log error bodies/messages or keys.
+  const providerStatus=Number.isInteger(e?.status)&&e.status>=400&&e.status<=599?e.status:null;
+  const reason=stage+(providerStatus?"_HTTP_"+providerStatus:"_ERROR");
+  console.error("AA1776_CHECK_FAILED",reason);
   if(sql&&!code.startsWith("DAILY_")){
-   try{await mark(sql,date,"PENDING_SOURCE","PROVIDER_OR_BUILD_ERROR");}catch{}
+   try{await mark(sql,date,"PENDING_SOURCE",reason,flightId);}catch{}
+   try{await sql`insert into aa1776_planb_cron_runs(flight_date,phase,detail) values(${date}::date,'CHECK_FAILED',${reason})`;}catch{}
   }
   return deny(res,status,code.startsWith("DAILY_")?code:"AA1776_CHECK_FAILED");
  }
