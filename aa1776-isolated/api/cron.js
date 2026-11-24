@@ -29,7 +29,7 @@ async function reserve(sql,date,mills,kind){
  request_count=aa1776_planb_budget.request_count+1,
  updated_at=now()
  where aa1776_planb_budget.reserved_mills+excluded.reserved_mills<=${MAX_DAILY_RESERVED_MILLS}
- and aa1776_planb_budget.request_count<${MAX_DAILY_PROVIDER_REQUESTS}
+ and aa1776_planb_budget.request_count<${MAX_DAILY_PROVIDER_REQUESTS-1}
  returning reserved_mills,request_count`;
  if(!rows.length)throw Object.assign(Error("DAILY_BUDGET_OR_REQUEST_CAP_REACHED"),{httpStatus:429});
  return rows[0]; // Reserve even on provider errors (never refund).
