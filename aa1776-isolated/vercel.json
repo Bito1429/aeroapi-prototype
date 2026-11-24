@@ -7,27 +7,27 @@
     },
     {
       "path": "/api/cron",
-      "schedule": "*/15 19-20 24-26 11 *"
+      "schedule": "*/15 19-20 24 11 *"
     },
     {
       "path": "/api/cron",
-      "schedule": "0,15 21 24-26 11 *"
+      "schedule": "0,15 21 24 11 *"
     },
     {
       "path": "/api/cron",
-      "schedule": "30,45 21 25-26 11 *"
+      "schedule": "0,30 19 25-26 11 *"
     },
     {
       "path": "/api/cron",
-      "schedule": "*/15 22 25-26 11 *"
+      "schedule": "0 20 25-26 11 *"
     },
     {
       "path": "/api/cron",
-      "schedule": "0,15,30 23 25 11 *"
+      "schedule": "15,30,45 21 25-26 11 *"
     },
     {
       "path": "/api/cron",
-      "schedule": "*/15 23 26 11 *"
+      "schedule": "*/15 22-23 25-26 11 *"
     },
     {
       "path": "/api/purge",
