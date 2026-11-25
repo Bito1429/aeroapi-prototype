@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { neon } from "@neondatabase/serverless";
 export async function read(kind,arg){
  const url=process.env.ANY_FLIGHT_READER_URL;if(!url)throw Error("READER_NOT_CONFIGURED");
@@ -9,4 +10,11 @@ export async function read(kind,arg){
 export async function rate(client){
  const url=process.env.ANY_FLIGHT_READER_URL;if(!url)throw Error("READER_NOT_CONFIGURED");
  const sql=neon(url);const rows=await sql`SELECT any_flight.consume_delivery_rate(${client}) AS decision`;return rows[0]?.decision;
+}
+
+export async function alert(event){
+ console.error(JSON.stringify(event));
+ const url=process.env.ANY_FLIGHT_READER_URL;if(!url)throw Error("READER_NOT_CONFIGURED");
+ const sql=neon(url);
+ await sql`SELECT any_flight.record_delivery_error(${randomUUID()}::uuid,${event.request_id}::uuid,${event.code},${event.component})`;
 }
