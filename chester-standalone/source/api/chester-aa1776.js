@@ -31,6 +31,17 @@ export default async function handler(req,res){
      String(pkg?.flight?.scheduled_departure||"").slice(0,10)==="2026-11-24"&&
      pkg?.flight?.origin?.icao==="KPHL"&&pkg?.flight?.destination?.icao==="KBOS")
    return json(res,200,pkg);
+  // One-off authenticated replay: 25 Nov only, direct package, until 18:00 UTC 26 Nov.
+  if(date==="2026-11-25"&&mode==="package"&&state==="DEPARTED"&&
+     replayNow<Date.parse("2026-11-26T18:00:00Z")&&
+     row.upstream_state==="READY"&&
+     Date.parse(row.scheduled_out)<=replayNow&&
+     Date.parse(row.expires_at)>replayNow&&Date.parse(pkg?.expires_at)>replayNow&&
+     row.fa_flight_id==="AAL1776-1795422387-airline-1404p"&&
+     pkg?.flight_id===row.fa_flight_id&&pkg?.schema==="aevpath.package.v1"&&pkg?.market==="US"&&
+     String(pkg?.flight?.scheduled_departure||"").slice(0,10)==="2026-11-25"&&
+     pkg?.flight?.origin?.icao==="KPHL"&&pkg?.flight?.destination?.icao==="KBOS")
+   return json(res,200,pkg);
   if(state==="DEPARTED"||state==="CANCELLED")
    return json(res,409,{status:state,sale_state:state,sellable:false,flight_date:date});
   if(state!=="SELLABLE")
