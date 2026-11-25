@@ -7,6 +7,6 @@ export function deliveryState(r,now=Date.now()){
  if(r.state!=="READY")return r.state;
  const t=x=>x instanceof Date?x.getTime():Date.parse(x),out=t(r.scheduled_out),expiry=t(r.expires_at);
  if(!Number.isFinite(out)||!Number.isFinite(expiry))return "PENDING_SOURCE";
- if(now>=expiry)return "EXPIRED";if(now>=out)return "DEPARTED";
+ if(now>=out)return "DEPARTED";if(now>=expiry)return "EXPIRED";
  return r.package_json?"READY":"PENDING_SOURCE";
 }
