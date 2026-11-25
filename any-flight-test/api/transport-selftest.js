@@ -4,7 +4,7 @@ export default async function(req,res){
  if(req.method!=="GET"||process.env.VERCEL_ENV!=="preview")return res.status(404).json({error:"NOT_AVAILABLE"});
  const key=process.env.ANY_FLIGHT_TEST_KEY,bypass=process.env.ANY_FLIGHT_AUTOMATION_BYPASS;
  if(!key||!bypass)return res.status(503).json({error:"TEST_ENV_MISSING"});
- const base="https://aevpath-us-any-flight-test-7ym8j6gds-benitogaldo-5827.vercel.app";
+ const base="https://aevpath-us-any-flight-test-m5hf1ufti-benitogaldo-5827.vercel.app";
  const cases=[];
  for(const [name,path] of Object.entries({search:"/api/chester-search?ident=TEST001",details:"/api/chester-details?flight_id=TEST-DELIVERY-001",package:"/api/chester-package?flight_id=TEST-DELIVERY-001"})){
   for(const mode of ["missing","wrong","correct"]){
