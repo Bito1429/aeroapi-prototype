@@ -19,8 +19,10 @@ export function makeDelivery({read,rate,secret,alert=()=>{},clock=()=>Date.now()
   }catch{await report("RATE_CONTROL_FAILED");return fail(503,"RATE_CONTROL_FAILED");}
   if(req.method!=="GET")return fail(405,"METHOD_NOT_ALLOWED");
   const q=req.query||{};
+  // Neon may return native Date objects; Date.parse(Date) loses fractional seconds.
+  const time=v=>v instanceof Date?v.getTime():typeof v==="string"?Date.parse(v):NaN;
   const state=r=>{
-   const now=clock(),expires=Date.parse(r.expires_at),out=Date.parse(r.scheduled_out);
+   const now=clock(),expires=time(r.expires_at),out=time(r.scheduled_out);
    if(!Number.isFinite(now)||!Number.isFinite(expires)||!Number.isFinite(out)||expires<=out)return "FAILED";
    if(expires<=now)return "EXPIRED";
    if(r.state==="CANCELLED"||r.state==="FAILED")return r.state;
@@ -41,8 +43,8 @@ export function makeDelivery({read,rate,secret,alert=()=>{},clock=()=>Date.now()
    if(r.package_json?.schema!=="aevpath.package.v1"||r.package_json?.market!=="US"||r.package_json?.flight_id!==r.flight_id||r.package_json?.test_only!==true){await report("INVALID_TEST_PACKAGE");return fail(500,"INVALID_TEST_PACKAGE");}
    // The legacy transport-only fixture has no embedded expiry; all full packages must match the row.
    const legacy=r.flight_id==="TEST-DELIVERY-001"&&r.package_json.fixture_kind==="TRANSPORT_ONLY_NOT_NAVIGATION";
-   const embedded=Date.parse(r.package_json.expires_at);
-   if(!legacy&&(!Number.isFinite(embedded)||embedded!==Date.parse(r.expires_at))){await report("INVALID_TEST_PACKAGE");return fail(500,"INVALID_TEST_PACKAGE");}
+   const embedded=time(r.package_json.expires_at);
+   if(!legacy&&(!Number.isFinite(embedded)||embedded!==time(r.expires_at))){await report("INVALID_TEST_PACKAGE");return fail(500,"INVALID_TEST_PACKAGE");}
    // Recheck immediately before sending, including time spent reading the database.
    const finalState=state(r);if(finalState!=="READY")return fail(finalState==="FAILED"?503:409,finalState);
    return send(200,r.package_json);
