@@ -1,0 +1,11 @@
+{
+  "name": "aevpath-any-flight-test",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "24.x"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.2"
+  }
+}
