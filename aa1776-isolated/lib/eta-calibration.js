@@ -38,26 +38,36 @@ export function airborneOffsets(filedEteSeconds){
   landing_late_offset_seconds:duration+half
  };
 }
-export function etaPackage({estimatedOff=null,filedEteSeconds=null}={}){
- const duration=filedEteSeconds==null||filedEteSeconds===""?NaN:Number(filedEteSeconds);
+// Isolated Wed/Thu AA1776 only: median actual takeoff-to-touchdown time (8 scored KPHL-KBOS jobs, 14 Sep–2 Oct 2026); leave-one-out MAE 4.896 min. No flight-provider duration used on these dates.
+export const AA1776_HISTORICAL_TIMING=Object.freeze({version:"phl-bos-median-8-2026-11-25",seconds:3282,sample_count:8});
+export function aa1776Timing(flight,flightDate){
+ if(["2026-11-25","2026-11-26"].includes(flightDate)){
+  if(flight?.origin!=="KPHL"||flight?.destination!=="KBOS"||! /^(?:AAL|AA)1776$/.test(String(flight?.ident_icao||flight?.ident||"").toUpperCase()))return {seconds:null,historical:true};
+  return {seconds:AA1776_HISTORICAL_TIMING.seconds,historical:true};
+ }
+ return {seconds:Number(flight?.filed_ete),historical:false};
+}
+export function etaPackage({estimatedOff=null,filedEteSeconds=null,historicalAirborneSeconds=null}={}){
+ const historical=historicalAirborneSeconds!==null;
+ const duration=historical?Number(historicalAirborneSeconds):(filedEteSeconds==null||filedEteSeconds===""?NaN:Number(filedEteSeconds));
  const validDuration=Number.isFinite(duration)&&duration>0;
  const preCenter=estimatedOff&&validDuration?addSeconds(estimatedOff,duration):null;
  return{
-  calibration_version:ETA_CALIBRATION.version,
-  baseline_source:ETA_CALIBRATION.baseline_source,
+  calibration_version:historical?AA1776_HISTORICAL_TIMING.version:ETA_CALIBRATION.version,
+  baseline_source:historical?"HISTORICAL_ROUTE_MEDIAN":ETA_CALIBRATION.baseline_source,
   duration_seconds:validDuration?duration:null,
   semantics:"LANDING_NOT_GATE_ARRIVAL",
   predeparture:{
    landing_time_center:preCenter,
    landing_window:preCenter?windowAround(preCenter,ETA_CALIBRATION.predeparture.half_width_minutes):null,
    half_width_minutes:ETA_CALIBRATION.predeparture.half_width_minutes,
-   center_rule:ETA_CALIBRATION.predeparture.center_rule,
-   validated_coverage:ETA_CALIBRATION.predeparture.validation_coverage
+   center_rule:historical?"estimated_off_plus_historical_duration":ETA_CALIBRATION.predeparture.center_rule,
+   validated_coverage:historical?null:ETA_CALIBRATION.predeparture.validation_coverage
   },
   airborne:{
-   center_rule:ETA_CALIBRATION.airborne.center_rule,
+   center_rule:historical?"detected_takeoff_plus_historical_duration":ETA_CALIBRATION.airborne.center_rule,
    half_width_minutes:ETA_CALIBRATION.airborne.half_width_minutes,
-   validated_coverage:ETA_CALIBRATION.airborne.validation_coverage,
+   validated_coverage:historical?null:ETA_CALIBRATION.airborne.validation_coverage,
    relative_to_detected_takeoff:validDuration?airborneOffsets(duration):null
   }
  };
