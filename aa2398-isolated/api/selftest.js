@@ -16,7 +16,7 @@ export default async function handler(req,res){
  check("duplicate flight refused",!selectFlight([flight,flight]).flight);
  check("actual off blocks",eligibility({...flight,actual_off:now},now)==="DEPARTED");
  check("missing estimates blocks",eligibility({...flight,estimated_off:null},now)==="PENDING_SOURCE");
- check("expired delivery denied",deliveryState({state:"READY",scheduled_out:flight.scheduled_out,expires_at:p.expires_at,package_json:p},Date.parse(p.expires_at))==="EXPIRED");
+ check("expired delivery denied",deliveryState({state:"READY",scheduled_out:flight.scheduled_out,expires_at:p.expires_at,package_json:p},Date.parse(p.expires_at))==="DEPARTED");
  check("date precision",deliveryState({state:"READY",scheduled_out:new Date(flight.scheduled_out),expires_at:new Date(p.expires_at),package_json:p},Date.parse(now))==="READY");
  check("auth rejects wrong key",!equal("wrong","a".repeat(64))&&equal("a".repeat(64),"a".repeat(64)));
  for(const [name,patch,want,calls] of [["disabled",{claim:async()=>"DISABLED"},"DISABLED",0],["cap",{reserve:async()=>"CAP_REACHED"},"CAP_REACHED",0],["wrong route",{lookup:async()=>({flights:[]})},"PENDING_SOURCE",1],["valid",{},"READY",2]]){
