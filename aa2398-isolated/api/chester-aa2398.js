@@ -8,7 +8,7 @@ export default async function handler(req,res){
  if(date!=="2026-11-27"||!["status","package"].includes(mode))return reply(res,400,{error:"AA1776_DATE_OR_MODE_INVALID"});
  let sql;
  try{
- sql=neon(process.env.AA2398_DELIVERY_URL);const [r]=await sql`SELECT * FROM aa2398.delivery`;
+ sql=neon(process.env.VERCEL_ENV==='preview'&&process.env.AA2398_LIFECYCLE_DELIVERY_URL?process.env.AA2398_LIFECYCLE_DELIVERY_URL:process.env.AA2398_DELIVERY_URL);const [r]=await sql`SELECT * FROM aa2398.delivery`;
  const raw=deliveryState(r),state=raw==="READY"?"SELLABLE":raw==="DEPARTED"||raw==="CANCELLED"?raw:"PENDING_ROUTE";
  const again=new Date(Date.now()+15*60000).toISOString();
  if(!r?.flight_id)return reply(res,202,{status:"PENDING_ROUTE",sale_state:"PENDING_ROUTE",sellable:false,flight_date:date,check_again_after:again});
