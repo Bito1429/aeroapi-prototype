@@ -20,7 +20,7 @@ export function makeDelivery({read,rate,secret,alert=()=>{},clock=()=>Date.now()
   if(req.method!=="GET")return fail(405,"METHOD_NOT_ALLOWED");
   const q=req.query||{};
   const state=r=>r.state==="CANCELLED"||r.state==="FAILED"?r.state:r.state==="DEPARTED"||Date.parse(r.scheduled_out)<=clock()?"DEPARTED":Date.parse(r.expires_at)<=clock()?"EXPIRED":r.state;
-  const summary=r=>({flight_id:r.flight_id,ident:r.ident,origin:r.origin,destination:r.destination,scheduled_out:r.scheduled_out,sale_state:state(r),sellable:state(r)==="READY",package_url:"/api/chester-package?flight_id="+encodeURIComponent(r.flight_id)});
+  const summary=r=>({flight_id:r.flight_id,ident:r.ident,origin:r.origin,destination:r.destination,scheduled_out:r.scheduled_out,sale_state:state(r),sellable:false,test_only:true,downloadable:state(r)==="READY",package_url:"/api/chester-package?flight_id="+encodeURIComponent(r.flight_id)});
   try{
    if(kind==="search"){
     const filters={};for(const [k,pattern] of Object.entries({ident:/^[A-Z0-9]{1,16}$/,origin:/^K[A-Z]{3}$/,destination:/^K[A-Z]{3}$/})){if(q[k]!==undefined){if(typeof q[k]!=="string"||!pattern.test(q[k].toUpperCase()))return fail(400,"INVALID_SEARCH");filters[k]=q[k].toUpperCase();}}
