@@ -48,6 +48,10 @@
     {
       "path": "/api/purge",
       "schedule": "0 11 27 11 *"
+    },
+    {
+      "path": "/api/score",
+      "schedule": "*/15 * 25-27 11 *"
     }
   ],
   "functions": {
@@ -56,6 +60,9 @@
     },
     "api/purge.js": {
       "maxDuration": 30
+    },
+    "api/score.js": {
+      "maxDuration": 60
     }
   }
 }
