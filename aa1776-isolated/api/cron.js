@@ -142,8 +142,11 @@ export default async function handler(req,res){
   if(today!==date||!inCollectionWindow(date,nowIso))
    return deny(res,403,"COLLECTION_WINDOW_CLOSED",{flight_date:date});
   const prior=await sql`select state,reason,last_checked_at from aa1776_planb_state where flight_date=${date}::date`;
-  const budget=await sql`select request_count from aa1776_planb_budget where usage_date=${today}::date`;
-  const retry=paidCheckDecision({state:prior[0]?.state,lastCheckedAt:prior[0]?.last_checked_at,now:nowIso,requestCount:budget[0]?.request_count||0});
+  // Score requests count against the actual UTC day but must not suppress the next flight 16:00 collection check.
+  const budget=await sql`select b.request_count,(select count(*)::int from aa1776_planb_scores s where s.request_date=${today}::date and s.reserved_mills>0) as score_requests from aa1776_planb_budget b where b.usage_date=${today}::date`;
+  const totalRequests=Number(budget[0]?.request_count||0);
+  const collectionRequests=Math.max(0,totalRequests-Number(budget[0]?.score_requests||0));
+  const retry=paidCheckDecision({state:prior[0]?.state,lastCheckedAt:prior[0]?.last_checked_at,now:nowIso,requestCount:collectionRequests});
   if(retry==="DAILY_REQUEST_CAP_REACHED")
    return deny(res,429,retry,{flight_date:date,provider_calls:0});
   if(retry!=="CHECK_ROUTE")
