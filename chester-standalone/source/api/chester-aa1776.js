@@ -18,6 +18,19 @@ export default async function handler(req,res){
    sellable:false,flight_date:date,check_again_after:new Date(Date.now()+15*60000).toISOString()});
   const state=aa1776SaleState(row);
   if(mode==="status")return json(res,200,{flight_date:date,...aa1776Summary(row)});
+  // One-off authenticated replay: 24 Nov only, direct package endpoint, until midnight UTC.
+  const replayNow=Date.now();
+  const pkg=row.package_json;
+  if(date==="2026-11-24"&&mode==="package"&&state==="DEPARTED"&&
+     replayNow<Date.parse("2026-11-26T00:00:00Z")&&
+     row.upstream_state==="READY"&&
+     Date.parse(row.scheduled_out)<=replayNow&&
+     Date.parse(row.expires_at)>replayNow&&Date.parse(pkg?.expires_at)>replayNow&&
+     row.fa_flight_id==="AAL1776-1795337810-airline-1217p"&&
+     pkg?.flight_id===row.fa_flight_id&&pkg?.schema==="aevpath.package.v1"&&pkg?.market==="US"&&
+     String(pkg?.flight?.scheduled_departure||"").slice(0,10)==="2026-11-24"&&
+     pkg?.flight?.origin?.icao==="KPHL"&&pkg?.flight?.destination?.icao==="KBOS")
+   return json(res,200,pkg);
   if(state==="DEPARTED"||state==="CANCELLED")
    return json(res,409,{status:state,sale_state:state,sellable:false,flight_date:date});
   if(state!=="SELLABLE")
