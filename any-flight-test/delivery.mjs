@@ -19,7 +19,14 @@ export function makeDelivery({read,rate,secret,alert=()=>{},clock=()=>Date.now()
   }catch{await report("RATE_CONTROL_FAILED");return fail(503,"RATE_CONTROL_FAILED");}
   if(req.method!=="GET")return fail(405,"METHOD_NOT_ALLOWED");
   const q=req.query||{};
-  const state=r=>r.state==="CANCELLED"||r.state==="FAILED"?r.state:r.state==="DEPARTED"||Date.parse(r.scheduled_out)<=clock()?"DEPARTED":Date.parse(r.expires_at)<=clock()?"EXPIRED":r.state;
+  const state=r=>{
+   const now=clock(),expires=Date.parse(r.expires_at),out=Date.parse(r.scheduled_out);
+   if(!Number.isFinite(now)||!Number.isFinite(expires)||!Number.isFinite(out)||expires<=out)return "FAILED";
+   if(expires<=now)return "EXPIRED";
+   if(r.state==="CANCELLED"||r.state==="FAILED")return r.state;
+   if(r.state==="DEPARTED"||out<=now)return "DEPARTED";
+   return r.state==="READY"||r.state==="PENDING_ROUTE"?r.state:"FAILED";
+  };
   const summary=r=>({flight_id:r.flight_id,ident:r.ident,origin:r.origin,destination:r.destination,scheduled_out:r.scheduled_out,sale_state:state(r),sellable:false,test_only:true,downloadable:state(r)==="READY",package_url:"/api/chester-package?flight_id="+encodeURIComponent(r.flight_id)});
   try{
    if(kind==="search"){
@@ -32,6 +39,12 @@ export function makeDelivery({read,rate,secret,alert=()=>{},clock=()=>Date.now()
    const s=state(r);if(s==="PENDING_ROUTE")return send(202,{status:s,sellable:false,request_id:id});
    if(s!=="READY")return fail(s==="FAILED"?503:409,s);
    if(r.package_json?.schema!=="aevpath.package.v1"||r.package_json?.market!=="US"||r.package_json?.flight_id!==r.flight_id||r.package_json?.test_only!==true){await report("INVALID_TEST_PACKAGE");return fail(500,"INVALID_TEST_PACKAGE");}
+   // The legacy transport-only fixture has no embedded expiry; all full packages must match the row.
+   const legacy=r.flight_id==="TEST-DELIVERY-001"&&r.package_json.fixture_kind==="TRANSPORT_ONLY_NOT_NAVIGATION";
+   const embedded=Date.parse(r.package_json.expires_at);
+   if(!legacy&&(!Number.isFinite(embedded)||embedded!==Date.parse(r.expires_at))){await report("INVALID_TEST_PACKAGE");return fail(500,"INVALID_TEST_PACKAGE");}
+   // Recheck immediately before sending, including time spent reading the database.
+   const finalState=state(r);if(finalState!=="READY")return fail(finalState==="FAILED"?503:409,finalState);
    return send(200,r.package_json);
   }catch{await report("DELIVERY_READ_FAILED");return fail(503,"DELIVERY_READ_FAILED");}
  };
