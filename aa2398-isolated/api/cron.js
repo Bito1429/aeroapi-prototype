@@ -14,7 +14,7 @@ export default async function handler(req,res){
  try{const [c]=await sql`SELECT aa2398.claim_slot() AS result`;if(c.result==="DISABLED"){await sql`SELECT aa2398.record_event('PRODUCTION_CRON_DRY_RUN','DRY_RUN',true)`;return reply(res,200,{status:"DRY_RUN_PASS",providerCalls:0});}return reply(res,200,{status:"OUTSIDE_WINDOW",providerCalls:0});}catch{console.error("AA2398_DRY_RUN_FAILED");return reply(res,503,{status:"DRY_RUN_FAILED",providerCalls:0});}
  }
  async function provider(path,params={}){
-  if(!key)throw Error("PROVIDER_NOT_CONFIGURED");
+  if(!key)throw Error("PROVIDER_NOT_CONFIGURED");if(!(await sql`SELECT aa2398.provider_allowed_now() AS allowed`)[0].allowed)throw Error("PROVIDER_GATE_CLOSED");
   const url=new URL("https://aeroapi.flightaware.com/aeroapi"+path);
   for(const [k,v] of Object.entries(params))url.searchParams.set(k,v);
   const r=await fetch(url,{headers:{"x-apikey":key},redirect:"error",signal:AbortSignal.timeout(8000),cache:"no-store"});
