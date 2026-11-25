@@ -3,7 +3,7 @@ res.setHeader("cache-control","no-store");
 if(req.method!=="GET"||process.env.VERCEL_ENV!=="preview")return res.status(404).json({error:"NOT_AVAILABLE"});
 const key=process.env.ANY_FLIGHT_TEST_KEY,bypass=process.env.ANY_FLIGHT_AUTOMATION_BYPASS;
 if(!key||!bypass)return res.status(503).json({error:"TEST_ENV_MISSING"});
-const base="https://aevpath-us-any-flight-test-20yuacmrh-benitogaldo-5827.vercel.app",id="TEST-FULL-DELIVERY-002";
+const base="https://aevpath-us-any-flight-test-11ci49yug-benitogaldo-5827.vercel.app",id="TEST-FULL-DELIVERY-002";
 const paths=["/api/chester-search?ident=TEST002","/api/chester-details?flight_id="+id,"/api/chester-package?flight_id="+id];
 const cases=[];
 for(let i=0;i<paths.length;i++){
