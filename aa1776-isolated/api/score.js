@@ -44,7 +44,7 @@ export default async function handler(req,res){
     returning s.flight_date,s.fa_flight_id,s.actual_off,s.actual_on
    ), reservation as (
     insert into aa1776_planb_budget(usage_date,reserved_mills,request_count)
-    select ${today}::date,${SCORE_RESERVATION_MILLS},1 from claim
+    select ${today}::date,${SCORE_RESERVATION_MILLS},1 from claim where true
     on conflict(usage_date) do update set
      reserved_mills=aa1776_planb_budget.reserved_mills+excluded.reserved_mills,
      request_count=aa1776_planb_budget.request_count+1,updated_at=now()
