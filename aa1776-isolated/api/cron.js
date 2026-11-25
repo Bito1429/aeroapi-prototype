@@ -4,7 +4,7 @@
 import{timingSafeEqual}from"node:crypto";
 import{aero,flightView,canonicalize,json}from"../lib/lib.js";
 import{db}from"../lib/db.js";
-import{etaPackage}from"../lib/eta-calibration.js";
+import{etaPackage,aa1776Timing}from"../lib/eta-calibration.js";
 import{modelFiledTimeline}from"../lib/filed-timeline.js";
 import{toChesterV1}from"../lib/chester-schema.js";
 import{inCollectionWindow,isTargetDate,selectAA1776,saleDecision,routeValid,LOOKUP_RESERVATION_MILLS,ROUTE_RESERVATION_MILLS,MAX_DAILY_RESERVED_MILLS,MAX_DAILY_PROVIDER_REQUESTS,paidCheckDecision,aa1776PackageExpiresAt}from"../lib/aa1776-policy.js";
@@ -43,8 +43,9 @@ async function mark(sql,date,state,code,flightId=null){
  ready_at=case when excluded.state='READY' then now() else aa1776_planb_state.ready_at end`;
 }
 // Validate required provider fields before spending on the route endpoint.
-export function checkFlightFields(f){
+export function checkFlightFields(f,flightDate){
  const flight=flightView(f);
+ const timing=aa1776Timing(flight,flightDate);
  const fields={
   "flight.id":flight.fa_flight_id,
   "flight.ident_icao":flight.ident_icao,
@@ -53,7 +54,7 @@ export function checkFlightFields(f){
   "flight.scheduled_arrival":flight.scheduled_on,
   "flight.estimated_out":flight.estimated_out,
   "flight.estimated_off":flight.estimated_off,
-  "flight.filed_ete":flight.filed_ete,
+  [timing.historical?"flight.historical_airborne_duration":"flight.filed_ete"]:timing.seconds,
   "flight.airline":flight.airline?.code&&flight.airline?.name,
   "flight.aircraft_type":flight.aircraft_type
  };
@@ -63,8 +64,8 @@ export function checkFlightFields(f){
  for(const name of ["scheduled_out","scheduled_on","estimated_out","estimated_off"])
   if(!Number.isFinite(Date.parse(flight[name])))
    return {ok:false,reason:"CHESTER_REQUIRED_FIELD:flight."+name};
- if(!Number.isFinite(Number(flight.filed_ete))||Number(flight.filed_ete)<=0)
-  return {ok:false,reason:"CHESTER_REQUIRED_FIELD:flight.filed_ete"};
+ if(!Number.isFinite(timing.seconds)||timing.seconds<=0)
+  return {ok:false,reason:timing.historical?"CHESTER_REQUIRED_FIELD:flight.historical_airborne_duration":"CHESTER_REQUIRED_FIELD:flight.filed_ete"};
  for(const name of ["origin_airport","destination_airport"]){
   const a=flight[name];
   if(!a?.code_iata||!a?.code_icao||!a?.name||!a?.timezone||
@@ -74,11 +75,12 @@ export function checkFlightFields(f){
  return {ok:true};
 }
 export function packageFromLive(f,protocol,nowIso,flightDate){
- const validation=checkFlightFields(f);
+ const validation=checkFlightFields(f,flightDate);
  if(!validation.ok)throw Object.assign(Error(validation.reason),{httpStatus:202});
  const flight=flightView(f);
  const estimatedOff=flight.estimated_off;
- const duration=Number(flight.filed_ete);
+ const timing=aa1776Timing(flight,flightDate);
+ const duration=timing.seconds;
  if(!estimatedOff||!Number.isFinite(Date.parse(estimatedOff))||
     !flight.estimated_out||!Number.isFinite(Date.parse(flight.estimated_out))||
     !Number.isFinite(duration)||duration<=0||
@@ -99,7 +101,7 @@ export function packageFromLive(f,protocol,nowIso,flightDate){
    airline:flight.airline,aircraft_type:flight.aircraft_type
   },
   route:{distance_km:routeKm,fixes:routePoints,resolver_sanity:{ok:true},timeline},
-  eta:etaPackage({estimatedOff,filedEteSeconds:duration})
+  eta:etaPackage(timing.historical?{estimatedOff,historicalAirborneSeconds:duration}:{estimatedOff,filedEteSeconds:duration})
  };
  const expiresAt=aa1776PackageExpiresAt(flightDate,flight.scheduled_on);
  return toChesterV1(draft,{
@@ -169,7 +171,7 @@ export default async function handler(req,res){
     {sale_state:decision,sellable:false,flight_date:date});
   }
   stage="FIELD_VALIDATION";
-  const preflight=checkFlightFields(f);
+  const preflight=checkFlightFields(f,date);
   if(!preflight.ok){
    await mark(sql,date,"PENDING_SOURCE",preflight.reason,f.fa_flight_id);
    return deny(res,202,"PENDING_SOURCE",{flight_date:date,reason:preflight.reason});
