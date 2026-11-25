@@ -1,5 +1,5 @@
-import { timingSafeEqual,randomUUID } from "node:crypto";
-export function makeDelivery({read,secret,alert=()=>{},clock=()=>Date.now()}){
+import { timingSafeEqual,randomUUID,createHmac } from "node:crypto";
+export function makeDelivery({read,rate,secret,alert=()=>{},clock=()=>Date.now()}){
  return kind=>async(req,res)=>{
   const id=randomUUID();
   const send=(status,body)=>{res.statusCode=status;res.setHeader("content-type","application/json; charset=utf-8");res.setHeader("cache-control","private, no-store");res.setHeader("x-request-id",id);res.end(JSON.stringify(body));};
@@ -8,6 +8,14 @@ export function makeDelivery({read,secret,alert=()=>{},clock=()=>Date.now()}){
   const supplied=req.headers?.["x-aevpath-key"];
   const a=Buffer.from(typeof supplied==="string"&&supplied.length<=256?supplied:""),b=Buffer.from(secret);
   if(a.length!==b.length||!timingSafeEqual(a,b))return fail(401,"CHESTER_UNAUTHORIZED");
+  // One shared key bucket across all delivery endpoints. Never store the key or client IP.
+  try{
+   if(typeof rate!=="function")throw Error("RATE_NOT_CONFIGURED");
+   const client=createHmac("sha256",secret).update("any-flight-delivery-client-v1").digest("hex");
+   const decision=await rate(client);
+   if(decision==="CLIENT_RATE_LIMIT"||decision==="GLOBAL_RATE_LIMIT"){res.setHeader("retry-after","60");return fail(429,"RATE_LIMIT");}
+   if(decision!=="ALLOWED")throw Error("RATE_DECISION_INVALID");
+  }catch{try{alert({code:"RATE_CONTROL_FAILED",request_id:id,component:kind});}catch{}return fail(503,"RATE_CONTROL_FAILED");}
   if(req.method!=="GET")return fail(405,"METHOD_NOT_ALLOWED");
   const q=req.query||{};
   const state=r=>r.state==="CANCELLED"||r.state==="FAILED"?r.state:r.state==="DEPARTED"||Date.parse(r.scheduled_out)<=clock()?"DEPARTED":Date.parse(r.expires_at)<=clock()?"EXPIRED":r.state;
