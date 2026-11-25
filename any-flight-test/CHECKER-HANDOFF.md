@@ -1,0 +1,8 @@
+# Austen official checker — isolated US Any Flight
+Status: awaiting confirmed official checker link/version and invocation instructions. Do not infer checker success from internal tests.
+## Inputs
+Use protected preview GET /api/route-retention-selftest to obtain two synthetic complete route versions (versions[0], versions[1]); GET /api/synthetic-package-selftest for a fresh complete fallback package. GET /api/package-builder-selftest checks both timing branches but returns metrics only. Use only synthetic TEST- IDs. Save each complete JSON object as a separate input file in a private temporary workspace. Do not send credentials, raw provider data, or production packages. Keep test_only and candidate_metadata intact; if the official schema rejects extra properties, record the actual rejection, not a fabricated pass.
+## Execution
+Confirm the supplied checker version, source/hash and documented command. Inspect code for network access or writes before running. Run locally or in isolated environment without provider credentials, no external upload unless specifically approved. Record exact command, checker version/hash, exit code, stdout/stderr and per-package errors. Do not mark conformance until the actual checker passes. Check short/long cases, history/fallback timing, route revision and expiry. More synthetic cases can be generated if checker requires them.
+## Known limitations
+Movement is illustrative constant speed, corridor uncalibrated, synthetic waypoints; no commercial approval. Checker conformance is not accuracy or licence approval. No real data, no sale, no change to Chester/AA1776/main US/Europe. External alert delivery is not verified.
