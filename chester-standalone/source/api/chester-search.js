@@ -29,7 +29,7 @@ export default async function handler(req,res){
   // No invented flight/date and no provider call from Chester.
   if((!ident||ident==="AA1776"||ident==="AAL1776")&&(!origin||origin==="KPHL")&&(!destination||destination==="KBOS")){
    const now=Date.now();
-   for(const day of ["2026-11-24","2026-11-26"]){
+   for(const day of ["2026-11-24","2026-11-25","2026-11-26"]){
     const a=await aa1776ByDate(sql,day);
     if(!a)continue;
     const out=Date.parse(a.scheduled_out);
