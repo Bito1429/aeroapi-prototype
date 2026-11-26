@@ -176,6 +176,16 @@ export default async function handler(req,res){
   const f=selected.flight; flightId=f.fa_flight_id||null;
   stage="SALE_DECISION";
   if(refresh&&flightId!==priorRow.fa_flight_id)return rejectRefresh(sql,res,date,"FLIGHT_ID_CHANGED");
+  // Internal Method A evidence, never part of the Chester package. Record before
+  // route validation, even if the route request fails or take-off is confirmed.
+  if(date==="2026-11-26"){
+   stage="METHOD_A_OBSERVATION";
+   const isoOrNull=v=>typeof v==="string"&&Number.isFinite(Date.parse(v))?new Date(v).toISOString():null;
+   const filedEte=Number.isSafeInteger(f.filed_ete)&&f.filed_ete>0?f.filed_ete:null;
+   const actualOff=isoOrNull(f.actual_off);
+   const observation={kind:"METHOD_A_OBSERVATION",filed_ete_seconds:filedEte,estimated_off:isoOrNull(f.estimated_off),actual_off:actualOff&&Date.parse(actualOff)<=Date.parse(nowIso)?actualOff:null};
+   await sql`insert into aa1776_planb_cron_runs(flight_date,phase,detail) values(${date}::date,'CHECK_STARTED',${JSON.stringify(observation)})`;
+  }
   if(refresh){
    const rd=refreshDecision(f,nowIso);
    if(rd==="CANCELLED"||rd==="FROZEN"){
