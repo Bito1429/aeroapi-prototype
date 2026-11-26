@@ -29,7 +29,7 @@ async function reserve(sql,date,mills,kind){
  request_count=aa1776_planb_budget.request_count+1,
  updated_at=now()
  where aa1776_planb_budget.reserved_mills+excluded.reserved_mills<=${MAX_DAILY_RESERVED_MILLS}
- and aa1776_planb_budget.request_count<${MAX_DAILY_PROVIDER_REQUESTS-1}
+ and aa1776_planb_budget.request_count<${MAX_DAILY_PROVIDER_REQUESTS-(date==="2026-11-26"?2:1)}
  returning reserved_mills,request_count`;
  if(!rows.length)throw Object.assign(Error("DAILY_BUDGET_OR_REQUEST_CAP_REACHED"),{httpStatus:429});
  return rows[0]; // Reserve even on provider errors (never refund).
@@ -258,7 +258,7 @@ export default async function handler(req,res){
   const reason=stage+(providerStatus?"_HTTP_"+providerStatus:"_ERROR");
   console.error("AA1776_CHECK_FAILED",reason);
   if(sql&&!code.startsWith("DAILY_")){
-   if(!refresh)try{await mark(sql,date,"PENDING_SOURCE",reason,flightId);}catch{}
+   if(!refresh)try{await sql`update aa1776_planb_state set state='PENDING_SOURCE',reason=${reason},last_checked_at=now() where flight_date=${date}::date and state not in ('READY','DEPARTED','CANCELLED') and not exists(select 1 from aa1776_planb_relay where flight_date=${date}::date)`;}catch{}
    try{await sql`insert into aa1776_planb_cron_runs(flight_date,phase,detail) values(${date}::date,'CHECK_FAILED',${reason})`;}catch{}
   }
   return deny(res,status,code.startsWith("DAILY_")?code:"AA1776_CHECK_FAILED");
