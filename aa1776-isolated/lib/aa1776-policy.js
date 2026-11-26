@@ -19,8 +19,8 @@ const EARLY_START="T16:00:00Z", EARLY_END="T16:10:00Z";
 const EVENING_START="T19:00:00Z";
 const EVENING_ENDS={"2026-11-24":"T21:18:00Z","2026-11-25":"T23:48:00Z","2026-11-26":"T21:18:00Z"};
 // Pure retry gate. Every no-call outcome is checkable with zero provider access.
-export function paidCheckDecision({state,lastCheckedAt,now,requestCount=0}={}){
- if(["READY","DEPARTED","CANCELLED"].includes(state))return"TERMINAL_STATE";
+export function paidCheckDecision({state,lastCheckedAt,now,requestCount=0,refresh=false}={}){
+ if(state==="CANCELLED"||(!refresh&&["READY","DEPARTED"].includes(state)))return"TERMINAL_STATE";
  const t=Date.parse(lastCheckedAt||""),n=Date.parse(now||"");
  const evening=Number.isFinite(n)&&(new Date(n).getUTCHours()>=19||(new Date(n).toISOString().slice(0,10)==="2026-11-26"&&new Date(n).getUTCHours()===18&&new Date(n).getUTCMinutes()>=30));
  const gap=evening?EVENING_RETRY_INTERVAL_MS:MIN_RETRY_INTERVAL_MS;
@@ -85,4 +85,13 @@ export function aa1776PackageExpiresAt(flightDate,scheduledArrival){
  if(!Number.isFinite(arrivalMs))throw Error("SCHEDULED_ARRIVAL_REQUIRED");
  if(flightDate==="2026-11-26")return new Date(arrivalMs+12*60*60*1000).toISOString();
  return new Date(Math.floor(arrivalMs/86400000)*86400000+86400000).toISOString();
+}
+
+// Refresh policy is limited to the 26 November isolated run. Gate-out closes sales; takeoff freezes the route.
+export function refreshDecision(f,now){
+ const n=Date.parse(now),off=Date.parse(f?.estimated_off||"");
+ if(f?.cancelled||/cancel/i.test(String(f?.status||"")))return "CANCELLED";
+ if(f?.actual_off||/en.?route|airborne|arriv|landed/i.test(String(f?.status||""))||(Number.isFinite(off)&&n>=off))return "FROZEN";
+ if(!Number.isFinite(n)||!Number.isFinite(off))return "REJECTED";
+ return "CHECK_ROUTE";
 }
