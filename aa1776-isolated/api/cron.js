@@ -144,7 +144,7 @@ export default async function handler(req,res){
   const prior=await sql`select s.state,s.reason,s.last_checked_at,r.package_json,r.source_captured_at,r.fa_flight_id,r.scheduled_out from aa1776_planb_state s left join aa1776_planb_relay r using(flight_date) where s.flight_date=${date}::date`;
   priorRow=prior[0];
   refresh=date==="2026-11-26"&&!!priorRow?.package_json&&["READY","DEPARTED"].includes(priorRow.state);
-  if(refresh&&(priorRow.reason==="ROUTE_FROZEN"||Date.parse(nowIso)>=Date.parse(priorRow.package_json.eta.departure.estimated_off)))return json(res,200,{ok:true,skipped:"ROUTE_FROZEN",provider_calls:0});
+  if(refresh&&priorRow.reason==="ROUTE_FROZEN")return json(res,200,{ok:true,skipped:"ROUTE_FROZEN",provider_calls:0});
   // Score requests count against the actual UTC day but must not suppress the next flight 16:00 collection check.
   const budget=await sql`select b.request_count,(select count(*)::int from aa1776_planb_scores s where s.request_date=${today}::date and s.reserved_mills>0) as score_requests from aa1776_planb_budget b where b.usage_date=${today}::date`;
   const totalRequests=Number(budget[0]?.request_count||0);
@@ -237,7 +237,7 @@ export default async function handler(req,res){
    const old=priorRow.package_json;
    const same=JSON.stringify(old.route.line)===JSON.stringify(derived.route.line)&&Date.parse(old.eta.departure.estimated_off)===Date.parse(derived.eta.departure.estimated_off)&&Date.parse(old.flight.estimated_out)===Date.parse(derived.flight.estimated_out);
    if(same){await sql`insert into aa1776_planb_cron_runs(flight_date,phase,detail) values(${date}::date,'REFRESH_UNCHANGED','PACKAGE_RETAINED')`;return json(res,200,{ok:true,status:"REFRESH_UNCHANGED",package_version:old.package_version});}
-   const changed=await sql`update aa1776_planb_relay r set source_captured_at=${nowIso}::timestamptz,package_json=${JSON.stringify(derived)}::jsonb,expires_at=${derived.expires_at}::timestamptz,updated_at=now() where flight_date=${date}::date and fa_flight_id=${flightId} and source_captured_at=${priorRow.source_captured_at}::timestamptz and now()<least((r.package_json#>>'{eta,departure,estimated_off}')::timestamptz,${derived.eta.departure.estimated_off}::timestamptz) and exists(select 1 from aa1776_planb_state s where s.flight_date=r.flight_date and s.state in ('READY','DEPARTED') and s.reason is distinct from 'ROUTE_FROZEN') and r.scheduled_out=${f.scheduled_out}::timestamptz returning flight_date`;
+   const changed=await sql`update aa1776_planb_relay r set source_captured_at=${nowIso}::timestamptz,package_json=${JSON.stringify(derived)}::jsonb,expires_at=${derived.expires_at}::timestamptz,updated_at=now() where flight_date=${date}::date and fa_flight_id=${flightId} and source_captured_at=${priorRow.source_captured_at}::timestamptz and exists(select 1 from aa1776_planb_state s where s.flight_date=r.flight_date and s.state in ('READY','DEPARTED') and s.reason is distinct from 'ROUTE_FROZEN') and r.scheduled_out=${f.scheduled_out}::timestamptz returning flight_date`;
    if(!changed.length)return rejectRefresh(sql,res,date,"ATOMIC_SWAP_GUARD");
    await sql`insert into aa1776_planb_cron_runs(flight_date,phase,detail) values(${date}::date,'REFRESH_CHANGED','VALIDATED_PACKAGE_REPLACED')`;
    return json(res,200,{ok:true,status:"REFRESH_CHANGED",package_version:derived.package_version});
