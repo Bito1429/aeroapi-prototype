@@ -39,7 +39,7 @@
     },
     {
       "path": "/api/cron",
-      "schedule": "0,15 21 26 11 *"
+      "schedule": "0,15,30 21 26 11 *"
     },
     {
       "path": "/api/purge",
