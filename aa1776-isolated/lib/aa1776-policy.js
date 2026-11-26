@@ -91,7 +91,8 @@ export function aa1776PackageExpiresAt(flightDate,scheduledArrival){
 export function refreshDecision(f,now){
  const n=Date.parse(now),off=Date.parse(f?.estimated_off||"");
  if(f?.cancelled||/cancel/i.test(String(f?.status||"")))return "CANCELLED";
- if(f?.actual_off||/en.?route|airborne|arriv|landed/i.test(String(f?.status||""))||(Number.isFinite(off)&&n>=off))return "FROZEN";
+ const actual=Date.parse(f?.actual_off||"");
+ if((Number.isFinite(actual)&&Number.isFinite(n)&&actual<=n)||/en.?route|airborne|arriv|landed/i.test(String(f?.status||"")))return "FROZEN";
  if(!Number.isFinite(n)||!Number.isFinite(off))return "REJECTED";
  return "CHECK_ROUTE";
 }
